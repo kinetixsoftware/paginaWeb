@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../css/FAQ-pagina-cliente.css">
+<title>Preguntas Frecuentes</title>
+</head>
+
+<body>
+  <!-- Menu -->
+  <nav class="menu">
+    <div class="menu-content">
+      <div class="menu-logo">
+        <img src="../../imagenes/Logo1.png" alt="Logo Kinetix">
+      </div>
+
+            <ul>
+        <li><a href="..\en\home.html">Home</a></li>
+        <li><a href="..\en\FAQ-pagina-cliente-en.html">FAQ</a></li>
+        <li><a href="..\en\pagina-de-tickets-tecnico-en.html">Tickets</a></li>
+        <li><a href="..\en\inventario-en.html">Inventory</a></li>
+        <li><a href="Login.html">My Account</a></li>
+                   
+             <input type="checkbox" id="langToggle" checked>
+          <label for="langToggle" class="switch">
+              <span class="lang left" style="color:black;">🇪🇸</span>
+              <span class="lang right" style="color:black;">🇺🇸</span>
+              <span class="slider"></span>
+          </label>
+
+          <script>
+            const toggle = document.getElementById("langToggle");
+            if (toggle) {
+              toggle.addEventListener("change", function () {
+                setTimeout(() => {
+                  window.location.href = this.checked ? "../en/FAQ-pagina-cliente-en.html" : "../es/FAQ-pagina-cliente.html";
+                }, 300);
+              });
+            }
+          </script>
+                        <li>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
+        </li>      </ul>
+            </div>
+        </nav>
+    <div class="page">
+        <div class="container">
+            <div class="content">
+                <h1>Help center</h1>
+                <p class="subtitle">
+                Find quick answers to the most common questions about our platform.
+                </p>
+                <div class="search-box">
+                    <input id="faqSearchInput" type="text" placeholder="Type your question here..." aria-label="Search in the FAQ">
+                    <button id="faqSearchButton" type="button" style="background-color: rgb(78, 131, 0);">Search</button>
+                </div>
+                <div id="faqNoResults" class="faq-no-results" hidden>
+                    No matches found for your search.
+                </div>
+                <div class="faq">
+                    <details open>
+                        <summary>How can I reset my password?</summary>
+                        <div class="answer">
+                        To reset your password, go to the login screen, click on "Forgot your password?" and follow the instructions sent to your email.
+                        </div>
+                    </details>
+                    <details>
+                        <summary>What payment methods do you accept?</summary>
+                            <div class="answer">
+                            We accept all major credit and debit cards (Visa, Mastercard, American Express), as well as bank transfers and authorized digital payment platforms.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>How can I update my profile information?</summary>
+                            <div class="answer">
+                            Log in to your account, go to the "My Account" or "Settings" section, update the necessary fields, and make sure to save your changes before exiting.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>What should I do if the platform isn't loading correctly?</summary>
+                            <div class="answer">
+                            We recommend clearing your browser's cache, checking your internet connection, or trying to access the site from an incognito window. If the problem persists, please contact our technical team.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>How can I cancel or modify my subscription?</summary>
+                            <div class="answer">
+                            You can manage your subscription at any time from the billing panel within your account, where you will find options to upgrade, change, or cancel your plan.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>Is my personal data safe on this site?</summary>
+                            <div class="answer">
+                            Yes, we implement industry-standard security protocols and data encryption to ensure that all your personal and financial information remains completely confidential.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>Where can I view my transaction history?</summary>
+                            <div class="answer">
+                            Your entire payment history and downloadable invoices are available in the billing section of your user profile.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>Does the platform have a mobile app?</summary>
+                            <div class="answer">
+                            Currently, our website is fully optimized for mobile devices, so you can access all features directly from your phone or tablet's browser.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>How can I report a system error or bug?</summary>
+                            <div class="answer">
+                            If you encounter an error, please take a screenshot and use the support button at the bottom of this page to send us the details.
+                            </div>
+                    </details>
+                    <details>
+                        <summary>How long does it take to respond to support requests?</summary>
+                            <div class="answer">
+                            Our technical team reviews requests continuously. The estimated response time is under 24 business hours.
+                            </div>
+                    </details>
+                </div>
+                <div class="support">
+                    <h2>Still have questions?</h2>
+                    <p>
+                    If you didn't find the answer you were looking for, you can fill out a support form and an advisor will get in touch with you as soon as possible.
+                    </p>
+                    <a href="../crear-ticket/crear-ticket.html" class="btn-contacto">Contact Support</a>
+                </div>
+            </div>
+        </div>
+    </div>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const body = document.body;
+      const isDark = theme === 'dark';
+      body.classList.toggle('dark-mode', isDark);
+      body.classList.toggle('light-mode', !isDark);
+      if (themeToggle) {
+        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+      });
+    }
+
+    const faqSearchInput = document.getElementById('faqSearchInput');
+    const faqSearchButton = document.getElementById('faqSearchButton');
+    const faqNoResults = document.getElementById('faqNoResults');
+    const faqItems = Array.from(document.querySelectorAll('.faq details'));
+
+    function filterFaq() {
+      const query = faqSearchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      faqItems.forEach((item) => {
+        const summaryText = item.querySelector('summary')?.textContent.toLowerCase() || '';
+        const matches = !query || summaryText.includes(query);
+
+        item.hidden = !matches;
+        item.style.display = matches ? '' : 'none';
+
+        if (matches) visibleCount++;
+      });
+
+      faqNoResults.hidden = visibleCount !== 0;
+    }
+
+    faqSearchInput.addEventListener('input', filterFaq);
+    faqSearchButton.addEventListener('click', filterFaq);
+  </script></body>
+</html>

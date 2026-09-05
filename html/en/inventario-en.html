@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="..\css\inventario.css">
+<title>Inventory</title>
+</head>
+
+<body>
+    <!-- Menu -->
+    <nav class="menu">
+        <div class="menu-content">
+            <div class="menu-logo">
+                <img src="..\..\imagenes\Logo1.png" alt="Kinetix Logo">
+            </div>
+            <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="..\en\FAQ-pagina-cliente-en.html">FAQ</a></li>
+        <li><a href="..\en\pagina-de-tickets-tecnico-en.html">Tickets</a></li>
+        <li><a href="..\en\inventario-en.html">Inventory</a></li>
+        <li><a href="Login.html">My Account</a></li>
+                    <li>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
+        </li>      </ul>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="container">
+            <div class="header">
+                <div>
+                    <h1>Inventory</h1>
+                    <p>Select a component to view its information.</p>
+                </div>
+            </div>
+            <div class="filters">
+
+                <input id="inventorySearch" type="text" placeholder="Search component..." aria-label="Search component">
+
+                <select>
+                    <option>All categories</option>
+                    <option>Processors</option>
+                    <option>Memory</option>
+                    <option>Storage</option>
+                    <option>Graphics Cards</option>
+                    <option>Peripherals</option>
+                </select>
+
+                <select>
+                    <option>All statuses</option>
+                    <option>Available</option>
+                    <option>On loan</option>
+                    <option>Under repair</option>
+                </select>
+
+            </div>
+
+            <div class="inventory">
+
+                <a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=RAM" alt="RAM">
+                <div class="info">
+                    <h3>32GB DDR4 RAM Memory</h3>
+                    <p class="brand">Kingston Fury</p>
+                    <span class="status available"> Available </span>
+                </div>
+
+
+                </a><a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=SSD" alt="SSD">
+                <div class="info">
+                    <h3>1TB NVMe SSD</h3>
+                    <p class="brand">Kingston</p>
+                    <span class="status available"> Available </span>
+                </div>
+
+
+                </a> <a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=GPU" alt="GPU">
+                <div class="info">
+                    <h3>NVIDIA GeForce RTX 5070</h3>
+                    <p class="brand">MSI</p>
+                    <span class="status loan"> On loan </span>
+                </div>
+
+                </a> <a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=Motherboard" alt="MotherBoard">
+                <div class="info">
+                    <h3>H610M K Motherboard</h3>
+                    <p class="brand">Gigabyte</p>
+                    <span class="status loan"> On loan </span>
+                </div>
+
+                </a><a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=CPU" alt="CPU">
+                <div class="info">
+                    <h3>Intel Core 12th i7-12700F</h3>
+                    <p class="brand">Intel Graphics</p>
+                    <span class="status available">Available</span>
+                </div>
+
+                </a><a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=HDD" alt="HDD">
+                <div class="info">
+                    <h3>2TB HDD</h3>
+                    <p class="brand">Seagate</p>
+                    <span class="status available">Available</span>
+                </div>
+
+                </a><a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=Monitor" alt="Monitor">
+                <div class="info">
+                    <h3>24" 240Hz Monitor</h3>
+                    <p class="brand">Gigabyte</p>
+                    <span class="status repair">Under repair</span>
+                </div>
+                </a>
+
+                </a><a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=Mouse" alt="Mouse">
+                <div class="info">
+                    <h3>G213 Wireless Mouse</h3>
+                    <p class="brand">Logitech</p>
+                    <span class="status available">Available</span>
+                </div>
+                </a>
+
+                </a><a href="producto.html" class="card">
+                <img src="https://placehold.co/400x300?text=Keyboard" alt="Keyboard">
+                <div class="info">
+                    <h3>Redragon K552</h3>
+                    <p class="brand">Redragon</p>
+                    <span class="status repair">Under repair</span>
+                </div>
+                </a>
+            </div>
+        </div>
+    </div>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const body = document.body;
+      const isDark = theme === 'dark';
+      body.classList.toggle('dark-mode', isDark);
+      body.classList.toggle('light-mode', !isDark);
+      if (themeToggle) {
+        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+      });
+    }
+
+    const inventorySearch = document.getElementById('inventorySearch');
+    const cards = Array.from(document.querySelectorAll('.card'));
+
+    if (inventorySearch) {
+      inventorySearch.addEventListener('input', function () {
+        const query = this.value.trim().toLowerCase();
+
+        cards.forEach((card) => {
+          const text = card.textContent.toLowerCase();
+          const matches = !query || text.includes(query);
+          card.style.display = matches ? '' : 'none';
+        });
+      });
+    }
+  </script></body>
+</html>

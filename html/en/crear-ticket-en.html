@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="..\css\crear-ticket.css">
+<title>Create Ticket</title>
+</head>
+
+<body>
+  <!-- Menu -->
+  <nav class="menu">
+    <div class="menu-content">
+      <div class="menu-logo">
+        <img src="../../imagenes/Logo1.png" alt="Kinetix Logo">
+      </div>
+
+      <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="..\en\FAQ-pagina-cliente-en.html">FAQ</a></li>
+        <li><a href="..\en\pagina-de-tickets-tecnico-en.html">Tickets</a></li>
+        <li><a href="..\en\inventario-en.html">Inventory</a></li>
+        <li><a href="Login.html">My Account</a></li>
+        <div class="language-switch">
+          <input type="checkbox" id="langToggle">
+
+          <label for="langToggle" class="switch">
+              <span class="lang left">ESP</span>
+              <span class="lang right">ENG</span>
+              <span class="slider"></span>
+
+              <script> 
+                const toggle = document.getElementById("langToggle");
+
+                toggle.addEventListener("change", function () {
+                  setTimeout(() => { window.location.href = this.checked ? "../../en/open-ticket.html" : "../../es/crear=ticket/.html"; }, 300);
+                });
+              </script>
+          </label>
+        </div>
+              <li>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
+        </li>      </ul>
+    </div>
+  </nav>
+
+  <div class="page">
+      <div class="container">
+          <h1>Create Ticket</h1>
+          <p class="subtitle"> Fill out the form to submit a request to the support team. </p>
+          <form>
+              <div class="form-group">
+                  <label>Subject *</label>
+                  <input type="text" placeholder="e.g. Cannot log in">
+              </div>
+              <div class="form-group">
+                  <label>Category *</label>
+                  <select>
+                      <option>Hardware</option>
+                      <option>Software</option>
+                      <option>Network</option>
+                      <option>Email</option>
+                      <option>Other</option>
+                  </select>
+              </div>
+              <div class="form-group">
+                  <label>Priority *</label>
+                  <select>
+                      <option>Low</option>
+                      <option selected>Medium</option>
+                      <option>High</option>
+                  </select>
+              </div>
+              <div class="form-group">
+                  <label>Description *</label>
+                  <textarea placeholder="Describe the issue in detail..."></textarea>
+              </div>
+              <div class="form-group">
+                  <label>Attach file (optional)</label>
+                  <input type="file">
+              </div>
+              <div class="buttons">
+                  <button type="button" class="cancel" onclick="window.location.href='../faq/faq-pagina-cliente.html'"> Cancel </button>
+                  <button type="button" class="reiniciar" onclick="location.reload()"> Reset </button>
+                  <button type="submit" class="create"> Create Ticket </button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const body = document.body;
+      const isDark = theme === 'dark';
+      body.classList.toggle('dark-mode', isDark);
+      if (themeToggle) {
+        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      }
+    }
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const isDark = document.body.classList.contains('dark-mode');
+        applyTheme(isDark ? 'light' : 'dark');
+      });
+    }
+  </script></body>
+</html>

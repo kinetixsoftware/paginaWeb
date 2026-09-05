@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <link rel="icon" type="image/x-icon" href="../imagenes/logo1.png">
+  <!--estilo -->
+  <link rel="stylesheet" href="..\css\pagina-inicio.css">
+</head>
+
+<body>
+  <!-- Menu -->
+  <nav class="menu">
+    <div class="menu-content">
+      <div class="menu-logo">
+        <img src="..\imagenes\Logo1.png" alt="Logo Kinetix">
+      </div>
+      <ul>
+        <li><a href="FAQ-pagina-cliente-en.html">FAQ</a></li>
+        <li><a href="pagina-de-tickets-tecnico-en.html">Tickets</a></li>
+        <li><a href="inventario-en.html">Inventory</a></li>
+        <li><a href="login-en.html">My Account</a></li>
+        <div class="language-switch">
+          
+          <input type="checkbox" id="langToggle" checked>
+          <label for="langToggle" class="switch">
+              <span class="lang left" style="color:black;">🇪🇸</span>
+              <span class="lang right" style="color:black;">🇺🇸</span>
+              <span class="slider"></span>
+              
+              
+              <script> 
+                const toggle = document.getElementById("langToggle");
+
+                toggle.addEventListener("change", function () {
+                  setTimeout(() => { window.location.href = this.checked ? "../en/home.html" : "../es/inicio.html"; }, 300);
+                });
+              </script>
+          </label>
+        </div>
+              <li>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
+        </li>      </ul>
+    </div>
+  </nav>
+
+  <!-- Banner de video -->
+  <section class="section--top">
+    <video autoplay muted loop playsinline class="banner-video">
+      <source src="Videos\banner.mp4" type="video/mp4">
+    </video>
+
+    <div class="banner--overlay">
+      <h1>¡We welcome you!</h1>
+      <p>To your digital space, all in one place!</p>
+    </div>
+  </section>
+
+
+  <!-- Sobre Kinetix (Ahora Bienvenida al Cliente) -->
+  <section class="section--about">
+    <h2>We're glad to have you here</h2>
+    <p>
+      Hello! We want to officially welcome you to your Kinetix client panel. This is the centralized meeting point where you can manage, review, and closely monitor every stage of building your digital presence.
+      <br><br>
+      Our commitment is to accompany you every step of the way. From this platform, you'll have complete visibility into your website's progress, direct access to our technical team, and all the necessary tools to ensure a transparent, efficient process aligned with your goals.
+      <br><br>
+      We believe that constant communication is key to a successful project. That's why we designed this environment so you can ask questions, request adjustments, and see how your ideas are transformed into a stable platform ready to evolve.
+      <br><br>
+      Explore the sections of your dashboard and discover everything we have prepared to propel your project forward. Let's start working together!
+    </p>
+  </section>
+
+  <!-- Más información (Ahora Secciones del Portal) -->
+  <section class="info-section">
+    <div class="info-block">
+      <div class="info-text">
+        <h2>Your Project and Inventory</h2>
+        <p>
+          In the <strong>Inventory</strong> section, you'll be able to see the current status of your development in real time.
+          Review the site structure, the modules we're implementing, and the technical components assigned to your account,
+          ensuring that everything is progressing exactly at the pace and in the way your business needs.
+        </p>
+      </div>
+      <div class="info-image">
+        <img src="imagenes\Adaptabilidad.jpg" alt="Gestión de proyectos en Kinetix">
+      </div>
+    </div>
+
+    <div class="info-block reverse">
+      <div class="info-text">
+        <h2>Technical Support and Inquiries</h2>
+        <p>
+          Did you have any <stong>questions</stong> or need to make an adjustment? Our ticketing system is at your disposal. 
+          You can open a request at any time so that our technical team can analyze your case and provide you with 
+          quick responses and ensure that your platform's performance and security remain flawless.
+        </p>
+      </div>
+      <div class="info-image">
+        <img src="imagenes\Calidad.jpg" alt="Soporte técnico en Kinetix">
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="info-text">
+        <h2>Help Center and FAQ</h2>
+        <p>
+          We want you to feel completely independent in your web environment. In the section of <strong>FAQ</strong> 
+          You'll find practical guides, answers to frequently asked questions about optimization, maintenance, and
+          Content updates, designed specifically to answer your everyday questions immediately.
+        </p>
+      </div>
+      <div class="info-image">
+        <img src="imagenes\Acompañamiento.png" alt="Guías y recursos para clientes">
+      </div>
+    </div>
+  </section>
+
+  <!-- Fondo decorativo -->
+  <div class="fondo-personalizado"></div>
+
+
+  <!-- Footer contactos -->
+  <div class="footer-contacto">
+    <h3>Do you have an urgent question?</h3>
+    <a href=".html" class="btn-contacto">Open a Ticket</a>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 Kinetix. All rights reserved. Exclusive panel for registered clients.</p>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){setTimeout(() => {entry.target.classList.add("show");}, 250);observer.unobserve(entry.target);}});},{threshold:0.25});document.querySelectorAll(".info-text").forEach(item=>{observer.observe(item);});
+  </script>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const body = document.body;
+      const isDark = theme === 'dark';
+      body.classList.toggle('dark-mode', isDark);
+      body.classList.toggle('light-mode', !isDark);
+      if (themeToggle) {
+        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+      });
+    }
+  </script></body>
+</html>

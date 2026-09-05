@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tickets</title>
+<link rel="stylesheet" href="..\css\sistema-de-tickets-tecnico.css">
+
+</head>
+
+<body>
+    <!-- Header menu -->
+        <nav class="menu">
+            <div class="menu-content">
+                <div class="menu-logo">
+                    <img src="imagenes\Logo1.png" alt="Kinetix Logo">
+                </div>
+
+                <ul>
+        <li><a href="home.html">Home</a></li>
+        <li><a href="..\en\FAQ-pagina-cliente-en.html">FAQ</a></li>
+        <li><a href="..\en\pagina-de-tickets-tecnico-en.html">Tickets</a></li>
+        <li><a href="..\en\inventario-en.html">Inventory</a></li>
+        <li><a href="Login.html">My Account</a></li>
+                        <li>
+          <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
+        </li>      </ul>
+            </div>
+        </nav>
+    <div class="page">
+        <div class="container">
+            <!-- TICKET LIST -->
+            <div class="sidebar">
+                <h2>Tickets</h2>
+                <div class="ticket-list">
+                    <!-- tickets go here -->
+                    <!-- sample tickets -->
+                    <div class="ticket">
+                        <div class="ticket-top">
+                            <span class="ticket-id">#00001</span>
+                            <div class="ticket-status activo">
+                                <span class="status-dot"></span>
+                                Active
+                            </div>
+                        </div>
+                        <h6 style="font-size:13px; padding-bottom:-5px;">FirstName1 LastName1 </h6>
+                        <div class="ticket-title">
+                            <h6 style="font-size:16px; font-weight: lighter;">PC won't turn on</h6>
+                        </div>
+                    </div>
+                    <div class="ticket">
+                        <div class="ticket-top">
+                            <span class="ticket-id">#00002</span>
+                            <div class="ticket-status cerrado">
+                                <span class="status-dot"></span>
+                                Closed
+                            </div>
+                        </div>
+                        <h6 style="font-size:13px; padding-bottom:-5px;">FirstName2 LastName2 </h6>
+                        <div>
+                            <h6 style="font-size:16px; font-weight: lighter;">Printer has no internet connection</h6>
+                        </div>
+                    </div>
+                    <div class="ticket">
+                        <div class="ticket-top">
+                            <span class="ticket-id">#00003</span>
+                            <div class="ticket-status resuelto">
+                                <span class="status-dot"></span>
+                                Resolved
+                            </div>
+                        </div>
+                        <h6 style="font-size:13px; padding-bottom:-5px;">FirstName3 LastName3 </h6>
+                        <div>
+                            <h6 style="font-size:16px; font-weight: lighter;">Cannot access the system</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- CHAT -->
+            <div class="main">
+                <div class="header">
+                    <h1 style="text-align: center; padding: 15px;"> PC won't turn on</h1>
+                </div>
+                <div class="chat">
+                    <div class="message received">
+                        Hello, I need help with my computer.
+                    </div>
+                    <div class="message sent">
+                        Good day. What seems to be the issue?
+                    </div>
+                </div>
+                <div class="chat-input">
+                    <input type="text" placeholder="Type a message...">
+                    <button style="background-color: rgb(78, 131, 0);">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+  <script>
+    const themeToggle = document.getElementById('themeToggle');
+
+    function applyTheme(theme) {
+      const body = document.body;
+      const isDark = theme === 'dark';
+      body.classList.toggle('dark-mode', isDark);
+      body.classList.toggle('light-mode', !isDark);
+      if (themeToggle) {
+        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(savedTheme);
+
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
+      });
+    }
+  </script></body>
+</html>

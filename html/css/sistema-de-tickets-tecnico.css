@@ -1,0 +1,287 @@
+
+/* Reinicio y base de la pagina */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background: linear-gradient(90deg, #baeff3 0%, #c2f3e8 50%, #baeff3 100%);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+}
+
+.page{
+    display:flex;
+    justify-content:center;
+    padding:35px;
+}
+
+/* Ventana principal de tickets */
+
+.container{
+    width:1300px;
+    height:750px;
+    display:flex;
+    background:#f4f4f4;
+    border:1px solid #b5b5b5;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 8px 25px rgba(0,0,0,.15);
+}
+
+/* Menu principal */
+
+.menu{
+    width:100%;
+    background:#e7e7e7;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+    position:sticky;
+    top:0;
+    z-index:1000;
+}
+
+.menu-content{
+    max-width:1300px;
+    height:85px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 25px;
+}
+
+.menu-logo img{
+    display:block;
+    height: 120px;
+    width: 170px;
+}
+
+.menu ul{
+    list-style:none;
+    display:flex;
+    gap:35px;
+}
+
+.menu li{
+    display:flex;
+    align-items:center;
+}
+
+.menu a{
+    text-decoration:none;
+    color:#222;
+    font-weight:600;
+    transition:.2s;
+    position:relative;
+}
+
+.menu a::after{
+    content:"";
+    position:absolute;
+    left:0;
+    bottom:-6px;
+    width:0;
+    height:2px;
+    background:#5697ff;
+    transition:.25s;
+}
+
+.menu a:hover{
+    color:#5697ff;
+}
+
+.menu a:hover::after{
+    width:100%;
+}
+
+/* Panel izquierdo con la lista de tickets */
+
+.sidebar{
+    width:260px;
+    background:#bfbfbf;
+    border-right:2px solid #999;
+    display:flex;
+    flex-direction:column;
+}
+
+.sidebar h2{
+    background:#9f9f9f;
+    color:white;
+    padding:18px;
+    text-align:center;
+    border-bottom:2px solid #888;
+}
+
+.ticket-list{
+    flex:1;
+    overflow-y:auto;
+    padding:15px;
+}
+
+.ticket{
+    background:#d9d9d9;
+    border:1px solid #9b9b9b;
+    border-radius:6px;
+    padding:12px;
+    margin-bottom:12px;
+    cursor:pointer;
+}
+
+.ticket:hover{
+    background:#d1d1d1;
+}
+
+.ticket-status{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+
+.status-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+}
+
+/* Estado activo */
+.ticket-status.activo .status-dot{
+    background:#f1c40f;
+}
+
+/* Estado resuelto */
+.ticket-status.resuelto .status-dot{
+    background:#2ecc71;
+}
+
+/* Estado cerrado */
+.ticket-status.cerrado .status-dot{
+    background:#e74c3c;
+}
+
+/* Panel derecho de conversacion */
+
+/* PANEL DERECHO */
+
+.main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
+
+/* Encabezado del ticket */
+
+.header{
+    height:70px;
+    background:white;
+    border-bottom:2px solid #cfcfcf;
+}
+
+
+/* Historial del chat */
+
+.chat{
+    flex:1;
+    padding:20px;
+    overflow-y:auto;
+    background:#ececec;
+}
+
+/* Mensajes recibidos y enviados */
+
+.message{
+    max-width:70%;
+    margin-bottom:15px;
+    padding:12px;
+    border-radius:5px;
+}
+
+.received{
+    background:white;
+    border:1px solid #b5b5b5;
+}
+
+.sent{
+    background:#b8d6ff;
+    margin-left:auto;
+    border:1px solid #8db6eb;
+}
+
+
+/* Campo para escribir mensajes */
+
+.chat-input{
+    background:#d3d3d3;
+    padding:15px;
+    display:flex;
+    gap:10px;
+    border-top:2px solid #aaa;
+}
+
+.chat-input input{
+    flex:1;
+    height:42px;
+    padding:10px;
+    border:1px solid #888;
+    outline:none;
+    background:white;
+}
+
+.chat-input button{
+    width:110px;
+    border:none;
+    background:#808080;
+    color:white;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.chat-input button:hover{
+    background:#666;
+}
+.theme-toggle {
+  border: 1px solid #d0d7de;
+  background: #f8fafc;
+  color: #1f2937;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.dark-mode {
+  background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+}
+
+.dark-mode .menu {
+  background: #162036;
+  border-bottom-color: rgba(148, 163, 184, 0.25);
+}
+
+.dark-mode .menu a,
+.dark-mode .menu li {
+  color: #e5e7eb;
+}
+
+.dark-mode .menu a::after {
+  background: #60a5fa;
+}
+
+.dark-mode .theme-toggle {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
