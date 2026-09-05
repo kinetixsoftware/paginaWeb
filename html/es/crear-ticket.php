@@ -23,16 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$idUsuario = $_SESSION['idUsuario'];
 
 	try {
-		$sql = "INSERT INTO ticket (titulo, descripcion, id_prioridad, id_solicitante, id_categoria) 
-                VALUES ('$ticketTitulo', $ticketPrioridad, '$descripcion', $idUsuario, $ticketCategoria)";
+        $sql = "INSERT INTO ticket (titulo, descripcion, id_estado, id_prioridad, id_solicitante, id_categoria)
+        VALUES ('$ticketTitulo', '$descripcion', 1, $ticketPrioridad, $idUsuario, $ticketCategoria)";
         $registro = mysqli_query($conexion, $sql);
 
-        if(mysqli_fetch_assoc($registro)) {
+        if($registro) {
             header("Location: tickets.php");
+            exit;
+        } else {
+            echo "Error al crear el ticket: " . mysqli_error($conexion);
         }
 	} catch (Throwable $e) {
 		$tipoError = "error";
-		$mensaje = "Error al iniciar sesion. Intentalo de nuevo.";
+        $mensaje = "No se pudo crear el ticket: " . $e->getMessage();
 	}
 }
 ?>
