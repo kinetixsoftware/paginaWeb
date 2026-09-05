@@ -1,23 +1,16 @@
 <?php 
 session_start();
 
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1) {
     $_SESSION['mensaje'] = "No tienes acceso a esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: login.php");
   exit;
 }
-
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
-
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-
-if (!$conexion) {
-    die("Connection failed: " . mysqli_connect_error());
-}   
 
 $marcas = "SELECT * FROM activo_marca ORDER BY id_marca ASC";
 $resultadomarcas = mysqli_query($conexion, $marcas);

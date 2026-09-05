@@ -1,5 +1,10 @@
 <?php 
 session_start();
+
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 $mensaje = $_SESSION['mensaje'] ?? '';
 $tipoError = $_SESSION['tipoError'] ?? '';
 
@@ -11,17 +16,7 @@ if (!isset($_SESSION['rol'])) {
 }
 
 $rolUsuario = (int) $_SESSION['rol'];
-
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
-
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-
-if (!$conexion) {
-    die("Connection failed: " . mysqli_connect_error());
-}   
+  
 
 //Query secundario (no se si esta bien)
 //SELECT a.id_activo, a.nombre, a.modelo, a.id_marca, m.marca, a.id_estado, e.estado, a.id_categoria, c.categoria FROM activo AS a 

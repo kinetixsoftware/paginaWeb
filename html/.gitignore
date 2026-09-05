@@ -1,0 +1,6 @@
+# Configuración de la base de datos
+php/conexionBDD.php
+
+# Backups de MySQL
+*.sql
+*.sql.gz

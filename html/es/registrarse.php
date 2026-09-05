@@ -1,6 +1,10 @@
 <?php 
 session_start();
 
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 $mensaje = "";
 $tipoError = "";
 
@@ -23,15 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $mensaje = "Completá todos los campos del formulario.";
     } else {
         try {
-            $servername = "localhost";
-            $username = "root";
-            $passwordbd = "";
-            $dbname = "kinetixsoftware";
-
-            $conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-            if (!$conexion) {
-                die("Connection failed: " . mysqli_connect_error());
-            } 
 
             mysqli_set_charset($conexion, "utf8mb4");
 

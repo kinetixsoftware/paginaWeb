@@ -1,19 +1,16 @@
 <?php 
 session_start();
 
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 $rol = $_SESSION['rol'];
 if (!$rol === 3){
     $_SESSION['mensaje'] = "No tienes permiso para ver esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: ../es/inicio.php");
 }
-
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
-
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
 
 if (!$conexion) {
     die("Connection failed: " . mysqli_connect_error());

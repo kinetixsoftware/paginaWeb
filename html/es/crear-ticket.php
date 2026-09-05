@@ -1,18 +1,13 @@
 <?php 
 session_start();
 
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 if (!isset($_SESSION['rol'])) {
 die('No tienes permiso para entrar a esta página.');
 }
-
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
-
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-
-if (!$conexion) { die("Connection failed: " . mysqli_connect_error()); }	
 
 $categorias = "SELECT * FROM categoria_ticket ORDER BY id_categoria ASC";
 $resultadocategorias = mysqli_query($conexion, $categorias);

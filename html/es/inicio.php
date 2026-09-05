@@ -186,11 +186,11 @@ session_start();
         </footer>
 
         <?php 
-  if(isset($_SESSION['mensaje'] )){
-    $_SESSION['mensaje'] = null;
-    $_SESSION['tipoError'] = null;
-  }
-  ?>
+            if(isset($_SESSION['mensaje'] )){
+                $_SESSION['mensaje'] = null;
+                $_SESSION['tipoError'] = null;
+            }
+        ?>
         <script>
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {

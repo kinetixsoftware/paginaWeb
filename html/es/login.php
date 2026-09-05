@@ -2,6 +2,11 @@
 // login
 session_start();
 
+
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 if (isset($_SESSION['rol'])) {
     $_SESSION['mensaje'] = "Usted ya inicio sesion";
     $_SESSION['tipoError'] = "error";
@@ -18,16 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $password       = $_POST['password'] ?? '';
 
     try {
-        $servername = "localhost";
-        $username = "root";
-        $passwordbd = "";
-        $dbname = "kinetixsoftware";
-
-        $conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-        if (!$conexion) {
-            die("Connection failed: " . mysqli_connect_error());
-        }    
-
+        
         $sql = "SELECT id_usuario, nombre, apellido, password, activo, id_rol FROM usuario WHERE email = '$email' LIMIT 1";
         $query = mysqli_query($conexion, $sql);
         $usuario = mysqli_fetch_assoc($query);

@@ -1,19 +1,17 @@
 <?php 
 session_start();
-$rol = $_SESSION['rol'];
 
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
+$rol = $_SESSION['rol'];
 if (!isset($_SESSION['rol'])) {
     $_SESSION['mensaje'] = "No estas autorizado a ver esta pagina";
     $_SESSTION['tipoError'] = "error";
     header("Location: login.php");
 } 
 
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
-
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
 
 $ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, p.prioridad, c.categoria
                 FROM ticket AS t 

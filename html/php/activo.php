@@ -1,16 +1,9 @@
 <?php 
 session_start();
 
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
+require_once "../php/conexionBDD.php";
 
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-
-if (!$conexion) {
-    die("Connection failed: " . mysqli_connect_error());
-}  
+$conexion = conectarBD();
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("Activo no encontrado.");

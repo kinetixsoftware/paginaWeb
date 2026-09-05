@@ -1,6 +1,10 @@
 <?php
 session_start();
 
+require_once "../php/conexionBDD.php";
+
+$conexion = conectarBD();
+
 $rol = $_SESSION['rol'] ?? null;
 
 if (!$rol == 3) {
@@ -10,16 +14,6 @@ if (!$rol == 3) {
     exit;
 }
 
-$servername = "localhost";
-$username = "root";
-$passwordbd = "";
-$dbname = "kinetixsoftware";
-
-$conexion = mysqli_connect($servername, $username, $passwordbd, $dbname);
-
-if (!$conexion) {
-    die("Connection failed: " . mysqli_connect_error());
-}
 
 $tablas = [
     'activo' => ['id_activo', 'codigo_inventario', 'nombre', 'descripcion', 'marca', 'modelo', 'numero_serie', 'fecha_adquisicion', 'fecha_baja', 'id_categoria', 'id_estado', 'id_ubicacion', 'id_marca'],
