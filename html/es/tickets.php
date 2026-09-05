@@ -29,6 +29,7 @@ $ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, pt
                 ORDER BY t.fecha_creacion DESC;";
 
 $ticketlistresult = mysqli_query($conexion, $ticketslist);
+$mensajesResultado = null;
 
 if (isset($_GET['id'])) {
     $id_ticket = (int) $_GET['id'];
@@ -119,7 +120,7 @@ if (isset($_GET['id'])) {
                 <div class="chat">
                     <?php while($reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
                         <div class="message <?= $rol === $reg['nombre-rol'] ? "sent" : "recieved" ?>">
-                            Hola, necesito ayuda con mi computadora.
+                            <?= $reg['contenido'] ?>
                         </div>
                     <?php }?>
                 </div>
