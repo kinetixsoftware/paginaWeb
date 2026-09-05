@@ -123,12 +123,15 @@ body{
 }
 
 .ticket{
+    display:block;
     background:#d9d9d9;
     border:1px solid #9b9b9b;
     border-radius:6px;
     padding:12px;
     margin-bottom:12px;
     cursor:pointer;
+    color:inherit;
+    text-decoration:none;
 }
 
 .ticket:hover{
@@ -153,6 +156,18 @@ body{
 /* Estado activo */
 .ticket-status.activo .status-dot{
     background:#f1c40f;
+}
+
+.ticket-status.abierto .status-dot{
+    background:#f1c40f;
+}
+
+.ticket-status.en-proceso .status-dot{
+    background:#3498db;
+}
+
+.ticket-status.revisado .status-dot{
+    background:#9b59b6;
 }
 
 /* Estado resuelto */
