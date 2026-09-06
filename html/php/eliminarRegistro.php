@@ -5,8 +5,8 @@ require_once "../php/conexionBDD.php";
 
 $conexion = conectarBD();
 
-$rol = $_SESSION['rol'];
-if (!$rol === 3){
+$rol = $_SESSION['rol'] ?? 0;
+if ($rol !== 3){
     $_SESSION['mensaje'] = "No tienes permiso para ver esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: ../es/inicio.php");
