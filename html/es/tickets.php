@@ -5,7 +5,7 @@ require_once "../php/conexionBDD.php";
 
 $conexion = conectarBD();
 
-$rol = $_SESSION['rol'] ?? null;
+$rol = isset($_SESSION['rol']) ? (int) $_SESSION['rol'] : null;
 $idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
 $visitante = "";
 if ($rol === null || $rol === 3) {
@@ -30,18 +30,32 @@ $ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, pt
 
 $ticketlistresult = mysqli_query($conexion, $ticketslist);
 $mensajesResultado = null;
+$ticketTitulo = null;
+$id_ticket = (int) ($_GET['id'] ?? $_POST['id_ticket'] ?? 0);
 
-if (isset($_GET['id'])) {
-    $id_ticket = (int) $_GET['id'];
+if ($id_ticket > 0) {
 
-    $ticket = "SELECT id_tecnico FROM ticket WHERE id_ticket = $id_ticket LIMIT 1";
+    $ticket = "SELECT id_tecnico, titulo FROM ticket WHERE id_ticket = $id_ticket LIMIT 1";
     $ticketResultado = mysqli_query($conexion, $ticket);
 
     while ($reg = mysqli_fetch_assoc($ticketResultado)) {
+        $ticketTitulo = $reg['titulo'];
+
         if(empty($reg['id_tecnico']) && $rol === 2) {
-            $sql = "UPDATE ticket 
-                    SET id_tecnico = $idUsuario
-                    WHERE id_ticket = $id_ticket;";
+                $sql = "UPDATE ticket
+                        SET id_tecnico = $idUsuario, id_estado = 3
+                        WHERE id_ticket = $id_ticket";
+                mysqli_query($conexion, $sql);
+        }
+    }
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'mandarMensaje') {
+        $contenidoMensaje = trim($_POST['contenido'] ?? '');
+
+        if ($contenidoMensaje !== '') {
+            $contenidoMensaje = mysqli_real_escape_string($conexion, $contenidoMensaje);
+            $sql = "INSERT INTO mensaje_ticket (id_ticket, id_usuario, contenido)
+                    VALUES ($id_ticket, $idUsuario, '$contenidoMensaje')";
             mysqli_query($conexion, $sql);
         }
     }
@@ -54,8 +68,6 @@ if (isset($_GET['id'])) {
                 ORDER BY mt.fecha_creacion ASC;";
     $mensajesResultado = mysqli_query($conexion, $mensajes);
 }
-
-
 
 ?>
 
@@ -115,18 +127,20 @@ if (isset($_GET['id'])) {
 
             <div class="main">
                 <div class="header">
-                    <h1 style="text-align: center; padding: 15px;"> No enciende la PC</h1>
+                    <h1 style="text-align: center; padding: 15px;"><?=$ticketTitulo?></h1>
                 </div>
                 <div class="chat">
-                    <?php while($reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
-                        <div class="message <?= $rol === $reg['nombre-rol'] ? "sent" : "recieved" ?>">
+                    <?php while($mensajesResultado && $reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
+                        <div class="message <?= $idUsuario === (int) $reg['id_usuario'] ? 'sent' : 'received' ?>">
                             <?= $reg['contenido'] ?>
                         </div>
                     <?php }?>
                 </div>
                 <div class="chat-input">
                     <form method="POST">
-                        <input type="text" name="contenido" placeholder="Escriba un mensaje...">
+                        <input type="hidden" name="accion" value="mandarMensaje">
+                        <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
+                        <textarea type="text" name="contenido" rows="2" column="10" placeholder="Escriba un mensaje..."></textarea>
                         <button type="submit" style="background-color: rgb(78, 131, 0);"> Enviar </button>
                     </form>
                 </div>
