@@ -1,302 +1,426 @@
-
-/* Reinicio y base de la pagina */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-body{
-    font-family:Arial, Helvetica, sans-serif;
-    background: linear-gradient(90deg, #baeff3 0%, #c2f3e8 50%, #baeff3 100%);
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
+:root {
+    --bg-start: #081120;
+    --bg-end: #111827;
+    --panel: #111827;
+    --panel-soft: #1f2937;
+    --menu: #111827;
+    --card: #1f2937;
+    --card-strong: #0f172a;
+    --text: #e5e7eb;
+    --muted: #a8b3c7;
+    --border: rgba(148, 163, 184, 0.2);
+    --primary: #60a5fa;
+    --received: #172235;
+    --sent: #164e63;
+    --sent-border: #0e7490;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
 }
 
-.page{
-    display:flex;
-    justify-content:center;
-    padding:35px;
+body {
+    min-height: 100vh;
+    background: linear-gradient(90deg, var(--bg-start) 0%, var(--bg-end) 100%);
+    color: var(--text);
 }
 
-/* Ventana principal de tickets */
-
-.container{
-    width:1300px;
-    height:750px;
-    display:flex;
-    background:#f4f4f4;
-    border:1px solid #b5b5b5;
-    border-radius:10px;
-    overflow:hidden;
-    box-shadow:0 8px 25px rgba(0,0,0,.15);
+body.light-mode {
+    --bg-start: #d9f7ff;
+    --bg-end: #c6f5ea;
+    --panel: #f1f5f9;
+    --panel-soft: #ffffff;
+    --menu: #ffffff;
+    --card: #ffffff;
+    --card-strong: #f8fafc;
+    --text: #1f2937;
+    --muted: #64748b;
+    --border: rgba(148, 163, 184, 0.5);
+    --primary: #2563eb;
+    --received: #ffffff;
+    --sent: #dbeafe;
+    --sent-border: #93c5fd;
 }
 
-/* Menu principal */
-
-.menu{
-    width:100%;
-    background:#e7e7e7;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-    position:sticky;
-    top:0;
-    z-index:1000;
+.menu {
+    width: 100%;
+    background: var(--menu);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-.menu-content{
-    max-width:1300px;
-    height:85px;
-    margin:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 25px;
+.menu-content {
+    max-width: 1300px;
+    height: 85px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
 }
 
-.menu-logo img{
-    display:block;
+.menu-logo img {
+    display: block;
     height: 120px;
     width: 170px;
 }
 
-.menu ul{
-    list-style:none;
-    display:flex;
-    gap:35px;
+.menu ul {
+    list-style: none;
+    display: flex;
+    gap: 35px;
 }
 
-.menu li{
-    display:flex;
-    align-items:center;
+.menu li {
+    display: flex;
+    align-items: center;
 }
 
-.menu a{
-    text-decoration:none;
-    color:#222;
-    font-weight:600;
-    transition:.2s;
-    position:relative;
+.menu a {
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 600;
+    transition: .2s;
+    position: relative;
 }
 
-.menu a::after{
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:-6px;
-    width:0;
-    height:2px;
-    background:#5697ff;
-    transition:.25s;
+.menu a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: .25s;
 }
 
-.menu a:hover{
-    color:#5697ff;
+.menu a:hover,
+.menu a:focus-visible {
+    color: var(--primary);
 }
 
-.menu a:hover::after{
-    width:100%;
+.menu a:hover::after,
+.menu a:focus-visible::after {
+    width: 100%;
 }
 
-/* Panel izquierdo con la lista de tickets */
-
-.sidebar{
-    width:260px;
-    background:#bfbfbf;
-    border-right:2px solid #999;
-    display:flex;
-    flex-direction:column;
+.page {
+    display: flex;
+    justify-content: center;
+    padding: 32px 20px 48px;
 }
 
-.sidebar h2{
-    background:#9f9f9f;
-    color:white;
-    padding:18px;
-    text-align:center;
-    border-bottom:2px solid #888;
+.container {
+    width: 100%;
+    max-width: 1300px;
+    min-height: calc(100vh - 165px);
+    display: flex;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
 }
 
-.ticket-list{
-    flex:1;
-    overflow-y:auto;
-    padding:15px;
+.sidebar {
+    width: 290px;
+    flex: 0 0 290px;
+    background: var(--panel-soft);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
 }
 
-.ticket{
-    display:block;
-    background:#d9d9d9;
-    border:1px solid #9b9b9b;
-    border-radius:6px;
-    padding:12px;
-    margin-bottom:12px;
-    cursor:pointer;
-    color:inherit;
-    text-decoration:none;
+.sidebar h2 {
+    color: var(--text);
+    padding: 24px 20px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 1.25rem;
 }
 
-.ticket:hover{
-    background:#d1d1d1;
+.ticket-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
 }
 
-.ticket-status{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:12px;
-    font-weight:bold;
-    margin-bottom:8px;
+.ticket {
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .08);
+    transition: .2s;
 }
 
-.status-dot{
-    width:10px;
-    height:10px;
-    border-radius:50%;
+.ticket:hover,
+.ticket:focus-visible {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .15);
+    outline: none;
 }
 
-/* Estado activo */
-.ticket-status.activo .status-dot{
-    background:#f1c40f;
+.ticket-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.ticket-status.abierto .status-dot{
-    background:#f1c40f;
+.ticket-id {
+    color: var(--muted);
+    font-size: .8rem;
+    font-weight: 700;
 }
 
-.ticket-status.en-proceso .status-dot{
-    background:#3498db;
+.ticket h6 {
+    font-size: .82rem;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
-.ticket-status.revisado .status-dot{
-    background:#9b59b6;
+.ticket-title h6 {
+    color: var(--text);
+    font-size: .98rem;
+    font-weight: 400;
+    margin-top: 5px;
 }
 
-/* Estado resuelto */
-.ticket-status.resuelto .status-dot{
-    background:#2ecc71;
+.ticket-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    font-size: .72rem;
+    font-weight: 700;
 }
 
-/* Estado cerrado */
-.ticket-status.cerrado .status-dot{
-    background:#e74c3c;
+.status-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--muted);
 }
 
-/* Panel derecho de conversacion */
+.ticket-status.activo .status-dot,
+.ticket-status.abierto .status-dot { background: var(--warning); }
+.ticket-status.en-proceso .status-dot { background: var(--primary); }
+.ticket-status.revisado .status-dot { background: #c084fc; }
+.ticket-status.resuelto .status-dot { background: var(--success); }
+.ticket-status.cerrado .status-dot { background: var(--danger); }
 
-/* PANEL DERECHO */
-
-.main{
-    flex:1;
-    display:flex;
-    flex-direction:column;
+.main {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Encabezado del ticket */
-
-.header{
-    height:70px;
-    background:white;
-    border-bottom:2px solid #cfcfcf;
+.header {
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
 }
 
-
-/* Historial del chat */
-
-.chat{
-    flex:1;
-    padding:20px;
-    overflow-y:auto;
-    background:#ececec;
+.header h1 {
+    width: 100%;
+    padding: 18px 24px;
+    color: var(--text);
+    font-size: 1.35rem;
 }
 
-/* Mensajes recibidos y enviados */
-
-.message{
-    max-width:70%;
-    margin-bottom:15px;
-    padding:12px;
-    border-radius:5px;
+.chat {
+    flex: 1;
+    min-height: 300px;
+    padding: 24px;
+    overflow-y: auto;
+    background: var(--card-strong);
 }
 
-.received{
-    background:white;
-    border:1px solid #b5b5b5;
+.message {
+    width: fit-content;
+    max-width: min(70%, 620px);
+    margin-bottom: 15px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: var(--text);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
 }
 
-.sent{
-    background:#b8d6ff;
-    margin-left:auto;
-    border:1px solid #8db6eb;
+.received,
+.recieved {
+    background: var(--received);
+    border: 1px solid var(--border);
 }
 
-
-/* Campo para escribir mensajes */
-
-.chat-input{
-    background:#d3d3d3;
-    padding:15px;
-    display:flex;
-    gap:10px;
-    border-top:2px solid #aaa;
+.sent {
+    margin-left: auto;
+    background: var(--sent);
+    border: 1px solid var(--sent-border);
 }
 
-.chat-input input{
-    flex:1;
-    height:42px;
-    padding:10px;
-    border:1px solid #888;
-    outline:none;
-    background:white;
+.chat-input {
+    padding: 16px 20px;
+    background: var(--panel-soft);
+    border-top: 1px solid var(--border);
 }
 
-.chat-input button{
-    width:110px;
-    border:none;
-    background:#808080;
-    color:white;
-    cursor:pointer;
-    transition:.2s;
+.chat-input form {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
 }
 
-.chat-input button:hover{
-    background:#666;
+.chat-input textarea {
+    min-height: 44px;
+    flex: 1;
+    resize: vertical;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+    font: inherit;
 }
+
+.chat-input textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+}
+
+.chat-input button {
+    min-height: 44px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: 8px;
+    background: #2b8a9e !important;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s ease, transform .1s ease;
+}
+
+.chat-input button:hover {
+    background: #216d7d !important;
+    transform: translateY(-1px);
+}
+
 .theme-toggle {
-  border: 1px solid #d0d7de;
-  background: #f8fafc;
-  color: #1f2937;
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, .08);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
 }
 
 .theme-toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
 }
 
-.dark-mode {
-  background: linear-gradient(135deg, #0f172a 0%, #111827 100%);
+body.light-mode .theme-toggle {
+    background: #f8fafc;
+    color: #1f2937;
+    border-color: #d0d7de;
 }
 
-.dark-mode .menu {
-  background: #162036;
-  border-bottom-color: rgba(148, 163, 184, 0.25);
+body.dark-mode {
+    background: linear-gradient(90deg, var(--bg-start) 0%, var(--bg-end) 100%);
 }
 
-.dark-mode .menu a,
-.dark-mode .menu li {
-  color: #e5e7eb;
+@media (max-width: 800px) {
+    .menu-content {
+        height: auto;
+        min-height: 85px;
+        padding: 10px 16px;
+        gap: 12px;
+    }
+
+    .menu-logo img {
+        width: 125px;
+        height: auto;
+    }
+
+    .menu ul {
+        gap: 12px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .menu ul li:nth-child(2),
+    .menu ul li:nth-child(3) {
+        display: none;
+    }
+
+    .page {
+        padding: 20px 12px 32px;
+    }
+
+    .container {
+        min-height: calc(100vh - 137px);
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        flex-basis: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .ticket-list {
+        max-height: 245px;
+    }
+
+    .header h1 {
+        font-size: 1.15rem;
+    }
+
+    .chat {
+        min-height: 260px;
+        padding: 18px;
+    }
+
+    .message {
+        max-width: 88%;
+    }
 }
 
-.dark-mode .menu a::after {
-  background: #60a5fa;
-}
+@media (max-width: 520px) {
+    .menu ul li:nth-child(1),
+    .menu ul li:nth-child(4) {
+        display: none;
+    }
 
-.dark-mode .theme-toggle {
-  background: #1f2937;
-  border-color: #374151;
-  color: #f3f4f6;
+    .chat-input form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .chat-input button {
+        width: 100%;
+    }
 }
