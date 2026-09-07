@@ -60,7 +60,8 @@ $resultadoestados = mysqli_query($conexion, $estados);
             <ul>
                 <li><a href="inicio.php">Inicio</a></li>
                 <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
-                <li><a href="pagina-de-tickets-tecnico.html">Tickets</a></li>
+                <li><a href="tickets.php">Tickets</a></li>
+                <li><a href="inventario.php" class="active" aria-current="page">Inventario</a></li>
                 <li><a href="Login.php">Mi Cuenta</a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>

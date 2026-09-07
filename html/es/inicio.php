@@ -30,18 +30,18 @@ session_start();
                 <?php 
                 if (isset($_SESSION["rol"])) { 
                     if ($_SESSION['rol'] == 1 || $_SESSION['rol'] == 2) {?>
-                <li id="nav-usuario"> <a href="inicio.php">Inicio</a></li>
-                <li id="nav-faq"> <a href="FAQ-pagina-cliente.html">FAQ</a></li>
-                <li id="nav-tickets"> <a href="tickets.php">Mis Tickets</a></li>
-                <li id="nav-inventario"> <a href="inventario.php">Inventario</a></li>
+                <li> <a href="inicio.php" class="active" aria-current="page">Inicio</a></li>
+                <li> <a href="FAQ-pagina-cliente.html">FAQ</a></li>
+                <li> <a href="tickets.php">Mis Tickets</a></li>
+                <li> <a href="inventario.php">Inventario</a></li>
                 <li id="nav-tecnico" hidden> <a href="pagina-de-tickets-tecnico.html">Panel técnico</a></li>
-                <li id="nav-logout"> <a href="../php/logout.php">Cerrar sesión</a></li>
+                <li> <a href="../php/logout.php">Cerrar sesión</a></li>
                     <?php } elseif ($_SESSION['rol'] == 3) {?>
                 <li> <a href="panel-admin.php">Panel Administrador</a></li>
-                <li id="nav-logout"> <a href="../php/logout.php">Cerrar sesión</a></li>
+                <li> <a href="../php/logout.php">Cerrar sesión</a></li>
                 <?php } } else { ?>
-                <li id="nav-visitante"> <a href="login.php">Iniciar sesión</a></li>
-                <li id="nav-registrarse"> <a href="registrarse.php">Registrarse</a></li>
+                <li> <a href="login.php">Iniciar sesión</a></li>
+                <li> <a href="registrarse.php">Registrarse</a></li>
                 <?php } ?>
                 <div class="language-switch">
                     <input type="checkbox" id="langToggle">

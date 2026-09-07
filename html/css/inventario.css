@@ -133,6 +133,15 @@ body.light-mode {
     transition:.25s;
 }
 
+.menu a.active{
+    color:var(--primary);
+}
+
+.menu a.active::after{
+    width:100%;
+    height:3px;
+}
+
 .header{
     display:flex;
     justify-content:space-between;

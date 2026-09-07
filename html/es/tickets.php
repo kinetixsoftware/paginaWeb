@@ -45,10 +45,7 @@ if ($id_ticket > 0) {
                LIMIT 1";
     $ticketResultado = mysqli_query($conexion, $ticket);
     $ticketData = mysqli_fetch_assoc($ticketResultado);
-    $ticketPermitido = $ticketData && (
-        ($rol === 2 && (empty($ticketData['id_tecnico']) || (int) $ticketData['id_tecnico'] === $idUsuario))
-        || ($rol === 1 && (int) $ticketData['id_solicitante'] === $idUsuario)
-    );
+    $ticketPermitido = $ticketData && (($rol === 2 && (empty($ticketData['id_tecnico']) || (int) $ticketData['id_tecnico'] === $idUsuario)) || ($rol === 1 && (int) $ticketData['id_solicitante'] === $idUsuario));
 
     if ($ticketPermitido) {
         $ticketTitulo = $ticketData['titulo'];
@@ -60,8 +57,7 @@ if ($id_ticket > 0) {
             mysqli_query($conexion, $sql);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST'
-            && ($_POST['accion'] ?? '') === 'mandarMensaje') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'mandarMensaje') {
             $contenidoMensaje = trim($_POST['contenido'] ?? '');
 
             if ($contenidoMensaje !== '') {
@@ -107,6 +103,7 @@ if ($id_ticket > 0) {
             <ul>
                 <li><a href="inicio.php">Inicio</a></li>
                 <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
+                <li><a href="tickets.php" class="active" aria-current="page">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="Login.php">Mi Cuenta</a></li>
                 <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button></li>
@@ -125,12 +122,12 @@ if ($id_ticket > 0) {
                         <a class="ticket" href="tickets.php?id=<?= $reg['id_ticket']?>">
                             <div class="ticket-top">
                                 <span class="ticket-id">#<?= str_pad($reg['id_ticket'], 5, '0', STR_PAD_LEFT) ?></span>
-                                <div class="ticket-status <?= htmlspecialchars(strtolower(str_replace(' ', '-', $reg['estado'])), ENT_QUOTES, 'UTF-8') ?>">
+                                <div class="ticket-status <?= strtolower(str_replace(' ', '-', $reg['estado'])) ?>">
                                     <span class="status-dot"></span>
-                                    <?= htmlspecialchars($reg['estado'], ENT_QUOTES, 'UTF-8') ?>
+                                    <?= $reg['estado'] ?>
                                 </div>
                             </div>
-                            <h6 style="font-size:13px; padding-bottom:-5px;">Categoria: <?= htmlspecialchars($reg['categoria'], ENT_QUOTES, 'UTF-8') ?> </h6>
+                            <h6 style="font-size:13px; padding-bottom:-5px;">Categoria: <?= $reg['categoria']?> </h6>
                             <div class="ticket-title">
                                 <h6 style="font-size:16px; font-weight: lighter;"><?= htmlspecialchars($reg['titulo'], ENT_QUOTES, 'UTF-8') ?></h6>
                             </div>
@@ -148,7 +145,7 @@ if ($id_ticket > 0) {
                 <div class="chat">
                     <?php while($mensajesResultado && $reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
                         <div class="message <?= $idUsuario === (int) $reg['id_usuario'] ? 'sent' : 'received' ?>">
-                            <?= nl2br(htmlspecialchars($reg['contenido'], ENT_QUOTES, 'UTF-8')) ?>
+                            <?= $reg['contenido'] ?>
                         </div>
                     <?php }?>
                 </div>

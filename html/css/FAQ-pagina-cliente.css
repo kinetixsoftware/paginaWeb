@@ -116,6 +116,15 @@ body{
     width:100%;
 }
 
+.menu a.active{
+    color:#5697ff;
+}
+
+.menu a.active::after{
+    width:100%;
+    height:3px;
+}
+
 /* Selector de idioma */
 
 .language-switch{
