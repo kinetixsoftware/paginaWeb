@@ -97,7 +97,7 @@ if ($id_ticket > 0) {
     <nav class="menu">
         <div class="menu-content">
             <div class="menu-logo">
-                <img src="../../imagenes/Logo1.png" alt="Logo Kinetix">
+                <img src="../imagenes/Logo1.png" alt="Logo Kinetix">
             </div>
 
             <ul>
