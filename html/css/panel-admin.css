@@ -205,6 +205,57 @@ body {
     color: var(--muted);
 }
 
+.selector-tabla,
+.tabla-seleccionada {
+    margin: 24px 30px 0;
+    padding: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.form-selector-tabla {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.form-selector-tabla label {
+    color: var(--muted);
+    flex-basis: 100%;
+}
+
+.form-selector-tabla select {
+    min-width: 260px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel-soft);
+    color: var(--text);
+    font: inherit;
+}
+
+.tabla-seleccionada {
+    margin-top: 18px;
+}
+
+.tabla-seleccionada-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.tabla-seleccionada-header h2 {
+    margin-bottom: 0;
+}
+
+.tabla-seleccionada-header form {
+    flex-shrink: 0;
+}
+
 .buscador {
     display: flex;
     gap: 10px;
@@ -466,6 +517,27 @@ tbody tr:hover {
 
     .admin-header {
         padding: 22px 20px;
+    }
+
+    .selector-tabla,
+    .tabla-seleccionada {
+        margin-right: 20px;
+        margin-left: 20px;
+        padding: 20px;
+    }
+
+    .form-selector-tabla select,
+    .form-selector-tabla button {
+        width: 100%;
+    }
+
+    .tabla-seleccionada-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .tabla-seleccionada-header button {
+        width: 100%;
     }
 
     .admin-header h2 {
