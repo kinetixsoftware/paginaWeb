@@ -71,8 +71,25 @@ if ($id_ticket > 0) {
             exit;
         }
 
-        $mensajes = "SELECT mt.id_usuario, mt.contenido, mt.fecha_creacion
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'eliminarMensaje') {
+            $idMensaje = (int) ($_POST['id_mensaje'] ?? 0);
+
+            if ($idMensaje > 0) {
+                $sql = "DELETE FROM mensaje_ticket
+                        WHERE id_mensaje = $idMensaje
+                        AND id_ticket = $id_ticket
+                        AND id_usuario = $idUsuario";
+                mysqli_query($conexion, $sql);
+            }
+
+            header("Location: tickets.php?id=$id_ticket");
+            exit;
+        }
+
+        $mensajes = "SELECT mt.id_mensaje, mt.id_usuario, mt.contenido, mt.fecha_creacion,
+                            u.nombre, u.apellido
                     FROM mensaje_ticket AS mt
+                    JOIN usuario AS u ON mt.id_usuario = u.id_usuario
                     WHERE mt.id_ticket = $id_ticket
                     ORDER BY mt.fecha_creacion ASC;";
         $mensajesResultado = mysqli_query($conexion, $mensajes);
@@ -145,7 +162,16 @@ if ($id_ticket > 0) {
                 <div class="chat">
                     <?php while($mensajesResultado && $reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
                         <div class="message <?= $idUsuario === (int) $reg['id_usuario'] ? 'sent' : 'received' ?>">
-                            <?= $reg['contenido'] ?>
+                            <strong><?= $reg['nombre'] . ' ' . $reg['apellido'] ?></strong>
+                            <div><?= $reg['contenido'] ?></div>
+                            <?php if ($idUsuario === (int) $reg['id_usuario']) { ?>
+                                <form method="POST">
+                                    <input type="hidden" name="accion" value="eliminarMensaje">
+                                    <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
+                                    <input type="hidden" name="id_mensaje" value="<?= $reg['id_mensaje'] ?>">
+                                    <button type="submit">Eliminar</button>
+                                </form>
+                            <?php } ?>
                         </div>
                     <?php }?>
                 </div>

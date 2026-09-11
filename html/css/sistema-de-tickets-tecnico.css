@@ -274,6 +274,32 @@ body.light-mode {
     overflow-wrap: anywhere;
 }
 
+.message strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: .82rem;
+}
+
+.message form {
+    margin-top: 9px;
+    text-align: right;
+}
+
+.message button {
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    font-size: .72rem;
+    cursor: pointer;
+}
+
+.message button:hover {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
 .received,
 .recieved {
     background: var(--received);
