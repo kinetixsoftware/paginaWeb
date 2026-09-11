@@ -5,8 +5,10 @@ require_once "../php/conexionBDD.php";
 
 $conexion = conectarBD();
 
-if (!isset($_SESSION['rol'])) {
-die('No tienes permiso para entrar a esta página.');
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== "1") {
+    $_SESSION['mensaje'] = "Solo los usuarios pueden crear tickets";
+    $_SESSION['tipoError'] = "error";
+    header("Location: inicio.php");
 }
 
 $categorias = "SELECT * FROM categoria_ticket ORDER BY id_categoria ASC";
@@ -21,13 +23,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$ticketPrioridad = $_POST['ticketPrioridad'];
 	$descripcion = $_POST['descripcion'];
 	$idUsuario = $_SESSION['idUsuario'];
+    $last_id = null;
 
 	try {
         $sql = "INSERT INTO ticket (titulo, descripcion, id_estado, id_prioridad, id_solicitante, id_categoria)
         VALUES ('$ticketTitulo', '$descripcion', 1, $ticketPrioridad, $idUsuario, $ticketCategoria)";
         $registro = mysqli_query($conexion, $sql);
 
-        if($registro) {
+        if($registro) {$last_id = $conexion->insert_id;} // obtener el id del ticket creado
+
+        $sql2 = "INSERT INTO historial_ticket (id_ticket, estado_nuevo) VALUES ('$last_id', 1)";
+        $registro2 = mysqli_query($conexion, $sql2);
+
+        if($registro && $registro2) {
             header("Location: tickets.php");
             exit;
         } else {
