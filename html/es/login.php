@@ -28,12 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $query = mysqli_query($conexion, $sql);
         $usuario = mysqli_fetch_assoc($query);
 
-        if (!$usuario) {
+        if (!$usuario || !password_verify($password, $usuario['password'])) {
             $tipoError = "error";
-            $mensaje = "El correo electrónico no está registrado.";
-        } elseif (!password_verify($password, $usuario['password'])) {
-            $tipoError = "error";
-            $mensaje = "La contraseña es incorrecta.";
+            $mensaje = "Lo que ingreso parece estar mal, intentelo de nuevo.";
         } elseif ($usuario['activo'] == 0) {
             $tipoError = "error";
             $mensaje = "Este usuario fue desactivado por un administrador, intente registrarse de nuevo";
@@ -121,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <p class="login-footer">
-                ¿No tenés cuenta? <a href="registrarse.php">Registrate aquí</a>
+                ¿No tenés una cuenta? <a href="registrarse.php">Registrate aquí</a>
             </p>
         </div>
     </section>
@@ -131,44 +128,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>© 2026 Kinetix. Todos los derechos reservados.</p>
     </footer>
     <script>
-    const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
     const emailParametro = urlParams.get('email')
-    const mensaje = urlParams.get('msg')
-
-    const msgBox = document.getElementById('formMessage');
-
-    function showToast(type, text) {
-        if (!msgBox) return;
-
-        msgBox.textContent = text;
-        msgBox.className = 'form-message ' + type;
-        msgBox.removeAttribute('hidden');
-
-        requestAnimationFrame(() => {
-            msgBox.classList.add('show');
-        });
-
-        clearTimeout(showToast.timeoutId);
-        showToast.timeoutId = setTimeout(() => {
-            msgBox.classList.add('hide');
-
-            setTimeout(() => {
-                msgBox.setAttribute('hidden', 'hidden');
-                msgBox.className = 'form-message';
-            }, 450);
-        }, 3000);
-    }
 
     if (emailParametro) {
         const emailInput = document.getElementById('email');
         if (emailInput) {
             emailInput.value = emailParametro;
         }
-    }
-
-    if (status && mensaje) {
-        showToast(status === 'success' ? 'success' : 'error', mensaje);
     }
 
     if (emailParametro) {
