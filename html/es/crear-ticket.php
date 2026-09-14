@@ -35,7 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql2 = "INSERT INTO historial_ticket (id_ticket, estado_nuevo) VALUES ('$last_id', 1)";
         $registro2 = mysqli_query($conexion, $sql2);
 
-        if($registro && $registro2) {
+        $sql3 = "INSERT INTO mensaje_ticket (id_ticket, id_usuario, contenido) VALUES ('$last_id', '$idUsuario', 'Descripcion: $descripcion')";
+        $registro3 = mysqli_query($conexion, $sql3);
+
+        if($registro && $registro2 && $registro3) {
             header("Location: tickets.php");
             exit;
         } else {
