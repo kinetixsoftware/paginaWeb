@@ -125,13 +125,16 @@ body.light-mode {
 .page {
     display: flex;
     justify-content: center;
+    height: calc(100vh - 85px);
     padding: 32px 20px 48px;
+    overflow: hidden;
 }
 
 .container {
     width: 100%;
     max-width: 1300px;
-    min-height: calc(100vh - 165px);
+    height: 100%;
+    min-height: 0;
     display: flex;
     background: var(--panel);
     border: 1px solid var(--border);
@@ -143,6 +146,7 @@ body.light-mode {
 .sidebar {
     width: 290px;
     flex: 0 0 290px;
+    min-height: 0;
     background: var(--panel-soft);
     border-right: 1px solid var(--border);
     display: flex;
@@ -152,14 +156,65 @@ body.light-mode {
 .sidebar h2 {
     color: var(--text);
     padding: 24px 20px 18px;
+    text-align:center;
     border-bottom: 1px solid var(--border);
     font-size: 1.25rem;
 }
 
 .ticket-list {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
+}
+
+.ticket-list::-webkit-scrollbar,
+.chat::-webkit-scrollbar {
+    width: 9px;
+}
+
+.ticket-list::-webkit-scrollbar-track,
+.chat::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.ticket-list::-webkit-scrollbar-thumb,
+.chat::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, .45);
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+}
+
+.ticket-list::-webkit-scrollbar-thumb:hover,
+.chat::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+    background-clip: padding-box;
+}
+
+.ticket-filter {
+    margin-bottom: 14px;
+}
+
+.ticket-filter select,
+.tech-controls select {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 30px 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+    font: inherit;
+    cursor: pointer;
+}
+
+.ticket-filter select:focus,
+.tech-controls select:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
 }
 
 .ticket {
@@ -203,6 +258,24 @@ body.light-mode {
     line-height: 1.4;
 }
 
+.ticket-category-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.ticket-category-row h6 {
+    min-width: 0;
+}
+
+.ticket-category-row form {
+    flex: 0 0 auto;
+}
+
+.ticket-title {
+    display:flex;
+}
 .ticket-title h6 {
     color: var(--text);
     font-size: .98rem;
@@ -233,15 +306,122 @@ body.light-mode {
 .ticket-status.resuelto .status-dot { background: var(--success); }
 .ticket-status.cerrado .status-dot { background: var(--danger); }
 
+.tech-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    background: var(--panel-soft);
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.resolution-panel {
+    padding: 12px 20px;
+    background: var(--panel);
+    border-top: 1px solid var(--border);
+}
+
+.resolution-panel h2 {
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: .9rem;
+}
+
+.resolution-panel form {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.resolution-panel textarea {
+    min-height: 42px;
+    flex: 1;
+    resize: vertical;
+    padding: 9px 11px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+    font: inherit;
+}
+
+.resolution-panel textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+}
+
+.resolution-panel .btn-editar {
+    margin-right: 0;
+    min-width: 210px;
+}
+
+.resolution-panel textarea:disabled,
+.resolution-panel button:disabled {
+    cursor: not-allowed;
+    opacity: .55;
+}
+
+.tech-controls > div {
+    flex: 1 1 150px;
+    min-width: 0;
+}
+
+.tech-controls form {
+    width: 100%;
+}
+
+.tech-controls .btn-editar {
+    width: 100%;
+    min-height: 36px;
+    margin-right: 0;
+}
+
+.tech-controls select {
+    background: var(--card-strong);
+}
+
+.btn-editar,
+.btn-eliminar {
+    margin-right: 5px;
+    padding: 3px 10px;
+    border: 0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-editar {
+    background: #374151;
+    color: var(--text);
+}
+
+.btn-editar:hover {
+    background: #4b5563;
+    transform: translateY(-1px);
+}
+
+.btn-eliminar {
+    background: #dc2626;
+    color: #fff;
+}
+
+.btn-eliminar:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
 .main {
     min-width: 0;
+    min-height: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
 .header {
-    min-height: 70px;
+    min-height: 66px;
     display: flex;
     align-items: center;
     background: var(--panel);
@@ -257,10 +437,12 @@ body.light-mode {
 
 .chat {
     flex: 1;
-    min-height: 300px;
+    min-height: 0;
     padding: 24px;
     overflow-y: auto;
     background: var(--card-strong);
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) transparent;
 }
 
 .message {
@@ -272,6 +454,7 @@ body.light-mode {
     color: var(--text);
     line-height: 1.45;
     overflow-wrap: anywhere;
+    box-shadow: 0 5px 14px rgba(0, 0, 0, .12);
 }
 
 .message strong {
@@ -342,7 +525,7 @@ body.light-mode {
 }
 
 .chat-input button {
-    min-height: 44px;
+    min-height: 60px;
     padding: 0 22px;
     border: 0;
     border-radius: 8px;
@@ -411,10 +594,14 @@ body.dark-mode {
     }
 
     .page {
+        height: auto;
+        min-height: calc(100vh - 85px);
         padding: 20px 12px 32px;
+        overflow: visible;
     }
 
     .container {
+        height: auto;
         min-height: calc(100vh - 137px);
         flex-direction: column;
     }
@@ -437,6 +624,15 @@ body.dark-mode {
     .chat {
         min-height: 260px;
         padding: 18px;
+    }
+
+    .resolution-panel form {
+        flex-direction: column;
+    }
+
+    .resolution-panel .btn-editar {
+        width: 100%;
+        min-width: 0;
     }
 
     .message {
