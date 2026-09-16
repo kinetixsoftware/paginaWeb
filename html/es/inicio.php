@@ -178,7 +178,7 @@ session_start();
     <!-- Footer contactos -->
     <div class="footer-contacto">
         <h3>¿Tenés alguna consulta urgente?</h3>
-        <a href="crear-ticket.html" class="btn-contacto">Abrir un Ticket</a>
+        <a href="crear-ticket.php" class="btn-contacto">Abrir un Ticket</a>
 
         <!-- Footer -->
         <footer class="footer">

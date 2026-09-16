@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const isDark = theme === 'dark';
         body.classList.toggle('dark-mode', isDark);
         body.classList.toggle('light-mode', !isDark);
-        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
         themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
     }
 

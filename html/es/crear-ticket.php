@@ -18,10 +18,10 @@ $prioridad = "SELECT * FROM prioridad_ticket ORDER BY id_prioridad ASC";
 $resultadoprioridad = mysqli_query($conexion, $prioridad);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	$ticketTitulo = $_POST['ticketTitulo'] ?? '';
+	$ticketTitulo = mysqli_real_escape_string($conexion, $_POST['ticketTitulo'] ?? '');
 	$ticketCategoria = $_POST['ticketCategoria'];
 	$ticketPrioridad = $_POST['ticketPrioridad'];
-	$descripcion = $_POST['descripcion'];
+	$descripcion = mysqli_real_escape_string($conexion, $_POST['descripcion']);
 	$idUsuario = $_SESSION['idUsuario'];
     $last_id = null;
 
@@ -32,14 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if($registro) {$last_id = $conexion->insert_id;} // obtener el id del ticket creado
 
-        $sql2 = "INSERT INTO historial_ticket (id_ticket, estado_nuevo) VALUES ('$last_id', 1)";
+        $sql2 = "INSERT INTO historial_ticket (id_ticket, estado_nuevo, accion) VALUES ($last_id, 1, 'Ticket creado por el usuario')";
         $registro2 = mysqli_query($conexion, $sql2);
 
-        $sql3 = "INSERT INTO mensaje_ticket (id_ticket, id_usuario, contenido) VALUES ('$last_id', '$idUsuario', 'Descripcion: $descripcion')";
+        $sql3 = "INSERT INTO mensaje_ticket (id_ticket, id_usuario, contenido) VALUES ($last_id, '$idUsuario', 'Descripcion: $descripcion')";
         $registro3 = mysqli_query($conexion, $sql3);
 
         if($registro && $registro2 && $registro3) {
-            header("Location: tickets.php");
+            header("Location: tickets.php?id=" . $last_id);
             exit;
         } else {
             echo "Error al crear el ticket: " . mysqli_error($conexion);
@@ -70,10 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <ul>
-                <li><a href="inicio.html">Inicio</a></li>
+                <li><a href="inicio.php">Inicio</a></li>
                 <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
-                <li><a href="pagina-de-tickets-tecnico.html">Tickets</a></li>
-                <li><a href="inventario.html">Inventario</a></li>
+                <li><a href="tickets.php">Tickets</a></li>
+                <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="Login.html">Mi Cuenta</a></li>
                 <div class="language-switch">
                     <input type="checkbox" id="langToggle">

@@ -133,7 +133,7 @@ $resultadoestados = mysqli_query($conexion, $estados);
       body.classList.toggle('dark-mode', isDark);
       body.classList.toggle('light-mode', !isDark);
       if (themeToggle) {
-        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
         themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
       }
     }

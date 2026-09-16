@@ -60,7 +60,7 @@ if ($id_ticket > 0) {
 
     if ($ticketPermitido) {
         $ticketTitulo = $ticketData['titulo'];
-        $ticketEstado = $ticketData['id_estado'];
+        $ticketEstado = (int) $ticketData['id_estado'];
 
         if (empty($ticketData['id_tecnico']) && $rol === 2 && (int) $ticketEstado !== 2) {
             $sql = "UPDATE ticket
@@ -68,6 +68,11 @@ if ($id_ticket > 0) {
                     WHERE id_ticket = $id_ticket";
             mysqli_query($conexion, $sql);
             $ticketEstado = 3;
+
+            $accion = 'El tecnico (ID:' . $idUsuario . ') fue asignado a este ticket';
+            $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                    VALUES ($id_ticket, 1, 3, '$accion')";
+            mysqli_query($conexion, $sql);
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -79,6 +84,11 @@ if ($id_ticket > 0) {
                     $sql = "INSERT INTO mensaje_ticket (id_ticket, id_usuario, contenido)
                             VALUES ($id_ticket, $idUsuario, '$contenidoMensaje')";
                     mysqli_query($conexion, $sql);
+
+                    $accion = "El $visitante mando un mensaje. Mensaje: $contenidoMensaje";
+                    $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                            VALUES ($id_ticket, $ticketEstado, $ticketEstado, '$accion')";
+                    mysqli_query($conexion, $sql);
                 }
 
                 header("Location: tickets.php?id=$id_ticket");
@@ -89,10 +99,22 @@ if ($id_ticket > 0) {
                 $idMensaje = (int) ($_POST['id_mensaje'] ?? 0);
 
                 if ($idMensaje > 0) {
+                    // obtener el mensaje que el usuario quiere eliminar
+                    $sql = "SELECT contenido FROM mensaje_ticket where id_mensaje = $idMensaje LIMIT 1";
+                    $resultado = mysqli_query($conexion, $sql);
+                    $mensaje = mysqli_fetch_assoc($resultado);
+                    $contenido = $mensaje['contenido'] ?? '';
+
                     $sql = "DELETE FROM mensaje_ticket
                             WHERE id_mensaje = $idMensaje
                             AND id_ticket = $id_ticket
                             AND id_usuario = $idUsuario";
+                    mysqli_query($conexion, $sql);
+
+
+                    $accion = "El $visitante elimino un mensaje. Mensaje: $contenido";
+                    $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion) 
+                            VALUES ($id_ticket, $ticketEstado, $ticketEstado, '$accion')";
                     mysqli_query($conexion, $sql);
                 }
 
@@ -106,6 +128,10 @@ if ($id_ticket > 0) {
                 $sql = "UPDATE ticket
                         SET id_categoria = $id_categoria
                         WHERE id_ticket = $id_ticket";
+                mysqli_query($conexion, $sql);
+
+                $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                        VALUES ($id_ticket, $ticketEstado, $ticketEstado, 'El tecnico cambio la categoria de este ticket.')";
                 mysqli_query($conexion, $sql);
 
                 header("Location: tickets.php?id=$id_ticket");
@@ -128,8 +154,8 @@ if ($id_ticket > 0) {
                 $sqlS = mysqli_fetch_array($sqlS);
                 $ultimoEstado = $sqlS['estado_nuevo'];
                     
-                $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo)
-                        VALUES ($id_ticket, $ultimoEstado, 2)";
+                $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                        VALUES ($id_ticket, $ultimoEstado, 2, 'Ticket cancelado por el usuario')";
                 mysqli_query($conexion, $sql);
 
                 header("Location: tickets.php?id=$id_ticket");
@@ -165,10 +191,10 @@ if ($id_ticket > 0) {
                             WHERE id_ticket = $id_ticket";
                     mysqli_query($conexion, $sql);
 
-                    $sql = "INSERT INTO historial_ticket
-                                (id_ticket, estado_anterior, estado_nuevo)
-                            VALUES ($id_ticket, $estadoAnterior, 4)";
+                    $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                            VALUES ($id_ticket, $estadoAnterior, 4, 'Ticket cerrado por el tecnico con solucion')";
                     mysqli_query($conexion, $sql);
+                    $ticketEstado = 4;
                     
                     $sql = "INSERT INTO mensaje_ticket (id_ticket, id_usuario, contenido) VALUES ('$id_ticket', '$idUsuario', 'Solucion: $solucion')";
                     $registro = mysqli_query($conexion, $sql);
@@ -180,6 +206,7 @@ if ($id_ticket > 0) {
 
             if (($_POST['accion'] ?? '') === 'cambiarEstado') {
                 $id_estado= $_POST['estado'];
+                $ticketEstado = $id_estado;
 
                 if($id_estado !== 1 && $id_estado !== 2) {
                     $sql = "UPDATE ticket
@@ -196,8 +223,8 @@ if ($id_ticket > 0) {
                     $sqlS = mysqli_fetch_array($sqlS);
                     $ultimoEstado = $sqlS['estado_nuevo'];
                     
-                    $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo)
-                            VALUES ($id_ticket, $ultimoEstado, $id_estado)";
+                    $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                            VALUES ($id_ticket, $ultimoEstado, $id_estado, 'Tecnico cambio el estado del ticket')";
                     mysqli_query($conexion, $sql);
                 }
 
@@ -220,6 +247,10 @@ if ($id_ticket > 0) {
                 $sql = "UPDATE ticket
                         SET id_prioridad = $id_prioridad
                         WHERE id_ticket = $id_ticket";
+                mysqli_query($conexion, $sql);
+
+                $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                        VALUES ($id_ticket, $ticketEstado, $ticketEstado, 'El tecnico cambio la prioridad de este ticket.')";
                 mysqli_query($conexion, $sql);
 
                 header("Location: tickets.php?id=$id_ticket");
@@ -272,7 +303,7 @@ $estadosResultado = mysqli_query($conexion, $estados);
                 <li><a href="tickets.php" class="active" aria-current="page">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="user.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
-                <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button></li>
+                <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
             </ul>
         </div>
     </nav>

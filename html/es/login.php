@@ -74,9 +74,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <ul>
                 <li><a href="inicio.php">Volver</a></li>
+                <li><a href="registrarse.php">Registrarse</a></li>
                 <li>
-                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
-                        Dark</button>
+                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema"> 🌙 </button>
                 </li>
             </ul>
     </nav>
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const isDark = theme === 'dark';
         body.classList.toggle('dark-mode', isDark);
         body.classList.toggle('light-mode', !isDark);
-        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        themeToggle.textContent = isDark ? '☀️' : '🌙';
         themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
     }
 

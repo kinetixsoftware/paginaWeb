@@ -52,7 +52,7 @@ $tablasDisponibles = [
     'solicitud_servicio' => ['id_solicitud', 'titulo', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante'],
     'ticket' => ['id_ticket', 'titulo', 'descripcion', 'fecha_creacion', 'id_estado', 'id_prioridad', 'id_solicitante', 'id_tecnico', 'id_activo', 'id_categoria'],
     'ubicacion' => ['id_ubicacion', 'calle', 'id_ciudad'],
-    'ciudad' => ['id_ciudad', 'ciudad', 'id_departamento'],
+    'ciudad' => ['id_ciudad', 'ciudad', 'departamento'],
     'usuario' => ['id_usuario', 'nombre', 'apellido', 'email', 'password', 'activo', 'id_rol']
 ];
 
