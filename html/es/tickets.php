@@ -191,8 +191,9 @@ if ($id_ticket > 0) {
                             WHERE id_ticket = $id_ticket";
                     mysqli_query($conexion, $sql);
 
+                    $accion = "Ticket cerrado por el tecnico con solucion: " . $solucion . ".";
                     $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
-                            VALUES ($id_ticket, $estadoAnterior, 4, 'Ticket cerrado por el tecnico con solucion')";
+                            VALUES ($id_ticket, $estadoAnterior, 4, '$accion')";
                     mysqli_query($conexion, $sql);
                     $ticketEstado = 4;
                     
