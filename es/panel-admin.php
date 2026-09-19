@@ -85,6 +85,7 @@ if ($columnasTablaSeleccionada) {
             </div>
             <ul>
                 <li> <a href="inicio.php">Inicio</a> </li>
+                <li> <a href="informes-admin.php">Informes sobre la pagina</a></li>
                 <li> <a href="../php/logout.php">Cerrar sesion</a> </li>
             </ul>
         </div>

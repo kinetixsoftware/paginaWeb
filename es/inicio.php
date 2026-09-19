@@ -38,6 +38,7 @@ session_start();
                 <li> <a href="../php/logout.php">Cerrar sesión</a></li>
                     <?php } elseif ($_SESSION['rol'] == 3) {?>
                 <li> <a href="panel-admin.php">Panel Administrador</a></li>
+                <li> <a href="informes-admin.php">Informes sobre la pagina</a></li>
                 <li> <a href="../php/logout.php">Cerrar sesión</a></li>
                 <?php } } else { ?>
                 <li> <a href="login.php">Iniciar sesión</a></li>
