@@ -128,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>© 2026 Kinetix. Todos los derechos reservados.</p>
     </footer>
     <script>
+    const urlParams = new URLSearchParams(window.location.search);
     const status = urlParams.get('status');
     const emailParametro = urlParams.get('email')
 
