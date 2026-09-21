@@ -34,7 +34,7 @@ session_start();
                 <li> <a href="FAQ-pagina-cliente.html">FAQ</a></li>
                 <li> <a href="tickets.php">Mis Tickets</a></li>
                 <li> <a href="inventario.php">Inventario</a></li>
-                <li id="nav-tecnico" hidden> <a href="pagina-de-tickets-tecnico.html">Panel técnico</a></li>
+                <li> <a href="usuario.php?id=<?= $_SESSION['idUsuario'] ?>">Mi Perfil</a></li>
                 <li> <a href="../php/logout.php">Cerrar sesión</a></li>
                     <?php } elseif ($_SESSION['rol'] == 3) {?>
                 <li> <a href="panel-admin.php">Panel Administrador</a></li>

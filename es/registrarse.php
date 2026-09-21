@@ -3,26 +3,28 @@ session_start();
 
 require_once "../php/conexionBDD.php";
 
-$conexion = conectarBD();
 
 $mensaje = "";
 $tipoError = "";
+$id_ubicacion = 0;
 
 if (isset($_SESSION['rol'])) {
     $_SESSION['mensaje'] = "Porfavor incia sesion para obtener acceso a esta pagina";
-      $_SESSION['tipoError'] = "error";
-      header("Location: login.php");
+    $_SESSION['tipoError'] = "error";
+    header("Location: login.php");
     exit;
 }
 
+$conexion = conectarBD();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nombre      = trim($_POST['nombre'] ?? '');
     $apellido = trim($_POST['apellido'] ?? '');
     $email       = trim($_POST['email'] ?? '');
-      $password = $_POST['password'] ?? '';
+    $password = $_POST['password'] ?? '';
     $id_rol      = (int) ($_POST['rol'] ?? 0);
+    $id_ubicacion = (int) ($_POST['id_ubicacion'] ?? 0);
 
-    if ($nombre === '' || $apellido === '' || $email === '' || $password === '' || $id_rol === 0) {
+    if ($nombre === '' || $apellido === '' || $email === '' || $password === '' || $id_rol === 0 || $id_ubicacion === 0) {
       $tipoError = "error";
       $mensaje = "Completá todos los campos del formulario.";
     } else {
@@ -49,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
                 $passwordSQL = mysqli_real_escape_string($conexion, $passwordHash);
-                $sqlQ = "INSERT INTO usuario (nombre, apellido, email, password, activo, id_rol)
-                    VALUES ('$nombreSQL', '$apellidoSQL', '$emailSQL', '$passwordSQL', 1, $id_rol)";
+                $sqlQ = "INSERT INTO usuario (nombre, apellido, email, password, activo, id_rol, id_ubicacion)
+                    VALUES ('$nombreSQL', '$apellidoSQL', '$emailSQL', '$passwordSQL', 1, $id_rol, $id_ubicacion)";
                 $query = mysqli_query($conexion, $sqlQ);
                 $queryInsert = $query === true;
 
@@ -71,6 +73,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 }
+
+$sqlUbicaciones = "SELECT u.id_ubicacion, u.calle, c.ciudad
+    FROM ubicacion AS u
+    LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
+    ORDER BY c.ciudad, u.calle";
+$ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
 ?>
 
 <!DOCTYPE html>
@@ -150,6 +158,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </svg>
                         </button>
                     </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="id_ubicacion">Este usuario trabaja en</label>
+                    <select id="id_ubicacion" name="id_ubicacion" required>
+                        <option value="">Seleccioná una ubicación</option>
+                        <?php while ($ubicacion = mysqli_fetch_assoc($ubicaciones)) { ?>
+                            <option value="<?= (int) $ubicacion['id_ubicacion'] ?>"
+                                <?= $id_ubicacion === (int) $ubicacion['id_ubicacion'] ? 'selected' : '' ?>>
+                                <?= $ubicacion['calle'] . ' - ' . ($ubicacion['ciudad'] ?? 'Sin ciudad') ?>
+                            </option>
+                        <?php } ?>
+                    </select>
                 </div>
 
                 <h3>¿En que rol te gustaria trabajar?</h3>

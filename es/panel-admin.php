@@ -9,7 +9,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 3) {
     $_SESSION['mensaje'] = "Usted no tiene permiso para ver esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: inicio.php");
-  exit;
+    exit;
 }
 
 $mensaje = "";
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'ingre
 }
 
 $tablasDisponibles = [
-    'activo' => ['id_activo', 'codigo_inventario', 'nombre', 'descripcion', 'marca', 'modelo', 'numero_serie', 'fecha_adquisicion', 'fecha_baja', 'id_categoria', 'id_estado', 'id_ubicacion', 'id_marca'],
+    'activo' => ['id_activo', 'codigo_inventario', 'nombre', 'descripcion', 'marca', 'modelo', 'numero_serie', 'fecha_adquisicion', 'fecha_baja', 'id_categoria', 'id_estado', 'id_ubicacion', 'id_marca', 'id_usuario'],
     'activo_marca' => ['id_marca', 'marca'],
     'categoria_activo' => ['id_categoria', 'categoria'],
     'categoria_ticket' => ['id_categoria', 'categoria'],
@@ -49,11 +49,11 @@ $tablasDisponibles = [
     'prioridad_ticket' => ['id_prioridad', 'prioridad'],
     'resultado_ticket' => ['id_resultado', 'solucion', 'fecha_resolucion', 'id_ticket', 'id_tecnico'],
     'rol' => ['id_rol', 'nombre_rol'],
-    'solicitud_servicio' => ['id_solicitud', 'titulo', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante'],
+    'solicitud_servicio' => ['id_solicitud', 'titulo', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante', 'id_activo'],
     'ticket' => ['id_ticket', 'titulo', 'descripcion', 'fecha_creacion', 'id_estado', 'id_prioridad', 'id_solicitante', 'id_tecnico', 'id_activo', 'id_categoria'],
     'ubicacion' => ['id_ubicacion', 'calle', 'id_ciudad'],
     'ciudad' => ['id_ciudad', 'ciudad', 'departamento'],
-    'usuario' => ['id_usuario', 'nombre', 'apellido', 'email', 'password', 'activo', 'id_rol']
+    'usuario' => ['id_usuario', 'nombre', 'apellido', 'email', 'password', 'activo', 'id_rol', 'id_ubicacion']
 ];
 
 $tablaSeleccionada = $_GET['tabla'] ?? '';

@@ -17,7 +17,7 @@ if (!$conexion) {
 }  
 
 $tablas = [
-    'activo' => ['id_activo', 'codigo_inventario', 'nombre', 'descripcion', 'marca', 'modelo', 'numero_serie', 'fecha_adquisicion', 'fecha_baja', 'id_categoria', 'id_estado', 'id_ubicacion', 'id_marca'],
+    'activo' => ['id_activo', 'codigo_inventario', 'nombre', 'descripcion', 'marca', 'modelo', 'numero_serie', 'fecha_adquisicion', 'fecha_baja', 'id_categoria', 'id_estado', 'id_ubicacion', 'id_marca', 'id_usuario'],
     'activo_marca' => ['id_marca', 'marca'],
     'categoria_activo' => ['id_categoria', 'categoria'],
     'categoria_ticket' => ['id_categoria', 'categoria'],
@@ -25,17 +25,16 @@ $tablas = [
     'estado_activo' => ['id_estado', 'estado'],
     'estado_solicitud' => ['id_estado', 'estado'],
     'estado_ticket' => ['id_estado', 'estado'],
-    'historial_ticket' => ['id_historial', 'id_ticket', 'id_usuario', 'estado_anterior', 'estado_nuevo', 'fecha'],
-    'mensaje' => ['id_mensaje', 'mensaje', 'imagenPATH', 'id_usuario', 'id_ticket'],
-    'mensaje_ticket' => ['id_mensaje', 'id_ticket', 'id_usuario', 'contenido', 'imagen_path', 'fecha_creacion'],
+    'historial_ticket' => ['id_historial', 'id_ticket', 'estado_anterior', 'estado_nuevo', 'fecha'],
+    'mensaje_ticket' => ['id_mensaje', 'id_ticket', 'id_usuario', 'contenido', 'fecha_creacion'],
     'prioridad_ticket' => ['id_prioridad', 'prioridad'],
     'resultado_ticket' => ['id_resultado', 'solucion', 'fecha_resolucion', 'id_ticket', 'id_tecnico'],
     'rol' => ['id_rol', 'nombre_rol'],
-    'solicitud_servicio' => ['id_solicitud', 'titulo', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante'],
+    'solicitud_servicio' => ['id_solicitud', 'titulo', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante', 'id_activo'],
     'ticket' => ['id_ticket', 'titulo', 'descripcion', 'fecha_creacion', 'id_estado', 'id_prioridad', 'id_solicitante', 'id_tecnico', 'id_activo', 'id_categoria'],
     'ubicacion' => ['id_ubicacion', 'calle', 'id_ciudad'],
-    'ciudad' => ['id_ciudad', 'ciudad', 'id_departamento'],
-    'usuario' => ['id_usuario', 'nombre', 'apellido', 'email', 'password', 'activo', 'id_rol']
+    'ciudad' => ['id_ciudad', 'ciudad', 'departamento'],
+    'usuario' => ['id_usuario', 'nombre', 'apellido', 'email', 'password', 'activo', 'id_rol', 'id_ubicacion']
 ];
 
 $tabla = $_POST['tabla'] ?? '';

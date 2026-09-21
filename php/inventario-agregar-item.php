@@ -18,14 +18,14 @@ $resultadomarcas = mysqli_query($conexion, $marcas);
 $categoria = "SELECT * FROM categoria_activo ORDER BY id_categoria ASC";
 $resultadocategorias = mysqli_query($conexion, $categoria);
 
-$estados = "SELECT * FROM estado_activo ORDER BY id_estado ASC";
+$estados = "SELECT * FROM estado_activo WHERE NOT id_estado = 2 ORDER BY id_estado ASC";
 $resultadoestados = mysqli_query($conexion, $estados);
 
-$ciudad =   "SELECT c.ciudad, c.id_ciudad, d.departamento 
-            FROM ciudad as c, departamento as d 
-            WHERE c.id_ciudad = d.id_departamento
-            ORDER BY id_ciudad ASC";
-$resultadoCiudad = mysqli_query($conexion, $ciudad);
+$sqlUbicaciones = "SELECT u.id_ubicacion, u.calle, c.ciudad
+    FROM ubicacion AS u
+    LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
+    ORDER BY c.ciudad, u.calle";
+$resultadoUbicacion = mysqli_query($conexion, $sqlUbicaciones);
 
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $codigo = $_POST['codigo_inventario'];
@@ -33,37 +33,25 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $descripcion = $_POST['descripcion'] ?? "";
     $modelo = $_POST['modelo'];
     $numero_serie = $_POST['numero_serie'];
-    $estado = $_POST['estadoActivo'];
-    $categoria = $_POST['categoria'];
-    $marca_id = $_POST['marca'];
+    $categoria = (int) $_POST['categoria'];
+    $marca_id = (int) $_POST['marca'];
     $fecha_adquisicion = date('Y-m-d');
     $fecha_baja = null;
-    $calle = $_POST['calle'];
-    $id_ciudad = $_POST['ciudad'];
+    $id_ubicacion = (int) $_POST['ubicacion'];
+
+    $sql = "INSERT INTO activo(codigo_inventario, nombre, descripcion, modelo, numero_serie, fecha_adquisicion, fecha_baja, id_estado, id_categoria, id_ubicacion, id_marca)
+            VALUES ('$codigo', '$nombre', '$descripcion', '$modelo', '$numero_serie', '$fecha_adquisicion', '$fecha_baja', 1, $categoria, $id_ubicacion, $marca_id)";
+    $sql = mysqli_query($conexion, $sql);
     
-    if ($estado == 4) {
-        $fecha_baja = date('Y-m-d');
+    if($sql) {
+        $_SESSION['mensaje'] = "Activo registrado correctamente";
+        $_SESSION['tipoError'] = "success";
+    } else {
+        $_SESSION['mensaje'] = "El activo no pudo ser registrado";
+        $_SESSION['tipoError'] = "error";
     }
-
-    $sql = "INSERT INTO ubicacion(calle, id_ciudad) values (?, ?)";
-    $stmtInsertar = $conexion->prepare($sql);
-    $stmtInsertar->bind_param( "si", $calle, $id_ciudad);
-
-    if($stmtInsertar->execute()) {
-        $id_ubicacion = mysqli_insert_id($conexion);
-        $sql = "INSERT INTO activo(codigo_inventario, nombre, descripcion, modelo, numero_serie, fecha_adquisicion, fecha_baja, id_estado, id_categoria, id_ubicacion, id_marca)
-                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $stmtInsertarr = $conexion->prepare($sql);
-                $stmtInsertarr->bind_param( "sssssssiiii", $codigo, $nombre, $descripcion, $modelo, $numero_serie, $fecha_adquisicion, $fecha_baja, $estado, $categoria, $id_ubicacion, $marca_id);
-                if($stmtInsertarr->execute()) {
-                    $_SESSION['mensaje'] = "Activo registrado correctamente";
-                    $_SESSION['tipoError'] = "success";
-                } else {
-                    $_SESSION['mensaje'] = "El activo no pudo ser registrado";
-                    $_SESSION['tipoError'] = "error";
-                }
-                Header("Location: ../es/inventario.php");
-    }
+    Header("Location: ../es/inventario.php");
+    exit;
 }
 ?>
 
@@ -112,12 +100,6 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input id="modelo" name="modelo" type="text">
                             <label for="numero_serie">Numero de serie</label>
                             <input id="numero_serie" name="numero_serie" type="text">
-                            <label for="estadoActivo">Estado del activo </label>
-                                <select id="estadoActivo" name="estadoActivo">
-                                    <?php  while ($reg = mysqli_fetch_array($resultadoestados)) { ?>
-                                        <option name="<?=$reg['estado'] ?>" value="<?= $reg['id_estado'] ?>" required> <h5><?= $reg['estado'] ?></h5></option>
-                                    <?php } ?>
-                                </select>
                             <label for="activoMarca"> Marca </label>
                                 <select id="activoMarca" name="marca">
                                     <?php  while ($reg = mysqli_fetch_array($resultadomarcas)) { ?>
@@ -130,14 +112,12 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <option name="<?=$reg['categoria'] ?>" value="<?= $reg['id_categoria'] ?>" > <h5><?= $reg['categoria'] ?></h5></option>
                                     <?php } ?>
                                 </select>
-                            <label for="activociudad"> Ciudad </label>
-                                <select id="activociudad" name="ciudad">
-                                    <?php  while ($reg = mysqli_fetch_array($resultadoCiudad)) { ?>
-                                        <option name="<?=$reg['ciudad'] ?>" value="<?= $reg['id_ciudad'] ?>" > <h5><?= $reg['ciudad'] ?></h5></option>
+                            <label for="activoUbicacion"> Ubicacion </label>
+                                <select id="activoUbicacion" name="ubicacion">
+                                    <?php  while ($reg = mysqli_fetch_array($resultadoUbicacion)) { ?>
+                                        <option name="<?=$reg['id_ubicacion'] ?>" value="<?= $reg['id_ubicacion'] ?>" > <h5><?=$reg['calle'] . ' - ' . $reg['ciudad'] ?></h5></option>
                                     <?php } ?>
                                 </select>
-                                <label for="calle">Calle</label>
-                                <input id="calle" name="calle" type="text">
                             <button type="submit">Guardar</button>
                         </form>
                     </section>
