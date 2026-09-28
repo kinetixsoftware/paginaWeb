@@ -405,6 +405,201 @@ body.light-mode {
 .card-meta .Reparacion{ background:#a66a00; color:var(--danger-text); }
 .card-meta .Discontinuado{ background:var(--danger-bg); color:var(--danger-text); }
 
+/* Detalle del activo */
+.asset-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.asset-hero {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.9fr) minmax(0, 1.1fr);
+    min-height: 300px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+}
+
+.asset-hero > img {
+    width: 100%;
+    height: 100%;
+    min-height: 300px;
+    object-fit: cover;
+    background: var(--card-strong);
+}
+
+.asset-hero-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 34px;
+}
+
+.asset-hero-info .category {
+    margin-top: 18px;
+}
+
+.asset-hero-info h2 {
+    margin: 8px 0 6px;
+    color: var(--text);
+    font-size: clamp(1.7rem, 4vw, 2.5rem);
+    line-height: 1.1;
+}
+
+.asset-description {
+    max-width: 620px;
+    margin-top: 18px;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.asset-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 24px;
+    align-items: start;
+}
+
+.asset-content,
+.asset-actions,
+.asset-section {
+    min-width: 0;
+}
+
+.asset-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.asset-section,
+.asset-actions {
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--card);
+}
+
+.asset-section h2,
+.asset-actions h2,
+.service-request h2 {
+    margin-bottom: 18px;
+    color: var(--text);
+    font-size: 1.2rem;
+}
+
+.asset-data {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.asset-data div {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--panel-soft);
+}
+
+.asset-data dt {
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.asset-data dd {
+    margin-top: 5px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.asset-timeline {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.asset-timeline article {
+    padding-left: 14px;
+    border-left: 3px solid var(--primary);
+}
+
+.asset-timeline strong,
+.asset-timeline span {
+    display: block;
+}
+
+.asset-timeline strong {
+    color: var(--text);
+    font-size: .85rem;
+}
+
+.asset-timeline span {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.4;
+}
+
+.asset-actions {
+    position: sticky;
+    top: 105px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.asset-actions h2 {
+    margin-bottom: 4px;
+}
+
+.asset-actions .btn-login,
+.asset-action-link {
+    width: 100%;
+    margin: 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+.asset-actions .btn-login:hover {
+    transform: translateY(-1px);
+}
+
+.asset-action-link {
+    display: block;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: .9rem;
+    font-weight: 600;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.asset-action-link:hover {
+    border-color: var(--primary);
+    background: var(--panel-soft);
+    transform: translateY(-1px);
+}
+
+.service-request {
+    margin-top: 24px;
+}
+
+.service-request > p {
+    margin-bottom: 20px;
+}
+
+.service-request form {
+    grid-template-columns: minmax(150px, 220px) minmax(0, 1fr);
+}
+
+.service-request form button {
+    margin-top: 4px;
+}
+
 .theme-toggle {
   border: 1px solid var(--border);
   background: rgba(255,255,255,0.08);
@@ -453,6 +648,10 @@ body.light-mode .card img { background: #f2f2f2; }
 body.light-mode .status.Disponible { background:#dff5e7; color:#18794E; }
 body.light-mode .status.Prestado { background:#fff4cc; color:#a66a00; }
 body.light-mode .status.Reparacion { background:#f8d7da; color:#842029; }
+
+body.light-mode .asset-data div {
+    background: #f8fafc;
+}
 
 body.light-mode .filters input,
 body.light-mode .filters select {
@@ -532,5 +731,28 @@ body.light-mode .menu a::after { background:#2563eb; }
     .formulario form button {
         width: 100%;
         text-align: center;
+    }
+
+    .asset-hero,
+    .asset-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .asset-hero-info {
+        padding: 24px;
+    }
+
+    .asset-hero > img {
+        min-height: 220px;
+        max-height: 280px;
+    }
+
+    .asset-actions {
+        position: static;
+    }
+
+    .asset-data,
+    .asset-timeline {
+        grid-template-columns: 1fr;
     }
 }
