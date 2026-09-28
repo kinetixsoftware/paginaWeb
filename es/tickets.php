@@ -3,7 +3,6 @@ session_start();
 
 require_once "../php/conexionBDD.php";
 
-$conexion = conectarBD();
 
 $rol = isset($_SESSION['rol']) ? (int) $_SESSION['rol'] : null;
 $idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
@@ -34,6 +33,7 @@ $filtroTickets = $rol === 2
     ? "(t.id_tecnico = $idUsuario OR t.id_tecnico IS NULL)"
     : "t.id_solicitante = $idUsuario";
 
+$conexion = conectarBD();
 $ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, pt.prioridad, ct.categoria
                 FROM ticket           AS t 
                 JOIN estado_ticket    AS e   ON t.id_estado = e.id_estado
@@ -48,6 +48,7 @@ $mensajesResultado = null;
 $ticketTitulo = null;
 $ticketEstado = null;
 $id_ticket = (int) ($_GET['id'] ?? $_POST['id_ticket'] ?? 0);
+$historialTicket = null;
 
 if ($id_ticket > 0) {
     $ticket = "SELECT id_tecnico, id_solicitante, titulo, id_estado
@@ -74,6 +75,9 @@ if ($id_ticket > 0) {
                     VALUES ($id_ticket, 1, 3, '$accion')";
             mysqli_query($conexion, $sql);
         }
+
+        $historialTicket = "SELECT fecha, accion FROM historial_ticket WHERE id_ticket = $id_ticket ORDER BY fecha ASC";
+        $historialTicket = mysqli_query($conexion, $historialTicket);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (($_POST['accion'] ?? '') === 'mandarMensaje' && !(in_array($ticketEstado, [2, 4, 5]))) {
@@ -303,7 +307,7 @@ $estadosResultado = mysqli_query($conexion, $estados);
                 <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
                 <li><a href="tickets.php" class="active" aria-current="page">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
-                <li><a href="user.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
                 <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
             </ul>
         </div>
@@ -437,6 +441,28 @@ $estadosResultado = mysqli_query($conexion, $estados);
                         <button type="submit"  <?= ($id_ticket <= 0 || (in_array($ticketEstado, [2, 4, 5]))) ? 'style="background-color: rgb(85, 85, 85);" disabled' : 'style="background-color: rgb(78, 131, 0);"' ?>> Enviar 
                 </div>
             </div>
+
+            <?php if ($rol === 2) { ?>
+                <aside class="ticket-history" aria-label="Historial del ticket">
+                    <div class="ticket-history-header">
+                        <h2>Historial del ticket</h2>
+                        <span><?= $id_ticket > 0 ? '#' . str_pad($id_ticket, 5, '0', STR_PAD_LEFT) : 'Sin seleccionar' ?></span>
+                    </div>
+
+                    <div class="ticket-history-list">
+                        <?php if (empty($historialTicket)) { ?>
+                            <p class="ticket-history-empty">Aca se mostrara el historial del ticket seleccionado.</p>
+                        <?php } else { ?>
+                            <?php while ($reg = mysqli_fetch_assoc($historialTicket)) { ?>
+                                <article class="ticket-history-item">
+                                    <strong><?= $reg['accion'] ?? '' ?></strong>
+                                    <span><?= $reg['fecha'] ?? '' ?></span>
+                                </article>
+                            <?php } ?>
+                        <?php } ?>
+                    </div>
+                </aside>
+            <?php } ?>
         </div>
     </div>
   <script>

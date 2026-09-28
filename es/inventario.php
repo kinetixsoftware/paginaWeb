@@ -24,12 +24,15 @@ $rolUsuario = (int) $_SESSION['rol'];
 // JOIN estado_activo AS e ON a.id_estado = e.id_estado
 // JOIN categoria_activo AS c ON a.id_categoria = c.id_categoria
 //ORDER BY a.id_activo ASC;
+$condicion = 'a.id_marca = m.id_marca AND a.id_estado = e.id_estado AND a.id_categoria = c.id_categoria';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === "verItemsPersonales") {
+    $idUsuario = (int) $_SESSION['idUsuario'];
+    $condicion = "a.id_marca = m.id_marca AND a.id_estado = e.id_estado AND a.id_categoria = c.id_categoria AND id_usuario = $idUsuario";
+}
 
 $activo = "SELECT a.id_activo, a.nombre, a.modelo, a.id_marca, a.id_estado, a.id_categoria, m.marca, e.estado, c.categoria 
            FROM activo as a, activo_marca as m, estado_activo as e, categoria_activo as c 
-           WHERE a.id_marca = m.id_marca 
-                AND a.id_estado = e.id_estado
-                AND a.id_categoria = c.id_categoria
+           WHERE $condicion
            ORDER BY id_activo ASC";
 $resultadoactivo = mysqli_query($conexion, $activo);
 
@@ -62,7 +65,7 @@ $resultadoestados = mysqli_query($conexion, $estados);
                 <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
                 <li><a href="tickets.php">Tickets</a></li>
                 <li><a href="inventario.php" class="active" aria-current="page">Inventario</a></li>
-                <li><a href="Login.php">Mi Cuenta</a></li>
+                <li><a href="usuario.php?id=<?= $_SESSION['idUsuario'] ?>">Mi Cuenta</a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
                 </li>
@@ -84,7 +87,14 @@ $resultadoestados = mysqli_query($conexion, $estados);
                     <h1>Inventario</h1>
                     <p>Seleccione un componente para ver su informacion.</p>
                 </div>
-                <a href="../php/inventario-agregar-item.php" class="btn-login" <?php if ($rolUsuario === 1) echo 'hidden'; ?>>Agregar Item</a>
+                <?php if ($rolUsuario === 2) { ?>
+                <a href="../php/inventario-agregar-item.php" class="btn-login">Agregar Item</a>
+                <?php } else { ?>
+                <form method="POST">
+                    <input type="hidden" name="accion" value="verItemsPersonales">
+                    <button type="submit" class="btn-login"> Ver Mis Items</button>
+                </form>
+                <?php } ?>
             </div>
             <div class="filters">
                 <input id="inventorySearch" type="text" placeholder="Buscar componente" aria-label="Buscar componente">
@@ -103,7 +113,7 @@ $resultadoestados = mysqli_query($conexion, $estados);
             </div>
             <div class="inventory">
                 <?php  while ($reg = mysqli_fetch_array($resultadoactivo)) { ?>
-                <a class="card" href="activo.php?id=<?= $reg['id_activo']?>">
+                <a class="card" href="../php/activo.php?id=<?= $reg['id_activo']?>">
                     <img src="https://placehold.co/400x300?text=<?=$reg['modelo']?>" alt="<?=$reg['modelo']?>">
                     <div class="info">
                         <h3><?=$reg['nombre']?></h3>
