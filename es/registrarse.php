@@ -91,7 +91,8 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
     <title>Registrarse | Kinetix</title>
     <link rel="icon" type="image/png" href="imagenes\Icon.png">
     <!-- Podés usar tu mismo archivo de estilos (ajustando la ruta si es necesario) -->
-    <link rel="stylesheet" href="..\css\Login.css">
+    <link rel="stylesheet" href="../css/Login.css">
+    <link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
 
 <body>
@@ -188,7 +189,7 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
                         <label for="tecnico" id="tecnicoTexto"> Tecnico </label>
                     </div>
                 </div>
-                <p>Al crear una cuenta, aceptas nuestros <a href="#" style="color:dodgerblue">Términos y Política de
+                <p>Al crear una cuenta, aceptas nuestros <a href="#" class="terms-link">Términos y Política de
                         Privacidad.</a>.</p>
                 <div class="input-buttons">
                     <!-- En caso de     -->

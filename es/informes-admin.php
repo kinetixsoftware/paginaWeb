@@ -66,6 +66,7 @@ if ((int) ($_SESSION['rol'] ?? 0) === 3) {
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Informes | Kinetix</title>
 	<link rel="stylesheet" href="../css/panel-admin.css">
+	<link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
 <body>
     <nav class="menu">

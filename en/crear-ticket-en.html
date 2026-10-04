@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="..\css\crear-ticket.css">
+<link rel="stylesheet" href="../css/kinetix-theme.css">
 <title>Create Ticket</title>
 </head>
 
@@ -12,7 +13,7 @@
   <nav class="menu">
     <div class="menu-content">
       <div class="menu-logo">
-        <img src="../../imagenes/Logo1.png" alt="Kinetix Logo">
+        <img src="../imagenes/logo1.png" alt="Kinetix Logo">
       </div>
 
       <ul>
@@ -95,16 +96,21 @@
       const body = document.body;
       const isDark = theme === 'dark';
       body.classList.toggle('dark-mode', isDark);
+      body.classList.toggle('light-mode', !isDark);
       if (themeToggle) {
         themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
         themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
       }
     }
 
+    applyTheme(localStorage.getItem('theme') || 'dark');
+
     if (themeToggle) {
       themeToggle.addEventListener('click', () => {
         const isDark = document.body.classList.contains('dark-mode');
-        applyTheme(isDark ? 'light' : 'dark');
+        const nextTheme = isDark ? 'light' : 'dark';
+        applyTheme(nextTheme);
+        localStorage.setItem('theme', nextTheme);
       });
     }
   </script></body>

@@ -484,8 +484,7 @@ body.light-mode {
     border-color: var(--danger);
 }
 
-.received,
-.recieved {
+.received {
     background: var(--received);
     border: 1px solid var(--border);
 }
@@ -530,7 +529,7 @@ body.light-mode {
     padding: 0 22px;
     border: 0;
     border-radius: 8px;
-    background: #2b8a9e !important;
+    background: var(--accent-strong);
     color: #fff;
     font: inherit;
     font-weight: 700;
@@ -539,7 +538,7 @@ body.light-mode {
 }
 
 .chat-input button:hover {
-    background: #216d7d !important;
+    background: var(--accent);
     transform: translateY(-1px);
 }
 

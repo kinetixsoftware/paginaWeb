@@ -301,32 +301,6 @@ body {
   gap: 7px;
 }
 
-.input-group-password {
-  display: flex;
-  flex-direction: row;
-}
-
-.input-group-password .passwordBox {
-  width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid #cbd5e0;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  background-color: #f8fafc;
-  color: #1a202c;
-  outline: none;
-  transition: all 0.2s ease;
-}
-
-.input-group-password input[type=checkbox] {
-  float: auto;
-  width: 20%;
-  padding: 10px;
-  border: 1.5px solid #d0d7de;
-  border-radius: 8px;
-  box-sizing: border-box;
-}
-
 .input-switch {
   padding: 10px;
   display: flex;
@@ -463,26 +437,6 @@ body {
 }
 
 /* Alertas PHP */
-.alert {
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 0.88rem;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.alert-danger {
-  background-color: #fff5f5;
-  color: #c53030;
-  border: 1px solid #feb2b2;
-}
-
-.alert-success {
-  background-color: #f0fff4;
-  color: #276749;
-  border: 1px solid #9ae6b4;
-}
-
 .btn-login {
   background: #2b8a9e;
   color: #ffffff;

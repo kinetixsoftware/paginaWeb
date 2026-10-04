@@ -256,78 +256,10 @@ body {
     flex-shrink: 0;
 }
 
-.buscador {
-    display: flex;
-    gap: 10px;
-    margin: 20px 30px 0;
-    padding: 20px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-}
-
-.buscador input,
-.buscador-registro {
-    padding: 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    outline: none;
-    background: var(--panel-soft);
-    color: var(--text);
-    font: inherit;
-}
-
-.buscador input {
-    flex: 1;
-}
-
-.buscador input:focus,
-.buscador-registro:focus {
-    border-color: var(--primario);
-    outline: 2px solid var(--primario);
-    outline-offset: 1px;
-}
-
-#btnBuscar {
-    padding: 12px 20px;
-    border: 0;
-    border-radius: 8px;
-    background: #2b8a9e;
-    color: #fff;
-    font: inherit;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.1s ease;
-}
-
-#btnBuscar:hover {
-    background: #216d7d;
-    transform: translateY(-1px);
-}
-
-.tablas-lista {
-    padding: 0 30px 30px;
-}
-
-.tablas-lista .tabla-container {
-    padding: 28px 0;
-    border-bottom: 1px solid var(--border);
-}
-
-.tablas-lista .tabla-container:last-child {
-    border-bottom: 0;
-}
-
 .tabla-container h2 {
     margin-bottom: 18px;
     color: var(--text);
     font-size: 21px;
-}
-
-.buscador-registro {
-    display: block;
-    width: min(280px, 100%);
-    margin: -5px 0 18px;
 }
 
 .tabla-wrapper {
@@ -595,22 +527,6 @@ tbody tr:hover {
     border-top: 1px solid var(--border);
 }
 
-.informes-admin .report-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 28px;
-}
-
-.informes-admin .report-grid p {
-    padding: 18px 0;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-}
-
-.informes-admin .report-grid p b {
-    color: var(--text);
-}
-
 .informes-admin .tecnicos-heading {
     display: flex;
     align-items: baseline;
@@ -710,16 +626,6 @@ tbody tr:hover {
         font-size: 2.3rem;
     }
 
-    .buscador {
-        flex-direction: column;
-        margin-right: 20px;
-        margin-left: 20px;
-    }
-
-    #btnBuscar {
-        width: 100%;
-    }
-
     .informes-admin .estadisticas-grupo-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -781,14 +687,6 @@ tbody tr:hover {
         font-size: 23px;
     }
 
-    .tablas-lista {
-        padding: 0 20px 20px;
-    }
-
-    .tablas-lista .tabla-container {
-        padding: 22px 0;
-    }
-
     .footer {
         border-radius: 0;
         padding: 28px 20px;
@@ -813,7 +711,6 @@ tbody tr:hover {
         width: 100%;
     }
 
-    .informes-admin .report-grid,
     .informes-admin .tecnicos-grid {
         grid-template-columns: 1fr;
     }

@@ -75,6 +75,7 @@ if ($columnasTablaSeleccionada) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kinetix - Administración</title>
     <link rel="stylesheet" href="../css/panel-admin.css">
+    <link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
 
 <body>

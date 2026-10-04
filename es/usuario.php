@@ -48,6 +48,7 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 	<title>Mi cuenta | Kinetix</title>
 	<link rel="icon" type="image/png" href="../imagenes/Icon.png">
 	<link rel="stylesheet" href="../css/usuario.css">
+	<link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
 <body>
 	<nav class="menu">

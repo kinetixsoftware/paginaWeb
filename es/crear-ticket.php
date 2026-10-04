@@ -11,6 +11,8 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== "1") {
     header("Location: inicio.php");
 }
 
+$idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
+
 $categorias = "SELECT * FROM categoria_ticket ORDER BY id_categoria ASC";
 $resultadocategorias = mysqli_query($conexion, $categorias);
 
@@ -57,7 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="..\css\crear-ticket.css">
+    <link rel="stylesheet" href="../css/crear-ticket.css">
+    <link rel="stylesheet" href="../css/kinetix-theme.css">
     <title>Crear Ticket</title>
 </head>
 
@@ -74,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
                 <li><a href="tickets.php">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
-                <li><a href="Login.html">Mi Cuenta</a></li>
+                <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
                 <div class="language-switch">
                     <input type="checkbox" id="langToggle">
 
@@ -144,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <textarea id="descripcion" name="descripcion" rows="5" cols="40" placeholder="Describa detalladamente el problema..."></textarea>
                 </div>
                 <div class="buttons">
-                    <button type="button" class="btn-login" style="background:#d5d5d5;"
+                    <button type="button" class="cancel"
                         onclick="window.location.href='faq-pagina-cliente.html'"> Cancelar </button>
                     <button type="submit" class="btn-login">Crear Ticket</button>
                 </div>
@@ -159,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const body = document.body;
         const isDark = theme === 'dark';
         body.classList.toggle('dark-mode', isDark);
+        body.classList.toggle('light-mode', !isDark);
         if (themeToggle) {
             themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
             themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
@@ -170,7 +174,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
             const isDark = document.body.classList.contains('dark-mode');
-            applyTheme(isDark ? 'light' : 'dark');
+                const nextTheme = isDark ? 'light' : 'dark';
+                applyTheme(nextTheme);
+                localStorage.setItem('theme', nextTheme);
         });
     }
 

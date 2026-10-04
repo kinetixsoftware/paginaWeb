@@ -1,0 +1,377 @@
+:root {
+    color-scheme: dark;
+    --page-bg: #0b1422;
+    --page-glow: rgba(29, 119, 126, 0.16);
+    --surface: #111d2d;
+    --surface-raised: #19283a;
+    --surface-soft: #202f40;
+    --nav-bg: rgba(11, 20, 34, 0.94);
+    --ink: #edf4f5;
+    --muted: #a7b7c3;
+    --line: rgba(166, 192, 202, 0.2);
+    --accent: #50c6b4;
+    --accent-strong: #17988f;
+    --accent-ink: #071d20;
+    --focus: #81e0d2;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.24);
+    --bg-start: var(--page-bg);
+    --bg-end: var(--page-bg);
+    --panel: var(--surface);
+    --panel-soft: var(--surface-raised);
+    --menu: var(--nav-bg);
+    --card: var(--surface-raised);
+    --card-strong: var(--page-bg);
+    --text: var(--ink);
+    --border: var(--line);
+    --primary: var(--accent);
+    --primario: var(--accent);
+    --accent-dark: var(--accent-strong);
+    --footer: var(--page-bg);
+    --success-bg: rgba(16, 185, 129, 0.18);
+    --success-text: #a7f3d0;
+    --warning-bg: rgba(245, 158, 11, 0.16);
+    --warning-text: #fcd34d;
+    --danger-bg: rgba(239, 68, 68, 0.18);
+    --danger-text: #fca5a5;
+    --received: var(--surface-raised);
+    --sent: #123e48;
+    --sent-border: #1b8e91;
+}
+
+body.light-mode {
+    color-scheme: light;
+    --page-bg: #edf4f3;
+    --page-glow: rgba(44, 164, 153, 0.12);
+    --surface: #ffffff;
+    --surface-raised: #f7fbfa;
+    --surface-soft: #e8f1f0;
+    --nav-bg: rgba(255, 255, 255, 0.95);
+    --ink: #172a31;
+    --muted: #5c7078;
+    --line: rgba(56, 91, 97, 0.18);
+    --accent: #117f79;
+    --accent-strong: #086b69;
+    --accent-ink: #ffffff;
+    --focus: #087f79;
+    --shadow: 0 16px 40px rgba(19, 54, 58, 0.1);
+    --bg-start: var(--page-bg);
+    --bg-end: var(--page-bg);
+    --panel: var(--surface);
+    --panel-soft: var(--surface-raised);
+    --menu: var(--nav-bg);
+    --card: var(--surface-raised);
+    --card-strong: var(--page-bg);
+    --text: var(--ink);
+    --border: var(--line);
+    --primary: var(--accent);
+    --primario: var(--accent);
+    --accent-dark: var(--accent-strong);
+    --footer: var(--page-bg);
+    --success-bg: #dff5e7;
+    --success-text: #18794e;
+    --warning-bg: #fff4cc;
+    --warning-text: #a66a00;
+    --danger-bg: #f8d7da;
+    --danger-text: #842029;
+    --received: var(--surface-raised);
+    --sent: #dcefeb;
+    --sent-border: #87c9be;
+}
+
+body {
+    color: var(--ink);
+    background:
+        radial-gradient(ellipse at 10% 0%, var(--page-glow), transparent 34%),
+        var(--page-bg);
+}
+
+.menu {
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(16px);
+}
+
+.menu-content {
+    max-width: 1400px;
+    min-height: 82px;
+}
+
+.menu-logo img {
+    width: 154px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.menu ul {
+    gap: 18px;
+}
+
+.menu a {
+    color: var(--ink);
+}
+
+.menu a::after {
+    background: var(--accent);
+}
+
+.menu a:hover,
+.menu a.active {
+    color: var(--accent);
+}
+
+.switch {
+    border: 1px solid var(--line);
+    background: var(--surface-soft);
+}
+
+.slider {
+    background: var(--accent);
+}
+
+#langToggle:checked + .switch {
+    background: var(--surface-soft);
+}
+
+body .switch .lang {
+    color: var(--ink);
+}
+
+.theme-toggle {
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 9px 12px;
+    background: var(--surface-raised);
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.container,
+.card,
+.ticket,
+.ticket-history-item,
+.search-box,
+.faq,
+.login-box,
+.admin-panel,
+.admin-header,
+.selector-tabla,
+.tabla-seleccionada,
+.formulario,
+.asset-hero,
+.asset-section,
+.asset-actions,
+.sidebar,
+.ticket-history,
+.chat-input,
+.section--about,
+.info-block,
+.footer-contacto,
+.perfil-card,
+.detail-item,
+.faq details {
+    border-color: var(--line);
+    background-color: var(--surface);
+    color: var(--ink);
+}
+
+body.dark-mode .menu,
+body.dark-mode .card,
+body.dark-mode .ticket,
+body.dark-mode .ticket-history-item,
+body.dark-mode .search-box,
+body.dark-mode .faq,
+body.dark-mode .container,
+body.dark-mode .login-box,
+body.dark-mode .admin-panel,
+body.dark-mode .admin-header,
+body.dark-mode .selector-tabla,
+body.dark-mode .tabla-seleccionada,
+body.dark-mode .formulario,
+body.dark-mode .asset-hero,
+body.dark-mode .asset-section,
+body.dark-mode .asset-actions,
+body.dark-mode .sidebar,
+body.dark-mode .ticket-history,
+body.dark-mode .chat-input,
+body.dark-mode .section--about,
+body.dark-mode .info-block,
+body.dark-mode .footer-contacto,
+body.dark-mode .perfil-card,
+body.dark-mode .detail-item,
+body.dark-mode .faq details {
+    background-color: var(--surface);
+    color: var(--ink);
+}
+
+body.light-mode .menu,
+body.light-mode .card,
+body.light-mode .ticket,
+body.light-mode .ticket-history-item,
+body.light-mode .search-box,
+body.light-mode .faq,
+body.light-mode .container,
+body.light-mode .login-box,
+body.light-mode .admin-panel,
+body.light-mode .admin-header,
+body.light-mode .selector-tabla,
+body.light-mode .tabla-seleccionada,
+body.light-mode .formulario,
+body.light-mode .asset-hero,
+body.light-mode .asset-section,
+body.light-mode .asset-actions,
+body.light-mode .sidebar,
+body.light-mode .ticket-history,
+body.light-mode .chat-input,
+body.light-mode .section--about,
+body.light-mode .info-block,
+body.light-mode .footer-contacto,
+body.light-mode .perfil-card,
+body.light-mode .detail-item,
+body.light-mode .faq details {
+    background-color: var(--surface);
+    color: var(--ink);
+}
+
+body input:not([type="checkbox"]):not([type="radio"]),
+body select,
+body textarea {
+    border-color: var(--line);
+    border-radius: 7px;
+    background-color: var(--surface-raised);
+    color: var(--ink);
+}
+
+body input::placeholder,
+body textarea::placeholder {
+    color: var(--muted);
+}
+
+body.dark-mode .content,
+body.light-mode .content {
+    color: var(--ink);
+}
+
+body.dark-mode .faq summary,
+body.light-mode .faq summary {
+    background: var(--surface-raised);
+    color: var(--ink);
+}
+
+body.dark-mode .faq .answer,
+body.light-mode .faq .answer {
+    color: var(--ink);
+}
+
+body.dark-mode .faq-no-results,
+body.light-mode .faq-no-results {
+    border-color: var(--line);
+    background: var(--surface-raised);
+    color: var(--ink);
+}
+
+body input:focus,
+body select:focus,
+body textarea:focus,
+body button:focus-visible,
+body a:focus-visible {
+    outline-color: var(--focus);
+    outline-offset: 2px;
+}
+
+.btn-contacto,
+.perfil-action,
+.btn-primario,
+.btn-login,
+.btn-editar,
+.create,
+.search-box button,
+.support button,
+.chat-input button,
+.send-button,
+.formulario form button {
+    border-color: transparent;
+    background: var(--accent-strong);
+    color: #ffffff;
+}
+
+.btn-contacto:hover,
+.perfil-action:hover,
+.btn-primario:hover,
+.btn-login:hover,
+.btn-editar:hover,
+.create:hover,
+.search-box button:hover,
+.support button:hover,
+.chat-input button:hover,
+.send-button:hover,
+.formulario form button:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+}
+
+.cancel {
+    border: 1px solid var(--line);
+    background: var(--surface-soft);
+    color: var(--ink);
+}
+
+.cancel:hover {
+    background: var(--surface-raised);
+    color: var(--ink);
+}
+
+.reiniciar {
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+}
+
+.reiniciar:hover {
+    background: var(--accent);
+    color: var(--accent-ink);
+}
+
+.send-button:disabled {
+    background: var(--surface-soft);
+    color: var(--muted);
+    cursor: not-allowed;
+}
+
+.terms-link {
+    color: var(--accent);
+}
+
+.footer,
+.footer-contacto .footer {
+    background-color: var(--page-bg);
+    color: var(--muted);
+    border-color: var(--line);
+}
+
+@media (max-width: 900px) {
+    .menu-content {
+        height: auto;
+        min-height: 82px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .menu-logo img {
+        width: 132px;
+        height: 62px;
+    }
+
+    .menu ul {
+        gap: 12px;
+    }
+}

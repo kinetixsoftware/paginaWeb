@@ -3,10 +3,12 @@ session_start();
 
 require_once "../php/conexionBDD.php";
 
-
+// Leer el rol y el ID del usuario que inicio sesion.
 $rol = isset($_SESSION['rol']) ? (int) $_SESSION['rol'] : null;
 $idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
 $visitante = "";
+
+// Permitir el acceso solo a usuarios y tecnicos.
 if ($rol === null || $rol === 3) {
     $_SESSION['mensaje'] = "No estas autorizado a ver esta pagina";
     $_SESSION['tipoError'] = "error";
@@ -18,6 +20,7 @@ if ($rol === null || $rol === 3) {
     $visitante = "Tecnico";
 }
 
+// Aplicar el filtro de categoria si se recibio desde el formulario.
 $filtroTipo = ($_GET['filtro'] ?? '');
 $filtroCategoria = '';
 if (!empty($filtroTipo)) {
@@ -27,13 +30,17 @@ if (!empty($filtroTipo)) {
             $filtroCategoria = " AND ct.id_categoria = $id_categoria";
         }
     }
+    // Aca van mas filtros en un futuro.
 }
 
+// Los tecnicos ven sus tickets y los que aun no tienen tecnico asignado.
+// Los usuarios solo ven los tickets que ellos crearon.
 $filtroTickets = $rol === 2
     ? "(t.id_tecnico = $idUsuario OR t.id_tecnico IS NULL)"
     : "t.id_solicitante = $idUsuario";
 
 $conexion = conectarBD();
+// Consultar los tickets que corresponden al rol y al filtro actual.
 $ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, pt.prioridad, ct.categoria
                 FROM ticket           AS t 
                 JOIN estado_ticket    AS e   ON t.id_estado = e.id_estado
@@ -50,6 +57,7 @@ $ticketEstado = null;
 $id_ticket = (int) ($_GET['id'] ?? $_POST['id_ticket'] ?? 0);
 $historialTicket = null;
 
+// Cargar el ticket seleccionado y revisar que el usuario pueda verlo.
 if ($id_ticket > 0) {
     $ticket = "SELECT id_tecnico, id_solicitante, titulo, id_estado
                FROM ticket
@@ -63,6 +71,7 @@ if ($id_ticket > 0) {
         $ticketTitulo = $ticketData['titulo'];
         $ticketEstado = (int) $ticketData['id_estado'];
 
+        // Asignar al tecnico actual si el ticket todavia no tiene uno.
         if (empty($ticketData['id_tecnico']) && $rol === 2 && (int) $ticketEstado !== 2) {
             $sql = "UPDATE ticket
                     SET id_tecnico = $idUsuario, id_estado = 3
@@ -76,10 +85,12 @@ if ($id_ticket > 0) {
             mysqli_query($conexion, $sql);
         }
 
+        // Cargar el historial y procesar la accion enviada por un formulario.
         $historialTicket = "SELECT fecha, accion FROM historial_ticket WHERE id_ticket = $id_ticket ORDER BY fecha ASC";
         $historialTicket = mysqli_query($conexion, $historialTicket);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Guardar un mensaje nuevo y dejar registro en el historial.
             if (($_POST['accion'] ?? '') === 'mandarMensaje' && !(in_array($ticketEstado, [2, 4, 5]))) {
                 $contenidoMensaje = trim($_POST['contenido'] ?? '');
 
@@ -99,6 +110,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Eliminar un mensaje escrito por el usuario actual.
             if (($_POST['accion'] ?? '') === 'eliminarMensaje') {
                 $idMensaje = (int) ($_POST['id_mensaje'] ?? 0);
 
@@ -126,6 +138,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Cambiar la categoria del ticket.
             if (($_POST['accion'] ?? '') === 'cambiarCategoria') {
                 $id_categoria = $_POST['categoria'];
 
@@ -142,6 +155,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Marcar el ticket como cancelado y guardar el cambio.
             if (($_POST['accion'] ?? '') === 'cancelarTicket') {
                 $id_ticket = $_POST['id_ticket'] ?? 0;
                 $sql = "UPDATE ticket
@@ -166,6 +180,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Guardar la solucion y cerrar el ticket para el tecnico.
             if (($_POST['accion'] ?? '') === 'cerrarTicket' && $rol === 2) {
                 $solucion = trim($_POST['solucion'] ?? '');
 
@@ -209,6 +224,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Cambiar el estado del ticket y agregarlo al historial.
             if (($_POST['accion'] ?? '') === 'cambiarEstado') {
                 $id_estado= $_POST['estado'];
                 $ticketEstado = $id_estado;
@@ -237,6 +253,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Borrar el ticket y volver a la lista.
             if (($_POST['accion'] ?? '') === 'borrarTicket') {
                 $sql = "DELETE FROM ticket 
                         WHERE id_ticket = $id_ticket";
@@ -246,6 +263,7 @@ if ($id_ticket > 0) {
                 exit;
             }
 
+            // Cambiar la prioridad y guardar el cambio en el historial.
             if (($_POST['accion'] ?? '') === 'cambiarPrioridad') {
                 $id_prioridad = $_POST['prioridad']; 
 
@@ -263,6 +281,7 @@ if ($id_ticket > 0) {
             }
         }
 
+        // Cargar los mensajes del ticket en orden de llegada.
         $mensajes = "SELECT mt.id_mensaje, mt.id_usuario, mt.contenido, mt.fecha_creacion,
                             u.nombre, u.apellido
                     FROM mensaje_ticket AS mt
@@ -275,6 +294,7 @@ if ($id_ticket > 0) {
     }
 }
 
+// Cargar las opciones que se muestran en los filtros y controles.
 $prioridades = "SELECT id_prioridad, prioridad FROM prioridad_ticket";
 $prioridadesResultado = mysqli_query($conexion, $prioridades);
 $categorias = "SELECT id_categoria, categoria FROM categoria_ticket";
@@ -292,10 +312,11 @@ $estadosResultado = mysqli_query($conexion, $estados);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tickets</title>
 <link rel="stylesheet" href="../css/sistema-de-tickets-tecnico.css">
+<link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
 
 <body>
-    <!-- Menu -->
+    <!-- Menu principal con enlaces a las secciones del sitio. -->
     <nav class="menu">
         <div class="menu-content">
             <div class="menu-logo">
@@ -314,7 +335,7 @@ $estadosResultado = mysqli_query($conexion, $estados);
     </nav>
     <div class="page">
         <div class="container">
-            <!-- LISTA DE TICKETS -->
+            <!-- Lista de tickets, filtro por categoria y boton para cancelar. -->
             <div class="sidebar">
                 <h2>Tickets</h2>
                 <div class="ticket-list">
@@ -330,7 +351,7 @@ $estadosResultado = mysqli_query($conexion, $estados);
                             </select>
                         </form>
                     </div>
-                    <!-- aca van los tickets -->
+                    <!-- Mostrar cada ticket encontrado. -->
                     <?php while($reg = mysqli_fetch_assoc($ticketlistresult)) { ?>
                         <a class="ticket" href="tickets.php?id=<?= $reg['id_ticket']?>">
                             <div class="ticket-top">
@@ -358,12 +379,13 @@ $estadosResultado = mysqli_query($conexion, $estados);
                 </div>
             </div>
 
-            <!-- CHAT -->
+            <!-- Panel principal con el chat del ticket seleccionado. -->
 
             <div class="main">
                 <div class="header">
                     <h1 style="text-align: center; padding: 15px;"><?= htmlspecialchars($ticketTitulo ?? 'Seleccioná un ticket', ENT_QUOTES, 'UTF-8') ?></h1>
                 </div>
+                <!-- Mostrar los mensajes y permitir borrar los propios. -->
                 <div class="chat">
                     <?php while($mensajesResultado && $reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
                         <div class="message <?= $idUsuario === (int) $reg['id_usuario'] ? 'sent' : 'received' ?>">
@@ -433,15 +455,17 @@ $estadosResultado = mysqli_query($conexion, $estados);
                         </div>
                     </div>
                 <?php }?>
+                <!-- Formulario para enviar mensajes mientras el ticket esta abierto. -->
                 <div class="chat-input">
                     <form method="POST">
                         <input type="hidden" name="accion" value="mandarMensaje">
                         <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
                         <textarea name="contenido" rows="2" cols="10" <?= ($id_ticket <= 0 || (in_array($ticketEstado, [2, 4, 5])))  ? 'placeholder="El ticket esta cerrado." disabled' : 'placeholder="Escriba un mensaje..."' ?> onkeydown="if (event.key === 'Enter') { this.form.submit(); }"></textarea>
-                        <button type="submit"  <?= ($id_ticket <= 0 || (in_array($ticketEstado, [2, 4, 5]))) ? 'style="background-color: rgb(85, 85, 85);" disabled' : 'style="background-color: rgb(78, 131, 0);"' ?>> Enviar 
+                        <button type="submit" class="send-button" <?= ($id_ticket <= 0 || (in_array($ticketEstado, [2, 4, 5]))) ? 'disabled' : '' ?>> Enviar
                 </div>
             </div>
 
+            <!-- Historial de cambios y acciones del ticket, visible solo para tecnicos. -->
             <?php if ($rol === 2) { ?>
                 <aside class="ticket-history" aria-label="Historial del ticket">
                     <div class="ticket-history-header">
@@ -465,6 +489,7 @@ $estadosResultado = mysqli_query($conexion, $estados);
             <?php } ?>
         </div>
     </div>
+    <!-- Aplicar el tema guardado y permitir cambiarlo desde el menu. -->
   <script>
     const themeToggle = document.getElementById('themeToggle');
 

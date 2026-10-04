@@ -5,53 +5,60 @@ require_once "../php/conexionBDD.php";
 
 $conexion = conectarBD();
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1) {
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
     $_SESSION['mensaje'] = "No tienes acceso a esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: login.php");
   exit;
-}
+} else {
+    $idUsuario = $_SESSION['idUsuario'];
+    $marcas = "SELECT * FROM activo_marca ORDER BY id_marca ASC";
+    $resultadomarcas = mysqli_query($conexion, $marcas);
 
-$marcas = "SELECT * FROM activo_marca ORDER BY id_marca ASC";
-$resultadomarcas = mysqli_query($conexion, $marcas);
+    $categoria = "SELECT * FROM categoria_activo ORDER BY id_categoria ASC";
+    $resultadocategorias = mysqli_query($conexion, $categoria);
 
-$categoria = "SELECT * FROM categoria_activo ORDER BY id_categoria ASC";
-$resultadocategorias = mysqli_query($conexion, $categoria);
+    $estados = "SELECT * FROM estado_activo WHERE NOT id_estado = 2 ORDER BY id_estado ASC";
+    $resultadoestados = mysqli_query($conexion, $estados);
 
-$estados = "SELECT * FROM estado_activo WHERE NOT id_estado = 2 ORDER BY id_estado ASC";
-$resultadoestados = mysqli_query($conexion, $estados);
+    $sqlUbicaciones = "SELECT u.id_ubicacion, u.calle, c.ciudad
+        FROM ubicacion AS u
+        LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
+        ORDER BY c.ciudad, u.calle";
+    $resultadoUbicacion = mysqli_query($conexion, $sqlUbicaciones);
 
-$sqlUbicaciones = "SELECT u.id_ubicacion, u.calle, c.ciudad
-    FROM ubicacion AS u
-    LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
-    ORDER BY c.ciudad, u.calle";
-$resultadoUbicacion = mysqli_query($conexion, $sqlUbicaciones);
+    if($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $codigo = $_POST['codigo_inventario'];
+        $nombre = $_POST['nombre'];
+        $descripcion = $_POST['descripcion'] ?? "";
+        $modelo = $_POST['modelo'];
+        $numero_serie = $_POST['numero_serie'];
+        $categoria = (int) $_POST['categoria'];
+        $marca_id = (int) $_POST['marca'];
+        $fecha_adquisicion = date('Y-m-d');
+        $fecha_baja = null;
+        $id_ubicacion = (int) $_POST['ubicacion'];
 
-if($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $codigo = $_POST['codigo_inventario'];
-    $nombre = $_POST['nombre'];
-    $descripcion = $_POST['descripcion'] ?? "";
-    $modelo = $_POST['modelo'];
-    $numero_serie = $_POST['numero_serie'];
-    $categoria = (int) $_POST['categoria'];
-    $marca_id = (int) $_POST['marca'];
-    $fecha_adquisicion = date('Y-m-d');
-    $fecha_baja = null;
-    $id_ubicacion = (int) $_POST['ubicacion'];
+        $registrarActivo = "INSERT INTO activo(codigo_inventario, nombre, descripcion, modelo, numero_serie, fecha_adquisicion, fecha_baja, id_estado, id_categoria, id_ubicacion, id_marca)
+                VALUES ('$codigo', '$nombre', '$descripcion', '$modelo', '$numero_serie', '$fecha_adquisicion', '$fecha_baja', 1, $categoria, $id_ubicacion, $marca_id)";
+        $registrarActivo = mysqli_query($conexion, $registrarActivo);
 
-    $sql = "INSERT INTO activo(codigo_inventario, nombre, descripcion, modelo, numero_serie, fecha_adquisicion, fecha_baja, id_estado, id_categoria, id_ubicacion, id_marca)
-            VALUES ('$codigo', '$nombre', '$descripcion', '$modelo', '$numero_serie', '$fecha_adquisicion', '$fecha_baja', 1, $categoria, $id_ubicacion, $marca_id)";
-    $sql = mysqli_query($conexion, $sql);
-    
-    if($sql) {
-        $_SESSION['mensaje'] = "Activo registrado correctamente";
-        $_SESSION['tipoError'] = "success";
-    } else {
-        $_SESSION['mensaje'] = "El activo no pudo ser registrado";
-        $_SESSION['tipoError'] = "error";
-    }
-    Header("Location: ../es/inventario.php");
-    exit;
+        if($registrarActivo) {
+            $last_id = $conexion->insert_id;} // obtener el id del activo creado
+
+        $sql = "INSERT INTO historial_activo(id_activo, accion) VALUES ($last_id, 'Tecnico ID: $idUsuario creo este activo')";
+        $sql = mysqli_query($conexion, $sql);
+        
+        if($registrarActivo && $sql) {
+            $_SESSION['mensaje'] = "Activo registrado correctamente";
+            $_SESSION['tipoError'] = "success";
+        } else {
+            $_SESSION['mensaje'] = "El activo no pudo ser registrado";
+            $_SESSION['tipoError'] = "error";
+        }
+        Header("Location: ../es/inventario.php");
+        exit;
+    } 
 }
 ?>
 
@@ -62,6 +69,7 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/inventario.css">
+<link rel="stylesheet" href="../css/kinetix-theme.css">
 <title>Inventario</title>
 </head>
 
