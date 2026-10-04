@@ -27,7 +27,7 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
             <ul>
                 <?php if ($rol === 1 || $rol === 2) { ?>
                 <li><a href="inicio.php" class="active" aria-current="page">Inicio</a></li>
-                <li><a href="pregunta-frecuentes.php">Ayuda</a></li>
+                <li><a href="preguntas-frecuentes.php">Ayuda</a></li>
                 <li><a href="tickets.php">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi cuenta</a></li>

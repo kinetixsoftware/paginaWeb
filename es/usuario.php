@@ -59,7 +59,7 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 			<ul>
 				<li><a href="inicio.php">Inicio</a></li>
 				<li><a href="tickets.php">Tickets</a></li>
-				<li><a href="pregunta-frecuentes.php">Ayuda</a></li>
+				<li><a href="preguntas-frecuentes.php">Ayuda</a></li>
 				<li><a href="inventario.php">Inventario</a></li>
 				<li><a class="active" href="usuario.php?id=<?= $idUsuario ?>">Mi cuenta</a></li>
 				<li><a href="../php/logout.php">Cerrar sesión</a></li>
