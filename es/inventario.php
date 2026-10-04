@@ -63,7 +63,7 @@ $resultadoestados = mysqli_query($conexion, $estados);
             </div>
             <ul>
                 <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="preguntas_frecuentes.php">Ayuda</a></li>
+                <li><a href="pregunta-frecuentes.php">Ayuda</a></li>
                 <li><a href="tickets.php">Tickets</a></li>
                 <li><a href="inventario.php" class="active" aria-current="page">Inventario</a></li>
                 <li><a href="usuario.php?id=<?= $_SESSION['idUsuario'] ?>">Mi Cuenta</a></li>
