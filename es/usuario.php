@@ -119,7 +119,7 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 				</article>
                 <?php if ($usuario['nombre_rol'] == "Usuario") {?>
                 <article class="detail-item">
-					<span>Cantidad de items en posecion</span>
+					<span>Cantidad de items en posesion</span>
 					<strong><?= $usuario['Cantidad_Activos'] ?></strong>
 				</article>
                 <?php } ?>
