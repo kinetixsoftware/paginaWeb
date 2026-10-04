@@ -68,8 +68,37 @@ if($id_activo > 0) {
                 exit;
             }
         }
-        if ($_POST['accion'] == "darDeBaja"){
+        if (($_POST['accion'] ?? '') === "solicitar" && $rol === 1 && (int) ($resultados['id_usuario'] ?? 0) === $idUsuario) {
+            $tiposServicio = ['mantenimiento', 'reparacion', 'revision', 'instalacion'];
+            $prioridades = ['baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta'];
+            $tipoServicio = $_POST['tipo_servicio'] ?? '';
+            $prioridadEnviada = strtolower($_POST['prioridad'] ?? '');
+            $descripcion = trim($_POST['descripcion'] ?? '');
 
+            if (in_array($tipoServicio, $tiposServicio, true) && isset($prioridades[$prioridadEnviada]) && $descripcion !== '') {
+                $prioridad = $prioridades[$prioridadEnviada];
+                $descripcionSQL = mysqli_real_escape_string($conexion, $descripcion);
+                $tipoServicioSQL = mysqli_real_escape_string($conexion, $tipoServicio);
+                $prioridadSQL = mysqli_real_escape_string($conexion, $prioridad);
+
+                $ubicacionUsuario = mysqli_query($conexion, "SELECT id_ubicacion FROM usuario WHERE id_usuario = $idUsuario LIMIT 1");
+                $ubicacionData = mysqli_fetch_assoc($ubicacionUsuario);
+                $idUbicacionSolicitud = (int) ($ubicacionData['id_ubicacion'] ?? 0);
+
+                if ($idUbicacionSolicitud > 0) {
+                    $sql = "INSERT INTO solicitud_servicio (descripcion, prioridad, tipo_servicio, id_ubicacion, id_activo, id_solicitante, id_estado)
+                            VALUES ('$descripcionSQL', '$prioridadSQL', '$tipoServicioSQL', $idUbicacionSolicitud, $id_activo, $idUsuario, 1)";
+
+                    if (mysqli_query($conexion, $sql)) {
+                        $accion = mysqli_real_escape_string($conexion, "El usuario (ID: $idUsuario) solicito un servicio ($tipoServicio)");
+                        $sql = "INSERT INTO historial_activo (id_activo, accion)
+                                VALUES ($id_activo, '$accion')";
+                        mysqli_query($conexion, $sql);
+                        header("Location: ../es/tickets.php?vista=solicitudes");
+                        exit;
+                    }
+                }
+            }
         }
         if ($_POST['accion'] == "solicitarServicio"){
 
@@ -190,9 +219,9 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
                     <label for="service-priority">Prioridad</label>
                     <select id="service-priority" name="prioridad" required>
                         <option value="">Seleccionar prioridad</option>
-                        <option value="baja">Baja</option>
-                        <option value="media">Media</option>
-                        <option value="alta">Alta</option>
+                        <option value="Baja">Baja</option>
+                        <option value="Media">Media</option>
+                        <option value="Alta">Alta</option>
                     </select>
 
                     <label for="service-description">Descripción de la solicitud</label>
