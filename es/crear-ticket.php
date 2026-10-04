@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <ul>
                 <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
+                <li><a href="preguntas_frecuentes.php">Ayuda</a></li>
                 <li><a href="tickets.php">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>

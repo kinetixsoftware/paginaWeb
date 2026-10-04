@@ -127,8 +127,12 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
                     <span class="home-link-index">01</span><span class="home-link-icon" aria-hidden="true">?</span>
                     <h3>Centro de ayuda</h3><p>Explorá respuestas y orientación para empezar.</p><span class="home-link-arrow" aria-hidden="true">↗</span>
                 </a>
-                <a class="home-link-card" href="registrarse.php">
+                <a class="home-link-card" href="login.php">
                     <span class="home-link-index">02</span><span class="home-link-icon" aria-hidden="true">＋</span>
+                    <h3>Iniciar Sesion</h3><p>Inicia sesin para acceder a tu espacio Kinetix.</p><span class="home-link-arrow" aria-hidden="true">↗</span>
+                </a>
+                <a class="home-link-card" href="registrarse.php">
+                    <span class="home-link-index">03</span><span class="home-link-icon" aria-hidden="true">＋</span>
                     <h3>Crear cuenta</h3><p>Registrate para acceder a tu espacio Kinetix.</p><span class="home-link-arrow" aria-hidden="true">↗</span>
                 </a>
                 <?php } ?>
