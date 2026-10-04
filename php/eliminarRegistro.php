@@ -30,12 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['tabla'], $_POST['id']
         'estado_activo' => 'id_estado',
         //Tickets
         'diagnostico' => 'id_diagnostico',
+        'historial_activo' => 'id_historial',
         'categoria_ticket' => 'id_categoria',
         'resultado_ticket' => 'id_resultado',
         'estado_ticket' => 'id_estado',
         'historial_ticket' => 'id_historial',
         'mensaje_ticket' => 'id_mensaje',
         'ticket' => 'id_ticket',
+        'pregunta_frecuente' => 'id_pregunta',
         //ubicacion
         'ciudad' => 'id_ciudad',
         'ubicacion' => 'id_ubicacion',

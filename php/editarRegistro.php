@@ -5,11 +5,12 @@ require_once "../php/conexionBDD.php";
 
 $conexion = conectarBD();
 
-$rol = $_SESSION['rol'];
-if (!$rol === 3){
+$rol = (int) ($_SESSION['rol'] ?? 0);
+if ($rol !== 3) {
     $_SESSION['mensaje'] = "No tienes permiso para ver esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: ../es/inicio.php");
+    exit;
 }
 
 if (!$conexion) {
@@ -25,12 +26,14 @@ $tablas = [
     'estado_activo' => ['id_estado', 'estado'],
     'estado_solicitud' => ['id_estado', 'estado'],
     'estado_ticket' => ['id_estado', 'estado'],
+    'historial_activo' => ['id_historial', 'id_activo', 'fecha', 'accion'],
     'historial_ticket' => ['id_historial', 'id_ticket', 'estado_anterior', 'estado_nuevo', 'fecha'],
     'mensaje_ticket' => ['id_mensaje', 'id_ticket', 'id_usuario', 'contenido', 'fecha_creacion'],
     'prioridad_ticket' => ['id_prioridad', 'prioridad'],
+    'pregunta_frecuente' => ['id_pregunta', 'pregunta', 'respuesta'],
     'resultado_ticket' => ['id_resultado', 'solucion', 'fecha_resolucion', 'id_ticket', 'id_tecnico'],
     'rol' => ['id_rol', 'nombre_rol'],
-    'solicitud_servicio' => ['id_solicitud', 'titulo', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante', 'id_activo'],
+    'solicitud_servicio' => ['id_solicitud', 'descripcion', 'fecha_creacion', 'aprobacion', 'id_estado', 'id_solicitante', 'id_ubicacion', 'id_activo', 'prioridad', 'tipo_servicio'],
     'ticket' => ['id_ticket', 'titulo', 'descripcion', 'fecha_creacion', 'id_estado', 'id_prioridad', 'id_solicitante', 'id_tecnico', 'id_activo', 'id_categoria'],
     'ubicacion' => ['id_ubicacion', 'calle', 'id_ciudad'],
     'ciudad' => ['id_ciudad', 'ciudad', 'departamento'],
@@ -105,29 +108,42 @@ if (!$registroEditar) {
     <link rel="stylesheet" href="../css/panel-admin.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
-<body>
-    <header class="encabezado">
-        <a href="../es/inicio.php"><img src="../imagenes/logo1.png" alt="Kinetix"></a>
+<body class="admin-record-body">
+    <header class="admin-record-header">
+        <a href="../es/panel-admin.php" class="admin-record-brand">
+            <img src="../imagenes/Logo1.png" alt="Kinetix">
+            <span>Centro de administración</span>
+        </a>
+        <a class="admin-record-back" href="../es/panel-admin.php">Volver al panel</a>
     </header>
 
-    <main class="contenedor">
-        <section class="formulario">
-            <form method="post">
+    <main class="admin-record-page">
+        <section class="admin-record-card">
+            <div class="admin-record-intro">
+                <p class="admin-record-eyebrow">GESTIÓN DE DATOS</p>
+                <h1>Editar registro</h1>
+                <p>Actualizá los campos de <strong><?= htmlspecialchars($tabla, ENT_QUOTES, 'UTF-8') ?></strong>.</p>
+            </div>
+            <form class="admin-record-form" method="post">
                 <input type="hidden" name="tabla" value="<?= $tabla ?>">
                 <input type="hidden" name="idRegistro" value="<?= $idRegistro ?>">
                 <input type="hidden" name="accion" value="guardar">
                 <?php foreach ($columnas as $columna) { ?>
                     <?php if ($columna == $clavePrimaria) {continue;} ?>
-                    <label for="<?= $columna ?>"><?= $columna ?></label>
-                    <?php if (in_array($columna, ['descripcion', 'mensaje', 'contenido', 'solucion'])) { ?>
-                        <textarea id="<?= $columna ?>" name="<?= $columna ?>"><?= $registroEditar[$columna] ?? '' ?></textarea>
+                    <div class="admin-record-field <?= in_array($columna, ['descripcion', 'mensaje', 'contenido', 'solucion', 'pregunta', 'respuesta', 'accion'], true) ? 'wide' : '' ?>">
+                    <label for="<?= htmlspecialchars($columna, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars(ucfirst(str_replace('_', ' ', $columna)), ENT_QUOTES, 'UTF-8') ?></label>
+                    <?php if (in_array($columna, ['descripcion', 'mensaje', 'contenido', 'solucion', 'pregunta', 'respuesta', 'accion'])) { ?>
+                        <textarea id="<?= htmlspecialchars($columna, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($columna, ENT_QUOTES, 'UTF-8') ?>" rows="4"><?= htmlspecialchars($registroEditar[$columna] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
                     <?php } else { ?>
-                        <input id="<?= $columna ?>" name="<?= $columna ?>" type="<?= $columna == 'password' ? 'password' : 'text' ?>" value="<?= $columna == 'password' ? '' : $registroEditar[$columna] ?? '' ?>">
+                        <input id="<?= htmlspecialchars($columna, ENT_QUOTES, 'UTF-8') ?>" name="<?= htmlspecialchars($columna, ENT_QUOTES, 'UTF-8') ?>" type="<?= $columna == 'password' ? 'password' : 'text' ?>" value="<?= $columna == 'password' ? '' : htmlspecialchars($registroEditar[$columna] ?? '', ENT_QUOTES, 'UTF-8') ?>" <?= $columna === 'password' ? 'autocomplete="new-password" placeholder="Dejar vacío para mantener la contraseña"' : '' ?>>
                     <?php } ?>
+                    </div>
                 <?php } ?>
 
-                <button type="submit">Guardar</button>
-                <a href="../es/panel-admin.php">Cancelar</a>
+                <div class="admin-record-actions">
+                    <button type="submit">Guardar cambios</button>
+                    <a href="../es/panel-admin.php">Cancelar</a>
+                </div>
             </form>
         </section>
     </main>
