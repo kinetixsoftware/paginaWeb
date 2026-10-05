@@ -4,28 +4,36 @@ session_start();
 require_once "../php/conexionBDD.php";
 
 $conexion = conectarBD();
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
     $_SESSION['mensaje'] = "No tienes acceso a esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: login.php");
-  exit;
+    exit;
 } else {
-    $idUsuario = $_SESSION['idUsuario'];
-    $marcas = "SELECT * FROM activo_marca ORDER BY id_marca ASC";
-    $resultadomarcas = mysqli_query($conexion, $marcas);
+    try {
+        $idUsuario = $_SESSION['idUsuario'];
+        $marcas = "SELECT * FROM activo_marca ORDER BY id_marca ASC";
+        $resultadomarcas = mysqli_query($conexion, $marcas);
 
-    $categoria = "SELECT * FROM categoria_activo ORDER BY id_categoria ASC";
-    $resultadocategorias = mysqli_query($conexion, $categoria);
+        $categoria = "SELECT * FROM categoria_activo ORDER BY id_categoria ASC";
+        $resultadocategorias = mysqli_query($conexion, $categoria);
 
-    $estados = "SELECT * FROM estado_activo WHERE NOT id_estado = 2 ORDER BY id_estado ASC";
-    $resultadoestados = mysqli_query($conexion, $estados);
+        $estados = "SELECT * FROM estado_activo WHERE NOT id_estado = 2 ORDER BY id_estado ASC";
+        $resultadoestados = mysqli_query($conexion, $estados);
 
-    $sqlUbicaciones = "SELECT u.id_ubicacion, u.calle, c.ciudad
-        FROM ubicacion AS u
-        LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
-        ORDER BY c.ciudad, u.calle";
-    $resultadoUbicacion = mysqli_query($conexion, $sqlUbicaciones);
+        $sqlUbicaciones = "SELECT u.id_ubicacion, u.calle, c.ciudad
+            FROM ubicacion AS u
+            LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
+            ORDER BY c.ciudad, u.calle";
+        $resultadoUbicacion = mysqli_query($conexion, $sqlUbicaciones); 
+    } catch (mysqli_sql_exception $e) {
+        $_SESSION['mensaje'] = "Error al obtener tablas. Error: " . $e->getMessage();;
+        $_SESSION['tipoError'] = "error";
+        header("Location: login.php");
+        exit;
+    }
 
     if($_SERVER['REQUEST_METHOD'] === 'POST') {
         $codigo = $_POST['codigo_inventario'];
@@ -40,15 +48,13 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
         $id_ubicacion = (int) $_POST['ubicacion'];
 
         $registrarActivo = "INSERT INTO activo(codigo_inventario, nombre, descripcion, modelo, numero_serie, fecha_adquisicion, fecha_baja, id_estado, id_categoria, id_ubicacion, id_marca)
-                VALUES ('$codigo', '$nombre', '$descripcion', '$modelo', '$numero_serie', '$fecha_adquisicion', '$fecha_baja', 1, $categoria, $id_ubicacion, $marca_id)";
+                            VALUES ('$codigo', '$nombre', '$descripcion', '$modelo', '$numero_serie', '$fecha_adquisicion', '$fecha_baja', 1, $categoria, $id_ubicacion, $marca_id)";
         $registrarActivo = mysqli_query($conexion, $registrarActivo);
 
-        if($registrarActivo) {
-            $last_id = $conexion->insert_id;} // obtener el id del activo creado
-
+        if($registrarActivo) {$last_id = $conexion->insert_id;} // obtener el id del activo creado
         $sql = "INSERT INTO historial_activo(id_activo, accion) VALUES ($last_id, 'Tecnico ID: $idUsuario creo este activo')";
         $sql = mysqli_query($conexion, $sql);
-        
+
         if($registrarActivo && $sql) {
             $_SESSION['mensaje'] = "Activo registrado correctamente";
             $_SESSION['tipoError'] = "success";
@@ -90,6 +96,15 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
             </ul>
         </div>
     </nav>
+
+    <!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
+    <div class="toast-wrapper">
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
+        </div>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
 
     <div class="page">
         <div class="container">

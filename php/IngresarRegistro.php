@@ -87,7 +87,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'ingre
     $consultaIngresar = "INSERT INTO `$tabla` SET " . implode(', ', $campos);
 
     if (!mysqli_query($conexion, $consultaIngresar)) {
-        die('Error al ingresar el registro: ' . mysqli_error($conexion));
+        $_SESSION['mensaje'] = "Error al ingresar registro: " . mysqli_error($conexion);
+        $_SESSION['tipoError'] = "error";
+        header('Location: ../es/panel-admin.php');
+        exit;
     }
 
     $_SESSION['mensaje'] = "Registro ingresado correctamente.";

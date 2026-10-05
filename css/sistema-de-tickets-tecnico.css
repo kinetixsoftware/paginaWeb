@@ -23,6 +23,7 @@
     --success: #34d399;
     --warning: #fbbf24;
     --danger: #f87171;
+    --tab-active-text: #081120;
 }
 
 body {
@@ -46,6 +47,7 @@ body.light-mode {
     --received: #ffffff;
     --sent: #dbeafe;
     --sent-border: #93c5fd;
+    --tab-active-text: #ffffff;
 }
 
 .menu {
@@ -160,6 +162,53 @@ body.light-mode {
     text-align:center;
     border-bottom: 1px solid var(--border);
     font-size: 1.25rem;
+}
+
+.ticket-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-soft);
+}
+
+.ticket-tabs a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--muted);
+    text-align: center;
+    text-decoration: none;
+    font-size: .9rem;
+    font-weight: 700;
+    line-height: 1.2;
+    transition: color .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.ticket-tabs a:hover {
+    border-color: var(--primary);
+    color: var(--text);
+}
+
+.ticket-tabs a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.ticket-tabs a.active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--tab-active-text);
+}
+
+.ticket-tabs a.active:hover {
+    color: var(--tab-active-text);
 }
 
 .ticket-list {
@@ -282,6 +331,155 @@ body.light-mode {
     font-size: .98rem;
     font-weight: 400;
     margin-top: 5px;
+}
+
+.request-list-meta {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.request-details {
+    max-width: 780px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    color: var(--text);
+}
+
+.request-details dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.request-details dt {
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: .75rem;
+}
+
+.request-details dd {
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.request-details p {
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.request-state-controls form {
+    max-width: 320px;
+}
+
+.request-state-controls {
+    align-items: stretch;
+}
+
+.request-state-controls > form {
+    flex: 0 1 240px;
+    max-width: none;
+}
+
+.request-action-row {
+    display: flex;
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.request-action-row form {
+    flex: 1 1 180px;
+    max-width: none;
+}
+
+.request-action-row button {
+    width: 100%;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--card);
+    color: var(--text);
+    font: inherit;
+    font-size: .88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+
+.request-action-row button:hover {
+    transform: translateY(-1px);
+    border-color: var(--primary);
+    background: var(--panel);
+}
+
+.request-action-row button:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.request-details {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(16px, 3vw, 24px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .12);
+}
+
+.request-details dd {
+    overflow-wrap: anywhere;
+}
+
+.request-details > p {
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.ticket-history.request-history {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+    max-height: none;
+    position: static;
+    margin: 18px auto 0;
+    display: block;
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.request-history h3 {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.request-history .history-item {
+    display: grid;
+    grid-template-columns: minmax(130px, auto) 1fr;
+    gap: 12px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.request-history .history-item:last-child {
+    border-bottom: 0;
+}
+
+.request-history .history-item small {
+    color: var(--muted);
+    font-size: .78rem;
+}
+
+.request-history .history-item p {
+    color: var(--text);
+    font-size: .85rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
 }
 
 .ticket-status {
@@ -709,6 +907,25 @@ body.dark-mode {
     .chat {
         min-height: 260px;
         padding: 18px;
+    }
+
+    .request-state-controls {
+        align-items: stretch;
+    }
+
+    .request-state-controls > form,
+    .request-action-row form {
+        flex-basis: 100%;
+    }
+
+    .ticket-history.request-history {
+        position: static;
+        max-height: none;
+    }
+
+    .request-history .history-item {
+        grid-template-columns: 1fr;
+        gap: 5px;
     }
 
     .resolution-panel form {

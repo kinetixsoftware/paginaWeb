@@ -22,24 +22,6 @@
         <li><a href="..\en\pagina-de-tickets-tecnico-en.html">Tickets</a></li>
         <li><a href="..\en\inventario-en.html">Inventory</a></li>
         <li><a href="Login.html">My Account</a></li>
-                   
-             <input type="checkbox" id="langToggle" checked>
-          <label for="langToggle" class="switch">
-              <span class="lang left">🇪🇸</span>
-              <span class="lang right">🇺🇸</span>
-              <span class="slider"></span>
-          </label>
-
-          <script>
-            const toggle = document.getElementById("langToggle");
-            if (toggle) {
-              toggle.addEventListener("change", function () {
-                setTimeout(() => {
-                  window.location.href = this.checked ? "../en/FAQ-pagina-cliente-en.html" : "../es/FAQ-pagina-cliente.html";
-                }, 300);
-              });
-            }
-          </script>
                         <li>
           <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
         </li>      </ul>
@@ -50,7 +32,7 @@
             <div class="content">
                 <h1>Help center</h1>
                 <p class="subtitle">
-                Find quick answers to the most common questions about our platform.
+                Guidance for managing equipment, support tickets, and service requests across locations.
                 </p>
                 <div class="search-box">
                     <input id="faqSearchInput" type="text" placeholder="Type your question here..." aria-label="Search in the FAQ">
@@ -61,72 +43,72 @@
                 </div>
                 <div class="faq">
                     <details open>
-                        <summary>How can I reset my password?</summary>
+                        <summary>What is the difference between a ticket and a service request?</summary>
                         <div class="answer">
-                        To reset your password, go to the login screen, click on "Forgot your password?" and follow the instructions sent to your email.
+                        Use a ticket to report a problem or ask for general help. Create a service request from an equipment page when you need maintenance, repair, inspection, or installation.
                         </div>
                     </details>
                     <details>
-                        <summary>What payment methods do you accept?</summary>
-                            <div class="answer">
-                            We accept all major credit and debit cards (Visa, Mastercard, American Express), as well as bank transfers and authorized digital payment platforms.
-                            </div>
+                        <summary>How do I create a request for equipment?</summary>
+                        <div class="answer">
+                        Sign in, open Inventory, select the equipment assigned to you, and choose the service request option. Select the service type and priority, then clearly describe the issue or work needed.
+                        </div>
                     </details>
                     <details>
-                        <summary>How can I update my profile information?</summary>
-                            <div class="answer">
-                            Log in to your account, go to the "My Account" or "Settings" section, update the necessary fields, and make sure to save your changes before exiting.
-                            </div>
+                        <summary>What information should I include in the description?</summary>
+                        <div class="answer">
+                        Explain what is happening, when it started, who is affected, and what you have already tried. Include any error message, but never include passwords or other confidential information.
+                        </div>
                     </details>
                     <details>
-                        <summary>What should I do if the platform isn't loading correctly?</summary>
-                            <div class="answer">
-                            We recommend clearing your browser's cache, checking your internet connection, or trying to access the site from an incognito window. If the problem persists, please contact our technical team.
-                            </div>
+                        <summary>What do the priority levels mean?</summary>
+                        <div class="answer">
+                        Low is for work that can be scheduled; Medium means the work is needed within a reasonable timeframe; High is for urgent issues that interrupt important work or affect multiple people. Choose the level that best reflects the impact.
+                        </div>
                     </details>
                     <details>
-                        <summary>How can I cancel or modify my subscription?</summary>
-                            <div class="answer">
-                            You can manage your subscription at any time from the billing panel within your account, where you will find options to upgrade, change, or cancel your plan.
-                            </div>
+                        <summary>Who can see and work on my request?</summary>
+                        <div class="answer">
+                        A request is automatically associated with the location registered on your account. Technicians at that location can view and manage it, and you can view your own requests from the Requests tab. Contact an administrator if your location is incorrect.
+                        </div>
                     </details>
                     <details>
-                        <summary>Is my personal data safe on this site?</summary>
-                            <div class="answer">
-                            Yes, we implement industry-standard security protocols and data encryption to ensure that all your personal and financial information remains completely confidential.
-                            </div>
+                        <summary>What do the request statuses mean?</summary>
+                        <div class="answer">
+                        “Created” means it was submitted; “Reviewed” means the technical team is evaluating or working on it; “Solved” means a solution was recorded; and “Closed” means the process is complete.
+                        </div>
                     </details>
                     <details>
-                        <summary>Where can I view my transaction history?</summary>
-                            <div class="answer">
-                            Your entire payment history and downloadable invoices are available in the billing section of your user profile.
-                            </div>
+                        <summary>How can I check the progress of my request?</summary>
+                        <div class="answer">
+                        Open Tickets and select the Requests tab. Choose a request to see its status, creation date, and action history.
+                        </div>
                     </details>
                     <details>
-                        <summary>Does the platform have a mobile app?</summary>
-                            <div class="answer">
-                            Currently, our website is fully optimized for mobile devices, so you can access all features directly from your phone or tablet's browser.
-                            </div>
+                        <summary>What does a technician do when a request comes in?</summary>
+                        <div class="answer">
+                        The technician can review the details, update the status, and record actions in the history. After completing the work, they mark the request as solved and can then close it.
+                        </div>
                     </details>
                     <details>
-                        <summary>How can I report a system error or bug?</summary>
-                            <div class="answer">
-                            If you encounter an error, please take a screenshot and use the support button at the bottom of this page to send us the details.
-                            </div>
+                        <summary>What if the equipment is missing or is not assigned to my account?</summary>
+                        <div class="answer">
+                        Make sure you are signed in with your institutional account and check whether the equipment is assigned to you in Inventory. If it is still missing, create a ticket with its name or asset code and the relevant location.
+                        </div>
                     </details>
                     <details>
-                        <summary>How long does it take to respond to support requests?</summary>
-                            <div class="answer">
-                            Our technical team reviews requests continuously. The estimated response time is under 24 business hours.
-                            </div>
+                        <summary>How do I report an urgent issue or one affecting multiple people?</summary>
+                        <div class="answer">
+                        Create a ticket or service request with High priority. Describe the impact and include the location and affected people or teams. Priority helps the team organize work but does not replace the institution’s emergency channels.
+                        </div>
                     </details>
                 </div>
                 <div class="support">
                     <h2>Still have questions?</h2>
                     <p>
-                    If you didn't find the answer you were looking for, you can fill out a support form and an advisor will get in touch with you as soon as possible.
+                    If you couldn't find your answer, create a ticket with the details and affected location so the support team can help.
                     </p>
-                    <a href="../crear-ticket/crear-ticket.html" class="btn-contacto">Contact Support</a>
+                    <a href="crear-ticket-en.html" class="btn-contacto">Contact Support</a>
                 </div>
             </div>
         </div>

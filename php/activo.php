@@ -77,9 +77,6 @@ if($id_activo > 0) {
 
             if (in_array($tipoServicio, $tiposServicio, true) && isset($prioridades[$prioridadEnviada]) && $descripcion !== '') {
                 $prioridad = $prioridades[$prioridadEnviada];
-                $descripcionSQL = mysqli_real_escape_string($conexion, $descripcion);
-                $tipoServicioSQL = mysqli_real_escape_string($conexion, $tipoServicio);
-                $prioridadSQL = mysqli_real_escape_string($conexion, $prioridad);
 
                 $ubicacionUsuario = mysqli_query($conexion, "SELECT id_ubicacion FROM usuario WHERE id_usuario = $idUsuario LIMIT 1");
                 $ubicacionData = mysqli_fetch_assoc($ubicacionUsuario);
@@ -87,7 +84,7 @@ if($id_activo > 0) {
 
                 if ($idUbicacionSolicitud > 0) {
                     $sql = "INSERT INTO solicitud_servicio (descripcion, prioridad, tipo_servicio, id_ubicacion, id_activo, id_solicitante, id_estado)
-                            VALUES ('$descripcionSQL', '$prioridadSQL', '$tipoServicioSQL', $idUbicacionSolicitud, $id_activo, $idUsuario, 1)";
+                            VALUES ('$descripcion', '$prioridad', '$tipoServicio', $idUbicacionSolicitud, $id_activo, $idUsuario, 1)";
 
                     if (mysqli_query($conexion, $sql)) {
                         $accion = mysqli_real_escape_string($conexion, "El usuario (ID: $idUsuario) solicito un servicio ($tipoServicio)");
@@ -136,6 +133,15 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
         </div>
     </nav>
 
+    <!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
+    <div class="toast-wrapper">
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
+        </div>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+    
     <main class="page">
         <div class="container">
             <header class="header">

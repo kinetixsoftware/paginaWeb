@@ -253,16 +253,6 @@ if ($id_ticket > 0) {
                 exit;
             }
 
-            // Borrar el ticket y volver a la lista.
-            if (($_POST['accion'] ?? '') === 'borrarTicket') {
-                $sql = "DELETE FROM ticket 
-                        WHERE id_ticket = $id_ticket";
-                mysqli_query($conexion, $sql);
-
-                header("Location: tickets.php");
-                exit;
-            }
-
             // Cambiar la prioridad y guardar el cambio en el historial.
             if (($_POST['accion'] ?? '') === 'cambiarPrioridad') {
                 $id_prioridad = $_POST['prioridad']; 
@@ -294,14 +284,124 @@ if ($id_ticket > 0) {
     }
 }
 
+// Cargar solicitudes propias para usuarios y solicitudes de activos de la ubicacion del tecnico.
+$vista = ($_GET['vista'] ?? 'tickets') === 'solicitudes' ? 'solicitudes' : 'tickets';
+$solicitudesResultado = null;
+$solicitudData = null;
+$historialActivo = null;
+$id_solicitud = (int) ($_GET['id_solicitud'] ?? $_POST['id_solicitud'] ?? 0);
+
+if ($vista === 'solicitudes') {
+    $filtroSolicitudes = $rol === 2
+        ? "tecnico.id_usuario = $idUsuario AND (tecnico.id_ubicacion = ss.id_ubicacion OR tecnico.id_ubicacion = solicitante.id_ubicacion OR tecnico.id_ubicacion = a.id_ubicacion)"
+        : "ss.id_solicitante = $idUsuario";
+    $solicitudes = "SELECT ss.id_solicitud, ss.descripcion, ss.fecha_creacion, ss.prioridad, ss.tipo_servicio,
+                           es.estado, a.id_activo, a.nombre AS activo,
+                           solicitante.nombre AS solicitante_nombre, solicitante.apellido AS solicitante_apellido,
+                           solicitante.email AS solicitante_email, ss.id_ubicacion
+                    FROM solicitud_servicio AS ss
+                    JOIN estado_solicitud AS es ON ss.id_estado = es.id_estado
+                    JOIN activo AS a ON ss.id_activo = a.id_activo
+                    JOIN usuario AS solicitante ON solicitante.id_usuario = ss.id_solicitante
+                    JOIN usuario AS tecnico ON tecnico.id_usuario = $idUsuario
+                    WHERE $filtroSolicitudes
+                    ORDER BY ss.fecha_creacion DESC";
+    $solicitudesResultado = mysqli_query($conexion, $solicitudes);
+
+    if ($id_solicitud > 0) {
+        $solicitud = "SELECT ss.id_solicitud, ss.descripcion, ss.fecha_creacion, ss.prioridad, ss.tipo_servicio,
+                             ss.id_estado, ss.id_activo, a.nombre AS activo, es.estado,
+                             solicitante.nombre AS solicitante_nombre, solicitante.apellido AS solicitante_apellido,
+                             solicitante.email AS solicitante_email, ss.id_ubicacion,
+                             uubicacion.calle AS ubicacion_calle, ciu.ciudad AS ubicacion_ciudad
+                      FROM solicitud_servicio AS ss
+                      JOIN estado_solicitud AS es ON ss.id_estado = es.id_estado
+                      JOIN activo AS a ON ss.id_activo = a.id_activo
+                      JOIN usuario AS solicitante ON solicitante.id_usuario = ss.id_solicitante
+                      JOIN usuario AS tecnico ON tecnico.id_usuario = $idUsuario
+                      LEFT JOIN ubicacion AS uubicacion ON uubicacion.id_ubicacion = ss.id_ubicacion
+                      LEFT JOIN ciudad AS ciu ON ciu.id_ciudad = uubicacion.id_ciudad
+                      WHERE ss.id_solicitud = $id_solicitud AND $filtroSolicitudes
+                      LIMIT 1";
+        $solicitudResultado = mysqli_query($conexion, $solicitud);
+        $solicitudData = mysqli_fetch_assoc($solicitudResultado);
+
+        if ($solicitudData && $_SERVER['REQUEST_METHOD'] === 'POST' && $rol === 2) {
+            $accionPost = $_POST['accion'] ?? '';
+
+            if ($accionPost === 'cambiarEstadoSolicitud') {
+                $nuevoEstado = (int) ($_POST['estado_solicitud'] ?? 0);
+                $estadoResultado = mysqli_query($conexion, "SELECT estado FROM estado_solicitud WHERE id_estado = $nuevoEstado LIMIT 1");
+                $estadoData = mysqli_fetch_assoc($estadoResultado);
+
+                if ($estadoData && $nuevoEstado !== (int) $solicitudData['id_estado']) {
+                    $sql = "UPDATE solicitud_servicio SET id_estado = $nuevoEstado WHERE id_solicitud = $id_solicitud";
+
+                    if (mysqli_query($conexion, $sql)) {
+                        $estadoNombre = $estadoData['estado'];
+                        $accion = "El tecnico (ID: $idUsuario) cambio la solicitud #$id_solicitud al estado: $estadoNombre";
+                        $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
+                        mysqli_query($conexion, $sql);
+                    }
+                }
+
+                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                exit;
+            }
+
+            if ($accionPost === 'aceptarSolicitud') {
+                $sql = "UPDATE solicitud_servicio SET id_estado = 2 WHERE id_solicitud = $id_solicitud AND id_estado IN (1, 2)";
+                if (mysqli_query($conexion, $sql)) {
+                    $accion = "El tecnico (ID: $idUsuario) acepto y reviso la solicitud #$id_solicitud";
+                    $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
+                    mysqli_query($conexion, $sql);
+                }
+                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                exit;
+            }
+
+            if ($accionPost === 'resolverSolicitud') {
+                $sql = "UPDATE solicitud_servicio SET id_estado = 4 WHERE id_solicitud = $id_solicitud";
+                if (mysqli_query($conexion, $sql)) {
+                    $accion = "El tecnico (ID: $idUsuario) marco la solicitud #$id_solicitud como solucionada";
+                    $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
+                    mysqli_query($conexion, $sql);
+                }
+                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                exit;
+            }
+
+            if ($accionPost === 'cerrarSolicitud') {
+                $sql = "UPDATE solicitud_servicio SET id_estado = 3 WHERE id_solicitud = $id_solicitud";
+                if (mysqli_query($conexion, $sql)) {
+                    $accion = "El tecnico (ID: $idUsuario) cerro la solicitud #$id_solicitud";
+                    $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
+                    mysqli_query($conexion, $sql);
+                }
+                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                exit;
+            }
+        }
+
+        if ($solicitudData) {
+            $historialActivo = mysqli_query(
+                $conexion,
+                "SELECT fecha, accion FROM historial_activo WHERE id_activo = " . (int) $solicitudData['id_activo'] . " ORDER BY fecha ASC"
+            );
+        } else {
+            $id_solicitud = 0;
+        }
+    }
+}
+
 // Cargar las opciones que se muestran en los filtros y controles.
 $prioridades = "SELECT id_prioridad, prioridad FROM prioridad_ticket";
 $prioridadesResultado = mysqli_query($conexion, $prioridades);
 $categorias = "SELECT id_categoria, categoria FROM categoria_ticket";
 $categoriasFiltroResultado = mysqli_query($conexion, $categorias);
 $categoriasResultado = mysqli_query($conexion, $categorias);
-$estados = "SELECT id_estado, estado FROM estado_ticket";
-$estadosResultado = mysqli_query($conexion, $estados);
+$estadosResultado = mysqli_query($conexion, "SELECT id_estado, estado FROM estado_ticket");
+$estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado FROM estado_solicitud ORDER BY id_estado ASC");
 
 ?>
 
@@ -325,7 +425,7 @@ $estadosResultado = mysqli_query($conexion, $estados);
 
             <ul>
                 <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="FAQ-pagina-cliente.html">FAQ</a></li>
+                <li><a href="preguntas-frecuentes.php">Ayuda</a></li>
                 <li><a href="tickets.php" class="active" aria-current="page">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
@@ -333,12 +433,26 @@ $estadosResultado = mysqli_query($conexion, $estados);
             </ul>
         </div>
     </nav>
+
+    <!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
+    <div class="toast-wrapper">
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
+        </div>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+    
     <div class="page">
         <div class="container">
-            <!-- Lista de tickets, filtro por categoria y boton para cancelar. -->
+            <!-- Lista de tickets o solicitudes de servicio. -->
             <div class="sidebar">
-                <h2>Tickets</h2>
+                <div class="ticket-tabs" role="tablist" aria-label="Tipo de solicitud">
+                    <a href="tickets.php" class="<?= $vista === 'tickets' ? 'active' : '' ?>" <?= $vista === 'tickets' ? 'aria-current="page"' : '' ?>>Tickets</a>
+                    <a href="tickets.php?vista=solicitudes" class="<?= $vista === 'solicitudes' ? 'active' : '' ?>" <?= $vista === 'solicitudes' ? 'aria-current="page"' : '' ?>>Solicitudes</a>
+                </div>
                 <div class="ticket-list">
+                    <?php if ($vista === 'tickets') { ?>
                     <div class="ticket-filter">
                         <form method="GET">
                             <input type="hidden" name="filtro" value="categoria">
@@ -372,9 +486,23 @@ $estadosResultado = mysqli_query($conexion, $estados);
                                 <?php }?>
                             </div>
                             <div class="ticket-title">
-                                <h6 style="font-size:16px; font-weight: lighter;"><?= htmlspecialchars($reg['titulo'], ENT_QUOTES, 'UTF-8') ?></h6>
+                                <h6 style="font-size:16px; font-weight: lighter;"><?= $reg['titulo'] ?></h6>
                             </div>
                         </a>
+                    <?php } ?>
+                    <?php } else { ?>
+                        <?php while ($reg = mysqli_fetch_assoc($solicitudesResultado)) { ?>
+                            <a class="ticket" href="tickets.php?vista=solicitudes&id_solicitud=<?= (int) $reg['id_solicitud'] ?>">
+                                <div class="ticket-top">
+                                    <span class="ticket-id">Solicitud #<?= str_pad($reg['id_solicitud'], 5, '0', STR_PAD_LEFT) ?></span>
+                                    <span class="ticket-status"><span class="status-dot"></span><?= $reg['estado'] ?></span>
+                                </div>
+                                <div class="ticket-title">
+                                    <h6><?= $reg['activo'] ?></h6>
+                                </div>
+                                <p class="request-list-meta"><?= ucfirst($reg['tipo_servicio'] ?? '') ?> · <?= $reg['prioridad'] ?? 'Sin prioridad' ?></p>
+                            </a>
+                        <?php } ?>
                     <?php } ?>
                 </div>
             </div>
@@ -383,8 +511,73 @@ $estadosResultado = mysqli_query($conexion, $estados);
 
             <div class="main">
                 <div class="header">
-                    <h1 style="text-align: center; padding: 15px;"><?= htmlspecialchars($ticketTitulo ?? 'Seleccioná un ticket', ENT_QUOTES, 'UTF-8') ?></h1>
+                    <h1 style="text-align: center; padding: 15px;">
+                        <?= $vista === 'solicitudes'
+                            ? $solicitudData ? 'Solicitud #' . $solicitudData['id_solicitud'] . ' · ' . $solicitudData['activo'] : 'Seleccioná una solicitud'
+                            : $ticketTitulo ?? 'Seleccioná un ticket' ?>
+                    </h1>
                 </div>
+                <?php if ($vista === 'solicitudes') { ?>
+                    <div class="chat">
+                        <?php if ($solicitudData) { ?>
+                            <article class="request-details">
+                                <dl>
+                                    <div><dt>Solicitante</dt><dd><?= htmlspecialchars($solicitudData['solicitante_nombre'] ?? '') ?> <?= htmlspecialchars($solicitudData['solicitante_apellido'] ?? '') ?> (<?= htmlspecialchars($solicitudData['solicitante_email'] ?? '') ?>)</dd></div>
+                                    <div><dt>Activo</dt><dd><?= $solicitudData['activo'] ?> (ID: <?= (int) $solicitudData['id_activo'] ?>)</dd></div>
+                                    <div><dt>Tipo de servicio</dt><dd><?= ucfirst($solicitudData['tipo_servicio'] ?? '') ?></dd></div>
+                                    <div><dt>Prioridad</dt><dd><?= $solicitudData['prioridad'] ?? 'Sin prioridad' ?></dd></div>
+                                    <div><dt>Estado</dt><dd><?= $solicitudData['estado'] ?></dd></div>
+                                    <div><dt>Sede</dt><dd><?= htmlspecialchars($solicitudData['ubicacion_calle'] ?? 'No definida') ?> <?= !empty($solicitudData['ubicacion_ciudad']) ? '· ' . htmlspecialchars($solicitudData['ubicacion_ciudad']) : '' ?></dd></div>
+                                    <div><dt>Creada</dt><dd><?= $solicitudData['fecha_creacion'] ?></dd></div>
+                                </dl>
+                                <p><?= nl2br($solicitudData['descripcion']) ?></p>
+                            </article>
+                            <?php if ($historialActivo) { ?>
+                                <div class="ticket-history request-history">
+                                    <h3>Historial de la solicitud</h3>
+                                    <?php while ($historial = mysqli_fetch_assoc($historialActivo)) { ?>
+                                        <div class="history-item">
+                                            <small><?= $historial['fecha'] ?></small>
+                                            <p><?= nl2br(htmlspecialchars($historial['accion'])) ?></p>
+                                        </div>
+                                    <?php } ?>
+                                </div>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <p class="ticket-history-empty">Seleccioná una solicitud de la lista.</p>
+                        <?php } ?>
+                    </div>
+                    <?php if ($rol === 2 && $solicitudData) { ?>
+                        <div class="tech-controls request-state-controls">
+                            <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                <input type="hidden" name="accion" value="cambiarEstadoSolicitud">
+                                <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
+                                <select name="estado_solicitud" aria-label="Cambiar estado de la solicitud" onchange="this.form.submit()">
+                                    <?php while ($estado = mysqli_fetch_assoc($estadosSolicitudResultado)) { ?>
+                                        <option value="<?= (int) $estado['id_estado'] ?>" <?= (int) $estado['id_estado'] === (int) $solicitudData['id_estado'] ? 'selected' : '' ?>><?= $estado['estado'] ?></option>
+                                    <?php } ?>
+                                </select>
+                            </form>
+                            <div class="request-action-row">
+                                <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                    <input type="hidden" name="accion" value="aceptarSolicitud">
+                                    <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
+                                    <button type="submit">Aceptar y revisar</button>
+                                </form>
+                                <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                    <input type="hidden" name="accion" value="resolverSolicitud">
+                                    <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
+                                    <button type="submit">Marcar solucionada</button>
+                                </form>
+                                <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                    <input type="hidden" name="accion" value="cerrarSolicitud">
+                                    <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
+                                    <button type="submit">Cerrar solicitud</button>
+                                </form>
+                            </div>
+                        </div>
+                    <?php } ?>
+                <?php } else { ?>
                 <!-- Mostrar los mensajes y permitir borrar los propios. -->
                 <div class="chat">
                     <?php while($mensajesResultado && $reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
@@ -460,24 +653,28 @@ $estadosResultado = mysqli_query($conexion, $estados);
                     <form method="POST">
                         <input type="hidden" name="accion" value="mandarMensaje">
                         <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
-                        <textarea name="contenido" rows="2" cols="10" <?= ($id_ticket <= 0 || (in_array($ticketEstado, [2, 4, 5])))  ? 'placeholder="El ticket esta cerrado." disabled' : 'placeholder="Escriba un mensaje..."' ?> onkeydown="if (event.key === 'Enter') { this.form.submit(); }"></textarea>
-                        <button type="submit" class="send-button" <?= ($id_ticket <= 0 || (in_array($ticketEstado, [2, 4, 5]))) ? 'disabled' : '' ?>> Enviar
+                        <textarea name="contenido" rows="2" cols="10" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'placeholder="El ticket esta cerrado." disabled' : 'placeholder="Escriba un mensaje..."' ?> onkeydown="if (event.key === 'Enter') { this.form.submit(); }"></textarea>
+                        <button type="submit" class="send-button" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'disabled' : '' ?>>Enviar</button>
+                    </form>
                 </div>
+                <?php } ?>
             </div>
 
-            <!-- Historial de cambios y acciones del ticket, visible solo para tecnicos. -->
+            <!-- Historial del ticket o del activo, visible solo para tecnicos. -->
             <?php if ($rol === 2) { ?>
-                <aside class="ticket-history" aria-label="Historial del ticket">
+                <?php $historialActual = $vista === 'solicitudes' ? $historialActivo : $historialTicket; ?>
+                <aside class="ticket-history" aria-label="Historial del <?= $vista === 'solicitudes' ? 'activo' : 'ticket' ?>">
                     <div class="ticket-history-header">
-                        <h2>Historial del ticket</h2>
-                        <span><?= $id_ticket > 0 ? '#' . str_pad($id_ticket, 5, '0', STR_PAD_LEFT) : 'Sin seleccionar' ?></span>
+                        <h2><?= $vista === 'solicitudes' ? 'Historial del activo' : 'Historial del ticket' ?></h2>
+                        <span><?= $vista === 'solicitudes'
+                            ? ($solicitudData ? $solicitudData['activo'] : 'Sin seleccionar')
+                            : ($id_ticket > 0 ? '#' . str_pad($id_ticket, 5, '0', STR_PAD_LEFT) : 'Sin seleccionar') ?></span>
                     </div>
-
                     <div class="ticket-history-list">
-                        <?php if (empty($historialTicket)) { ?>
-                            <p class="ticket-history-empty">Aca se mostrara el historial del ticket seleccionado.</p>
+                        <?php if (empty($historialActual)) { ?>
+                            <p class="ticket-history-empty">Aca se mostrara el historial del <?= $vista === 'solicitudes' ? 'activo seleccionado' : 'ticket seleccionado' ?>.</p>
                         <?php } else { ?>
-                            <?php while ($reg = mysqli_fetch_assoc($historialTicket)) { ?>
+                            <?php while ($reg = mysqli_fetch_assoc($historialActual)) { ?>
                                 <article class="ticket-history-item">
                                     <strong><?= $reg['accion'] ?? '' ?></strong>
                                     <span><?= $reg['fecha'] ?? '' ?></span>
@@ -490,29 +687,30 @@ $estadosResultado = mysqli_query($conexion, $estados);
         </div>
     </div>
     <!-- Aplicar el tema guardado y permitir cambiarlo desde el menu. -->
-  <script>
-    const themeToggle = document.getElementById('themeToggle');
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
 
-    function applyTheme(theme) {
-      const body = document.body;
-      const isDark = theme === 'dark';
-      body.classList.toggle('dark-mode', isDark);
-      body.classList.toggle('light-mode', !isDark);
-      if (themeToggle) {
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-      }
-    }
+        function applyTheme(theme) {
+            const body = document.body;
+            const isDark = theme === 'dark';
+            body.classList.toggle('dark-mode', isDark);
+            body.classList.toggle('light-mode', !isDark);
+            if (themeToggle) {
+                themeToggle.textContent = isDark ? '☀️' : '🌙';
+                themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+            }
+        }
 
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(savedTheme);
 
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-        applyTheme(nextTheme);
-        localStorage.setItem('theme', nextTheme);
-      });
-    }
-  </script></body>
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+                applyTheme(nextTheme);
+                localStorage.setItem('theme', nextTheme);
+            });
+        }
+    </script>
+</body>
 </html>

@@ -56,8 +56,8 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
 
     <?php if (isset($_SESSION['mensaje'])) { ?>
     <div class="toast-wrapper">
-        <div id="formMessage" class="form-message <?= htmlspecialchars((string) ($_SESSION['tipoError'] ?? 'success'), ENT_QUOTES, 'UTF-8') ?>">
-            <?= htmlspecialchars((string) $_SESSION['mensaje'], ENT_QUOTES, 'UTF-8') ?>
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
         </div>
     </div>
     <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>

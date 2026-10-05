@@ -113,13 +113,15 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
             </ul>
         </div>
     </nav>
+    <!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
     <div class="toast-wrapper">
-        <?php if($mensaje): ?>
-        <div id="formMessage" class="form-message <?= $tipoError ?>">
-            <?=$mensaje?>
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
         </div>
-        <?php endif; ?>
     </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+
     <!-- Contenedor principal de registro -->
     <section class="login-container">
         <div class="login-box">

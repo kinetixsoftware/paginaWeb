@@ -77,7 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'guard
     $consultaActualizar = "UPDATE `$tabla` SET " . implode(', ', $cambios) . " WHERE `$clavePrimaria` = $idRegistro";
 
     if (!mysqli_query($conexion, $consultaActualizar)) {
-        die('Error al actualizar el registro: ' . mysqli_error($conexion));
+        $_SESSION['mensaje'] = "Error al actualizar este registro: " . mysqli_error($conexion);
+        $_SESSION['tipoError'] = "error";
+        header('Location: ../es/panel-admin.php');
+        exit;
     }
 
     $_SESSION['mensaje'] = "Registro actualizado correctamente. ";

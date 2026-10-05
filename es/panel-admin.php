@@ -163,10 +163,7 @@ while ($faq = mysqli_fetch_assoc($resultadoFaq)) {
 $preguntaEnEdicion = null;
 $idEdicionFaq = (int) ($_GET['editar_pregunta'] ?? 0);
 if ($idEdicionFaq > 0) {
-    $resultadoEdicionFaq = mysqli_query(
-        $conexion,
-        "SELECT id_pregunta, pregunta, respuesta FROM pregunta_frecuente WHERE id_pregunta = $idEdicionFaq LIMIT 1"
-    );
+    $resultadoEdicionFaq = mysqli_query($conexion, "SELECT id_pregunta, pregunta, respuesta FROM pregunta_frecuente WHERE id_pregunta = $idEdicionFaq LIMIT 1" );
     if (!$resultadoEdicionFaq) {
         throw new RuntimeException('No se pudo cargar la pregunta para editar: ' . mysqli_error($conexion));
     }
@@ -214,6 +211,14 @@ $esc = static fn($valor): string => htmlspecialchars((string) $valor, ENT_QUOTES
         </div>
     </nav>
 
+    <?php if (isset($_SESSION['mensaje'])) { ?>
+    <div class="toast-wrapper">
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
+        </div>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+    
     <main class="admin-dashboard">
         <header class="admin-hero">
             <div>

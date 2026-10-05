@@ -78,26 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <li><a href="tickets.php">Tickets</a></li>
                 <li><a href="inventario.php">Inventario</a></li>
                 <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
-                <div class="language-switch">
-                    <input type="checkbox" id="langToggle">
-
-                    <label for="langToggle" class="switch">
-                        <span class="lang left">ESP</span>
-                        <span class="lang right">ENG</span>
-                        <span class="slider"></span>
-
-                        <script>
-                        const toggle = document.getElementById("langToggle");
-
-                        toggle.addEventListener("change", function() {
-                            setTimeout(() => {
-                                window.location.href = this.checked ? "../../en/open-ticket.html" :
-                                    "../../es/crear=ticket/.html";
-                            }, 300);
-                        });
-                        </script>
-                    </label>
-                </div>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
                         Dark</button>
@@ -106,13 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </nav>
 
+    <!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
     <div class="toast-wrapper">
-        <?php if(isset($_SESSION['mensaje'])) { ?>
         <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
-            <?= $_SESSION['mensaje'] ?>
+            <?= $_SESSION['mensaje']?>
         </div>
-        <?php } ?>
     </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
 
     <div class="page">
         <div class="container">

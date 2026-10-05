@@ -81,13 +81,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </li>
             </ul>
     </nav>
+
+    <?php if (isset($_SESSION['mensaje'])) { ?>
     <div class="toast-wrapper">
-        <?php if($mensaje): ?>
-        <div id="formMessage" class="form-message <?= $tipoError ?>">
-            <?= htmlspecialchars($mensaje) ?>
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
         </div>
-        <?php endif; ?>
     </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+
     <!-- Contenedor principal -->
     <section class="login-container">
         <div class="login-box">

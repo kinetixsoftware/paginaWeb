@@ -81,6 +81,16 @@ if ((int) ($_SESSION['rol'] ?? 0) === 3) {
             </ul>
         </div>
     </nav>
+
+	<!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
+    <div class="toast-wrapper">
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
+        </div>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+
 	<main class="admin-panel informes-admin">
 		<header class="page-header">
 			<div>

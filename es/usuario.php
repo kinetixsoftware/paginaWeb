@@ -67,6 +67,15 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 		</div>
 	</nav>
 
+	<!-- Mensaje error -->
+    <?php if (isset($_SESSION['mensaje'])) { ?>
+    <div class="toast-wrapper">
+        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
+            <?= $_SESSION['mensaje']?>
+        </div>
+    </div>
+    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
+	
 	<main class="perfil-page">
 		<section class="perfil-header">
 			<div>
