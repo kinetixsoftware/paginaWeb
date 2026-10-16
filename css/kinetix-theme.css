@@ -33,12 +33,16 @@
     --warning-text: #fcd34d;
     --danger-bg: rgba(239, 68, 68, 0.18);
     --danger-text: #fca5a5;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --tab-active-text: var(--accent-ink);
     --received: var(--surface-raised);
     --sent: #123e48;
     --sent-border: #1b8e91;
 }
 
-body.light-mode {
+[data-theme="light"] {
     color-scheme: light;
     --page-bg: #edf4f3;
     --page-glow: rgba(44, 164, 153, 0.12);
@@ -73,6 +77,10 @@ body.light-mode {
     --warning-text: #a66a00;
     --danger-bg: #f8d7da;
     --danger-text: #842029;
+    --success: #18794e;
+    --warning: #a66a00;
+    --danger: #842029;
+    --tab-active-text: var(--accent-ink);
     --received: var(--surface-raised);
     --sent: #dcefeb;
     --sent-border: #87c9be;
@@ -221,6 +229,86 @@ body .switch .lang {
     transform: translateY(-1px);
 }
 
+.menu a.logout-button {
+    display: inline-flex;
+    flex: 0 0 45px;
+    align-items: center;
+    justify-content: flex-start;
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface-raised);
+    color: var(--danger-text);
+    text-decoration: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+    transition: width 0.3s ease, flex-basis 0.3s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.menu a.logout-button::after {
+    display: none;
+}
+
+.menu a.logout-button:hover,
+.menu a.logout-button:focus-visible {
+    flex-basis: 146px;
+    width: 146px;
+    border-color: var(--accent);
+    background: var(--accent-strong);
+    color: #ffffff;
+}
+
+.logout-sign {
+    display: flex;
+    flex: 0 0 43px;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    transition: padding 0.3s ease, justify-content 0.3s ease;
+}
+
+.logout-sign::before {
+    content: "";
+    display: block;
+    width: 17px;
+    height: 17px;
+    background-color: currentColor;
+    mask: url("../imagenes/logout.svg") center / contain no-repeat;
+    -webkit-mask: url("../imagenes/logout.svg") center / contain no-repeat;
+}
+
+.logout-text {
+    flex: 0 0 0;
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    white-space: nowrap;
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: width 0.3s ease, flex-basis 0.3s ease, margin 0.3s ease, opacity 0.2s ease;
+}
+
+.menu a.logout-button:hover .logout-sign,
+.menu a.logout-button:focus-visible .logout-sign {
+    justify-content: flex-start;
+    padding-left: 13px;
+}
+
+.menu a.logout-button:hover .logout-text,
+.menu a.logout-button:focus-visible .logout-text {
+    flex-basis: 94px;
+    width: 94px;
+    margin-left: 4px;
+    opacity: 1;
+}
+
+.menu a.logout-button:active {
+    transform: translate(1px, 1px);
+}
+
 .container,
 .card,
 .ticket,
@@ -250,64 +338,6 @@ body .switch .lang {
     color: var(--ink);
 }
 
-body.dark-mode .menu,
-body.dark-mode .card,
-body.dark-mode .ticket,
-body.dark-mode .ticket-history-item,
-body.dark-mode .search-box,
-body.dark-mode .faq,
-body.dark-mode .container,
-body.dark-mode .login-box,
-body.dark-mode .admin-panel,
-body.dark-mode .admin-header,
-body.dark-mode .selector-tabla,
-body.dark-mode .tabla-seleccionada,
-body.dark-mode .formulario,
-body.dark-mode .asset-hero,
-body.dark-mode .asset-section,
-body.dark-mode .asset-actions,
-body.dark-mode .sidebar,
-body.dark-mode .ticket-history,
-body.dark-mode .chat-input,
-body.dark-mode .section--about,
-body.dark-mode .info-block,
-body.dark-mode .footer-contacto,
-body.dark-mode .perfil-card,
-body.dark-mode .detail-item,
-body.dark-mode .faq details {
-    background-color: var(--surface);
-    color: var(--ink);
-}
-
-body.light-mode .menu,
-body.light-mode .card,
-body.light-mode .ticket,
-body.light-mode .ticket-history-item,
-body.light-mode .search-box,
-body.light-mode .faq,
-body.light-mode .container,
-body.light-mode .login-box,
-body.light-mode .admin-panel,
-body.light-mode .admin-header,
-body.light-mode .selector-tabla,
-body.light-mode .tabla-seleccionada,
-body.light-mode .formulario,
-body.light-mode .asset-hero,
-body.light-mode .asset-section,
-body.light-mode .asset-actions,
-body.light-mode .sidebar,
-body.light-mode .ticket-history,
-body.light-mode .chat-input,
-body.light-mode .section--about,
-body.light-mode .info-block,
-body.light-mode .footer-contacto,
-body.light-mode .perfil-card,
-body.light-mode .detail-item,
-body.light-mode .faq details {
-    background-color: var(--surface);
-    color: var(--ink);
-}
-
 body input:not([type="checkbox"]):not([type="radio"]),
 body select,
 body textarea {
@@ -322,24 +352,58 @@ body textarea::placeholder {
     color: var(--muted);
 }
 
-body.dark-mode .content,
-body.light-mode .content {
+.login-box h2,
+.login-box h3,
+.login-box p,
+.login-footer,
+.login-footer a,
+.login-form label,
+.input-group label,
+.container label,
+.content h1,
+.content h2,
+.content h3,
+.content p,
+.content .subtitle,
+.content .answer {
     color: var(--ink);
 }
 
-body.dark-mode .faq summary,
-body.light-mode .faq summary {
+.login-form input,
+.login-form select {
+    border-color: var(--line);
+    background-color: var(--surface-raised);
+    color: var(--ink);
+}
+
+.login-form input::placeholder,
+.password-input-wrapper input::placeholder {
+    color: var(--muted);
+}
+
+.btn-toggle-pwd {
+    color: var(--muted);
+}
+
+.tooltiptext {
+    background: var(--surface-soft);
+    color: var(--ink);
+}
+
+.content {
+    color: var(--ink);
+}
+
+.faq summary {
     background: var(--surface-raised);
     color: var(--ink);
 }
 
-body.dark-mode .faq .answer,
-body.light-mode .faq .answer {
+.faq .answer {
     color: var(--ink);
 }
 
-body.dark-mode .faq-no-results,
-body.light-mode .faq-no-results {
+.faq-no-results {
     border-color: var(--line);
     background: var(--surface-raised);
     color: var(--ink);

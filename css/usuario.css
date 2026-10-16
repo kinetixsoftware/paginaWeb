@@ -4,20 +4,6 @@
 	padding: 0;
 }
 
-:root {
-	--bg-start: #081120;
-	--bg-end: #111827;
-	--panel: #111827;
-	--menu: #111827;
-	--surface: #1f2937;
-	--ink: #e5e7eb;
-	--muted: #a8b3c7;
-	--line: rgba(148, 163, 184, 0.2);
-	--accent: #60a5fa;
-	--accent-dark: #2563eb;
-	--footer: #020817;
-}
-
 body {
 	min-height: 100vh;
 	display: flex;
@@ -26,20 +12,6 @@ body {
 	background: linear-gradient(90deg, var(--bg-start) 0%, var(--bg-end) 100%);
 	color: var(--ink);
 	font-family: Arial, Helvetica, sans-serif;
-}
-
-body.light-mode {
-	--bg-start: #d9f7ff;
-	--bg-end: #c6f5ea;
-	--panel: #f8fafc;
-	--menu: #e7e7e7;
-	--surface: #ffffff;
-	--ink: #1f2937;
-	--muted: #64748b;
-	--line: rgba(148, 163, 184, 0.5);
-	--accent: #2563eb;
-	--accent-dark: #1d4ed8;
-	--footer: #4a5a69;
 }
 
 .menu {
