@@ -10,7 +10,7 @@ $conexion = conectarBD();
 if (isset($_SESSION['rol'])) {
     $_SESSION['mensaje'] = "Usted ya inicio sesion";
     $_SESSION['tipoError'] = "error";
-    header("Location: inicio.php");
+    header("Location: inicio");
     exit;
 }
 
@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $_SESSION['mensaje'] = "Inicio de sesión exitoso. ";
             $_SESSION['tipoError'] = "success";
-            header("Location: inicio.php");
+            header("Location: inicio");
             exit;
         }
     } catch (Throwable $e) {
@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="icon" type="image/png" href="imagenes\Icon.png">
     <link rel="stylesheet" href="../css/Login.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
+    <script src="../js/theme.js" defer></script>
 </head>
 
 <body>
@@ -74,8 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <img class="img--logo" src="../imagenes/logo1.png" width="50" height="50" alt="Logo Vrision">
             </div>
             <ul>
-                <li><a href="inicio.php">Volver</a></li>
-                <li><a href="registrarse.php">Registrarse</a></li>
+                <li><a href="inicio">Volver</a></li>
+                <li><a href="registrarse">Registrarse</a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema"> 🌙 </button>
                 </li>
@@ -121,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </form>
 
             <p class="login-footer">
-                ¿No tenés una cuenta? <a href="registrarse.php">Registrate aquí</a>
+                ¿No tenés una cuenta? <a href="registrarse">Registrate aquí</a>
             </p>
         </div>
     </section>
@@ -145,27 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (emailParametro) {
         document.getElementById('password').focus();
     }
-
-    //DARK MODE LIGHT MODE SWITCH
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme) {
-        const body = document.body;
-        const isDark = theme === 'dark';
-        body.classList.toggle('dark-mode', isDark);
-        body.classList.toggle('light-mode', !isDark);
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    themeToggle.addEventListener('click', () => {
-        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-        applyTheme(nextTheme);
-        localStorage.setItem('theme', nextTheme);
-    });
 
     //MOSTRAR CONTRASENIA
     function showPassword() {
