@@ -1,4 +1,5 @@
-<?php 
+<?php
+session_start();
 
 require_once "../php/conexionBDD.php";
 
@@ -28,10 +29,13 @@ $sql = mysqli_query($conexion, $sql);
             </div>
 
             <ul>
-                <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="tickets.php">Tickets</a></li>
-                <li><a href="inventario.php">Inventario</a></li>
-                <li><a href="inicio.php">Mi Cuenta</a></li>
+                <li><a href="inicio">Inicio</a></li>
+                <li><a href="tickets">Tickets</a></li>
+                <li><a href="inventario">Inventario</a></li>
+                <li><a href="inicio">Mi Cuenta</a></li>
+                <?php if (isset($_SESSION['rol'])) { ?>
+                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
+                <?php } ?>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
                         Dark</button>
@@ -58,7 +62,6 @@ $sql = mysqli_query($conexion, $sql);
                 <div class="search-box">
                     <input id="faqSearchInput" type="text" placeholder="Escribe tu duda aquí..."
                         aria-label="Buscar en preguntas frecuentes">
-                    <button id="faqSearchButton" type="button">Buscar</button>
                 </div>
                 <div id="faqNoResults" class="faq-no-results" hidden>
                     No se encontraron coincidencias para tu búsqueda, considera abrir un ticket para hablar con un
@@ -78,38 +81,14 @@ $sql = mysqli_query($conexion, $sql);
                         Si no encontraste la respuesta, crea un ticket con los detalles y la sede afectada para que el
                         equipo de soporte pueda orientarte.
                     </p>
-                    <a href="../es/crear-ticket.php" class="btn-contacto">Contactar Soporte</a>
+                    <a href="crear-ticket" class="btn-contacto">Contactar Soporte</a>
                 </div>
             </div>
         </div>
     </div>
+    <script src="../js/theme.js"></script>
     <script>
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme) {
-        const body = document.body;
-        const isDark = theme === 'dark';
-        body.classList.toggle('dark-mode', isDark);
-        body.classList.toggle('light-mode', !isDark);
-        if (themeToggle) {
-            themeToggle.textContent = isDark ? '☀️' : '🌙';
-            themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-        }
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-            applyTheme(nextTheme);
-            localStorage.setItem('theme', nextTheme);
-        });
-    }
-
     const faqSearchInput = document.getElementById('faqSearchInput');
-    const faqSearchButton = document.getElementById('faqSearchButton');
     const faqNoResults = document.getElementById('faqNoResults');
     const faqItems = Array.from(document.querySelectorAll('.faq details'));
 
@@ -129,9 +108,8 @@ $sql = mysqli_query($conexion, $sql);
 
         faqNoResults.hidden = visibleCount !== 0;
     }
-
     faqSearchInput.addEventListener('input', filterFaq);
-    faqSearchButton.addEventListener('click', filterFaq);
+    faqSearchInput.addEventListener('input', filterFaq);
     </script>
 </body>
 
