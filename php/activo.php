@@ -8,7 +8,7 @@ $conexion = conectarBD();
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['mensaje'] = "Activo no encontrado";
     $_SESSION['tipoError'] = "error";
-    header("Location: inicio.php");
+    header("Location: /Kinetix/es/inicio");
     exit;
 }
 
@@ -17,10 +17,10 @@ $rol = isset($_SESSION['rol']) ? (int) $_SESSION['rol'] : null;
 $idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
 
 // Permitir el acceso solo a usuarios y tecnicos.
-if ($rol === null || $rol === 3) {
+if ($rol === null) {
     $_SESSION['mensaje'] = "No estas autorizado a ver esta pagina";
     $_SESSION['tipoError'] = "error";
-    header("Location: inicio.php");
+    header("Location: /Kinetix/es/inicio");
     exit;
 }
 
@@ -33,7 +33,7 @@ $verificarTicket = mysqli_fetch_assoc($verificarTicket);
 if ($verificarTicket['CantidadActivos'] == 0) {
     $_SESSION['mensaje'] = "No existe el activo que estas intentando ver";
     $_SESSION['tipoError'] = "error";
-    header("Location: ../es/inicio.php");
+    header("Location: /Kinetix/es/inicio");
     exit;
 }
 
@@ -64,7 +64,7 @@ if($id_activo > 0) {
                 $sql = "INSERT INTO historial_activo(id_activo, accion) VALUES ($id_activo, 'Usuario: $idUsuario ahora es responsable de este activo')";
                 $sql = mysqli_query($conexion, $sql);
 
-                header("Location: ../es/inventario.php");
+                header("Location: /Kinetix/es/inventario");
                 exit;
             }
         }
@@ -91,14 +91,11 @@ if($id_activo > 0) {
                         $sql = "INSERT INTO historial_activo (id_activo, accion)
                                 VALUES ($id_activo, '$accion')";
                         mysqli_query($conexion, $sql);
-                        header("Location: ../es/tickets.php?vista=solicitudes");
+                        header("Location: /Kinetix/es/tickets/solicitudes");
                         exit;
                     }
                 }
             }
-        }
-        if ($_POST['accion'] == "solicitarServicio"){
-
         }
     }
 }
@@ -111,6 +108,7 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
 <!doctype html>
 <html lang="es">
 <head>
+    <base href="/Kinetix/php/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $resultados['nombre'] ?> | Kinetix</title>
@@ -124,10 +122,11 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
                 <img src="../imagenes/Logo1.png" alt="Logo Kinetix">
             </div>
             <ul>
-                <li><a href="../es/inicio.php">Inicio</a></li>
-                <li><a href="../es/inventario.php" class="active" aria-current="page">Inventario</a></li>
-                <li><a href="../es/tickets.php">Tickets</a></li>
-                <li><a href="../es/usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a href="../es/inicio">Inicio</a></li>
+                <li><a href="../es/inventario" class="active" aria-current="page">Inventario</a></li>
+                <li><a href="../es/tickets">Tickets</a></li>
+                <li><a href="../es/usuario/<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a class="logout-button" href="logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
                 <li><button type="button" class="theme-toggle" aria-label="Cambiar tema">Modo</button></li>
             </ul>
         </div>
@@ -141,7 +140,7 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
         </div>
     </div>
     <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
-    
+
     <main class="page">
         <div class="container">
             <header class="header">
@@ -150,7 +149,7 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
                     <h1>Información del activo</h1>
                     <p>Consulta el estado, los datos técnicos y las acciones disponibles.</p>
                 </div>
-                <a class="btn-login" href="../es/inventario.php">Volver al inventario</a>
+                <a class="btn-login" href="../es/inventario">Volver al inventario</a>
             </header>
 
             <section class="asset-detail" aria-labelledby="asset-title">
@@ -192,9 +191,9 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
                     <aside class="asset-actions" aria-labelledby="actions-title">
                         <h2 id="actions-title">Acciones del activo</h2>
                         <?php if ($idResponsable === $idUsuario && $rol === 1) { ?>
-                        <a class="btn-login" href="#solicitar-servicio">Solicitar servicio</a>
-                        <a class="asset-action-link" href="#reportar-problema">Reportar un problema</a>
-                        <a class="asset-action-link" href="#historial">Ver historial</a>
+                        <a class="btn-login" href="activo/<?= $id_activo ?>#solicitar-servicio">Solicitar servicio</a>
+                        <a class="asset-action-link" href="activo/<?= $id_activo ?>#reportar-problema">Reportar un problema</a>
+                        <a class="asset-action-link" href="activo/<?= $id_activo ?>#historial">Ver historial</a>
                         <?php } elseif ($rol === 1 && empty($resultados['id_usuario']) && $resultados['id_estado'] != 3) {?>
                         <form method="POST">
                             <input type="hidden" name="accion" value="solicitarActivo">
@@ -240,18 +239,6 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
         </div>
     </main>
 
-    <script>
-        const themeButton = document.querySelector('.theme-toggle');
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-
-        document.body.classList.toggle('light-mode', savedTheme === 'light');
-        document.body.classList.toggle('dark-mode', savedTheme !== 'light');
-
-        themeButton.addEventListener('click', () => {
-            const isLight = document.body.classList.toggle('light-mode');
-            document.body.classList.toggle('dark-mode', !isLight);
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
-        });
-    </script>
+    <script src="../js/theme.js"></script>
 </body>
 </html>
