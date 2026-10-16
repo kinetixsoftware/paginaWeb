@@ -8,7 +8,7 @@ $idUsuario = (int) ($_GET['id'] ?? 0);
 if ($idUsuario <= 0 ) {
 	$_SESSION['mensaje'] = "No tienes permiso para ver este perfil.";
 	$_SESSION['tipoError'] = "error";
-	header("Location: inicio.php");
+	header("Location: /Kinetix/es/inicio");
 	exit;
 }
 
@@ -28,12 +28,12 @@ $usuario = mysqli_fetch_assoc($resultado);
 if (!$usuario) {
 	$_SESSION['mensaje'] = "El usuario no existe.";
 	$_SESSION['tipoError'] = "error";
-	header("Location: inicio.php");
+	header("Location: /Kinetix/es/inicio");
 	exit;
 } elseif($usuario['nombre_rol'] == "Administrador") {
     $_SESSION['mensaje'] = "Este usuario es un administrador, no tienes permiso para ver este perfil.";
 	$_SESSION['tipoError'] = "error";
-	header("Location: inicio.php");
+	header("Location: /Kinetix/es/inicio");
 	exit;
 }
 
@@ -43,6 +43,7 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 <!DOCTYPE html>
 <html lang="es">
 <head>
+	<base href="/Kinetix/es/">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Mi cuenta | Kinetix</title>
@@ -53,16 +54,16 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 <body>
 	<nav class="menu">
 		<div class="menu-content">
-			<a class="menu-logo" href="inicio.php" aria-label="Volver al inicio">
+			<a class="menu-logo" href="inicio" aria-label="Volver al inicio">
 				<img src="../imagenes/Logo1.png" alt="Logo Kinetix">
 			</a>
 			<ul>
-				<li><a href="inicio.php">Inicio</a></li>
-				<li><a href="tickets.php">Tickets</a></li>
-				<li><a href="preguntas-frecuentes.php">Ayuda</a></li>
-				<li><a href="inventario.php">Inventario</a></li>
-				<li><a class="active" href="usuario.php?id=<?= $idUsuario ?>">Mi cuenta</a></li>
-				<li><a href="../php/logout.php">Cerrar sesión</a></li>
+				<li><a href="inicio">Inicio</a></li>
+				<li><a href="tickets">Tickets</a></li>
+				<li><a href="preguntas-frecuentes">Ayuda</a></li>
+				<li><a href="inventario">Inventario</a></li>
+				<li><a class="active" href="usuario/<?= $idUsuario ?>">Mi cuenta</a></li>
+				<li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
 			</ul>
 		</div>
 	</nav>
@@ -84,7 +85,7 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 				<p>Consultá la información asociada a esta cuenta de Kinetix.</p>
 			</div>
 			<?php if ($idUsuario === ((int) $_SESSION['idUsuario'] ?? 0)) { ?>
-				<a class="perfil-action" href="usuario-config.php>">Configurar perfil</a>
+				<a class="perfil-action" href="usuario-config">Configurar perfil</a>
 			<?php } ?>
 		</section>
 
