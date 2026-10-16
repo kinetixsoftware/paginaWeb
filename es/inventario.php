@@ -11,23 +11,25 @@ $tipoError = $_SESSION['tipoError'] ?? '';
 if (!isset($_SESSION['rol'])) {
     $_SESSION['mensaje'] = "Porfavor incia sesion para obtener acceso a esta pagina";
     $_SESSION['tipoError'] = "error";
-    header("Location: login.php");
+    header("Location: /Kinetix/es/login");
   exit;
 }
 
 $rolUsuario = (int) $_SESSION['rol'];
-  
 
-//Query secundario (no se si esta bien)
-//SELECT a.id_activo, a.nombre, a.modelo, a.id_marca, m.marca, a.id_estado, e.estado, a.id_categoria, c.categoria FROM activo AS a 
-// JOIN activo_marca AS m ON a.id_marca = m.id_marca 
-// JOIN estado_activo AS e ON a.id_estado = e.id_estado
-// JOIN categoria_activo AS c ON a.id_categoria = c.id_categoria
-//ORDER BY a.id_activo ASC;
 $condicion = 'a.id_marca = m.id_marca AND a.id_estado = e.id_estado AND a.id_categoria = c.id_categoria';
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === "verItemsPersonales") {
+$idUsuarioInventario = 0;
+if ($rolUsuario === 3 && isset($_GET['usuario'])) {
+    $idUsuarioInventario = filter_var($_GET['usuario'], FILTER_VALIDATE_INT);
+    if (!$idUsuarioInventario || $idUsuarioInventario < 1) {
+        $_SESSION['mensaje'] = 'El usuario seleccionado no es válido.';
+        $_SESSION['tipoError'] = 'error';
+        $idUsuarioInventario = -1;
+    }
+    $condicion .= " AND a.id_usuario = " . (int) $idUsuarioInventario;
+} elseif ($rolUsuario === 1 && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === "verItemsPersonales") {
     $idUsuario = (int) $_SESSION['idUsuario'];
-    $condicion = "a.id_marca = m.id_marca AND a.id_estado = e.id_estado AND a.id_categoria = c.id_categoria AND id_usuario = $idUsuario";
+    $condicion .= " AND a.id_usuario = $idUsuario";
 }
 
 $activo = "SELECT a.id_activo, a.nombre, a.modelo, a.id_marca, a.id_estado, a.id_categoria, m.marca, e.estado, c.categoria 
@@ -46,6 +48,7 @@ $resultadoestados = mysqli_query($conexion, $estados);
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<base href="/Kinetix/es/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -62,11 +65,12 @@ $resultadoestados = mysqli_query($conexion, $estados);
                 <img src="..\imagenes\Logo1.png" alt="Logo Kinetix">
             </div>
             <ul>
-                <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="preguntas-frecuentes.php">Ayuda</a></li>
-                <li><a href="tickets.php">Tickets</a></li>
-                <li><a href="inventario.php" class="active" aria-current="page">Inventario</a></li>
-                <li><a href="usuario.php?id=<?= $_SESSION['idUsuario'] ?>">Mi Cuenta</a></li>
+                <li><a href="inicio">Inicio</a></li>
+                <li><a href="preguntas-frecuentes">Ayuda</a></li>
+                <li><a href="tickets">Tickets</a></li>
+                <li><a href="inventario" class="active" aria-current="page">Inventario</a></li>
+                <li><a href="usuario/<?= (int) $_SESSION['idUsuario'] ?>">Mi Cuenta</a></li>
+                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
                 </li>
@@ -97,12 +101,14 @@ $resultadoestados = mysqli_query($conexion, $estados);
                     <p>Seleccione un componente para ver su informacion.</p>
                 </div>
                 <?php if ($rolUsuario === 2) { ?>
-                <a href="../php/inventario-agregar-item.php" class="btn-login">Agregar Item</a>
-                <?php } else { ?>
+                <a href="../php/inventario-agregar-item" class="btn-login">Agregar Item</a>
+                <?php } elseif ($rolUsuario === 1) { ?>
                 <form method="POST">
                     <input type="hidden" name="accion" value="verItemsPersonales">
                     <button type="submit" class="btn-login"> Ver Mis Items</button>
                 </form>
+                <?php } elseif ($rolUsuario === 3) { ?>
+                <a href="inventario" class="btn-login">Ver todo el inventario</a>
                 <?php } ?>
             </div>
             <div class="filters">
@@ -122,7 +128,7 @@ $resultadoestados = mysqli_query($conexion, $estados);
             </div>
             <div class="inventory">
                 <?php  while ($reg = mysqli_fetch_array($resultadoactivo)) { ?>
-                <a class="card" href="../php/activo.php?id=<?= $reg['id_activo']?>">
+                <a class="card" href="../php/activo/<?= (int) $reg['id_activo'] ?>">
                     <img src="https://placehold.co/400x300?text=<?=$reg['modelo']?>" alt="<?=$reg['modelo']?>">
                     <div class="info">
                         <h3><?=$reg['nombre']?></h3>
@@ -143,31 +149,8 @@ $resultadoestados = mysqli_query($conexion, $estados);
         $_SESSION['tipoError'] = null;
     }
   ?>
+  <script src="../js/theme.js"></script>
   <script>
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme) {
-      const body = document.body;
-      const isDark = theme === 'dark';
-      body.classList.toggle('dark-mode', isDark);
-      body.classList.toggle('light-mode', !isDark);
-      if (themeToggle) {
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-      }
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-        applyTheme(nextTheme);
-        localStorage.setItem('theme', nextTheme);
-      });
-    }
-
     const inventorySearch = document.getElementById('inventorySearch');
     const cards = Array.from(document.querySelectorAll('.card'));
 
