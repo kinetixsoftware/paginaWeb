@@ -8,7 +8,7 @@ $conexion = conectarBD();
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== "1") {
     $_SESSION['mensaje'] = "Solo los usuarios pueden crear tickets";
     $_SESSION['tipoError'] = "error";
-    header("Location: inicio.php");
+    header("Location: inicio");
 }
 
 $idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
@@ -41,10 +41,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $registro3 = mysqli_query($conexion, $sql3);
 
         if($registro && $registro2 && $registro3) {
-            header("Location: tickets.php?id=" . $last_id);
+            header("Location: ticket/" . (int) $last_id);
             exit;
         } else {
-            echo "Error al crear el ticket: " . mysqli_error($conexion);
+            $tipoError = "error";
+            $mensaje = "Error al crear ticket: " . mysqli_error($conexion);
         }
 	} catch (Throwable $e) {
 		$tipoError = "error";
@@ -59,8 +60,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../css/crear-ticket.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
+    <link rel="stylesheet" href="../css/crear-ticket.css">
     <title>Crear Ticket</title>
 </head>
 
@@ -69,15 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <nav class="menu">
         <div class="menu-content">
             <div class="menu-logo">
-                <img src="../../imagenes/Logo1.png" alt="Logo Kinetix">
+                <img src="../imagenes/Logo1.png" alt="Logo Kinetix">
             </div>
 
             <ul>
-                <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="preguntas-frecuentes.php">Ayuda</a></li>
-                <li><a href="tickets.php">Tickets</a></li>
-                <li><a href="inventario.php">Inventario</a></li>
-                <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a href="inicio">Inicio</a></li>
+                <li><a href="preguntas-frecuentes">Ayuda</a></li>
+                <li><a href="tickets">Tickets</a></li>
+                <li><a href="inventario">Inventario</a></li>
+                <li><a href="usuario/<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
                         Dark</button>
@@ -136,31 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <script src="../js/theme.js"></script>
     <script>
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme) {
-        const body = document.body;
-        const isDark = theme === 'dark';
-        body.classList.toggle('dark-mode', isDark);
-        body.classList.toggle('light-mode', !isDark);
-        if (themeToggle) {
-            themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-            themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-        }
-    }
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const isDark = document.body.classList.contains('dark-mode');
-                const nextTheme = isDark ? 'light' : 'dark';
-                applyTheme(nextTheme);
-                localStorage.setItem('theme', nextTheme);
-        });
-    }
-
     const formMessage = document.getElementById('formMessage');
     const params = new URLSearchParams(window.location.search);
     const status = params.get('status');
