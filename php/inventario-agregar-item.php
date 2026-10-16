@@ -90,6 +90,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
                 <li><a href="../es/inicio">Inicio</a></li>
                 <li><a href="../es/inventario">Volver</a></li>
                 <li style="font-size: 15px;">||</li>
+                <li><a class="logout-button" href="logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
                 </li>
@@ -139,29 +140,6 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
             </div>
         </div>
     </div>
-  <script>
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme) {
-      const body = document.body;
-      const isDark = theme === 'dark';
-      body.classList.toggle('dark-mode', isDark);
-      body.classList.toggle('light-mode', !isDark);
-      if (themeToggle) {
-        themeToggle.textContent = isDark ? '☀️ Light' : '🌙 Dark';
-        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-      }
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    if (themeToggle) {
-      themeToggle.addEventListener('click', () => {
-        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-        applyTheme(nextTheme);
-        localStorage.setItem('theme', nextTheme);
-      });
-    }
-  </script></body>
+  <script src="../js/theme.js"></script>
+</body>
 </html>
