@@ -11,7 +11,7 @@ $id_ubicacion = 0;
 if (isset($_SESSION['rol'])) {
     $_SESSION['mensaje'] = "Porfavor incia sesion para obtener acceso a esta pagina";
     $_SESSION['tipoError'] = "error";
-    header("Location: login.php");
+    header("Location: login");
     exit;
 }
 
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['tipoError'] = "success";
                     $_SESSION['mensaje'] = "¡Cuenta creada con éxito! Ingresá tu contraseña para iniciar sesión.";
                     $_SESSION['email'] = $email;
-                    header("Location: login.php");
+                    header("Location: login");
                     exit;
                 } else {
                     $tipoError = "error";
@@ -104,8 +104,8 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
             </div>
 
             <ul>
-                <li><a href="inicio.php">Volver al inicio</a></li>
-                <li><a href="login.php">Iniciar Sesion</a></li>
+                <li><a href="inicio">Volver al inicio</a></li>
+                <li><a href="login">Iniciar Sesion</a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
                         Dark</button>
@@ -200,7 +200,7 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
             </form>
 
             <p class="login-footer">
-                ¿Ya tenés una cuenta? <a href="Login.php">Iniciá sesión</a>
+                ¿Ya tenés una cuenta? <a href="login">Iniciá sesión</a>
             </p>
         </div>
     </section>
@@ -210,27 +210,8 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
         <p>© 2026 Kinetix Softwares. Todos los derechos reservados.</p>
     </footer>
 
+    <script src="../js/theme.js"></script>
     <script>
-    const themeToggle = document.getElementById('themeToggle');
-
-    function applyTheme(theme) {
-        const body = document.body;
-        const isDark = theme === 'dark';
-        body.classList.toggle('dark-mode', isDark);
-        body.classList.toggle('light-mode', !isDark);
-        themeToggle.textContent = isDark ? '☀️' : '🌙';
-        themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-    }
-
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    applyTheme(savedTheme);
-
-    themeToggle.addEventListener('click', () => {
-        const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-        applyTheme(nextTheme);
-        localStorage.setItem('theme', nextTheme);
-    });
-
     function showPassword() {
         var x = document.getElementById("password")
         if (x.type === "password") {
