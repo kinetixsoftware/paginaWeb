@@ -12,7 +12,7 @@ $visitante = "";
 if ($rol === null || $rol === 3) {
     $_SESSION['mensaje'] = "No estas autorizado a ver esta pagina";
     $_SESSION['tipoError'] = "error";
-    header("Location: inicio.php");
+    header("Location: /Kinetix/es/inicio");
     exit;
 } else if ($rol === 1) {
     $visitante = "Usuario";
@@ -22,10 +22,10 @@ if ($rol === null || $rol === 3) {
 
 // Aplicar el filtro de categoria si se recibio desde el formulario.
 $filtroTipo = ($_GET['filtro'] ?? '');
+$id_categoria = (int) ($_GET['id_categoria'] ?? 0);
 $filtroCategoria = '';
 if (!empty($filtroTipo)) {
     if ($filtroTipo == "categoria") {
-        $id_categoria = (int) ($_GET['id_categoria'] ?? 0);
         if ($id_categoria > 0) {
             $filtroCategoria = " AND ct.id_categoria = $id_categoria";
         }
@@ -106,7 +106,7 @@ if ($id_ticket > 0) {
                     mysqli_query($conexion, $sql);
                 }
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
@@ -134,7 +134,7 @@ if ($id_ticket > 0) {
                     mysqli_query($conexion, $sql);
                 }
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
@@ -151,7 +151,7 @@ if ($id_ticket > 0) {
                         VALUES ($id_ticket, $ticketEstado, $ticketEstado, 'El tecnico cambio la categoria de este ticket.')";
                 mysqli_query($conexion, $sql);
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
@@ -176,7 +176,7 @@ if ($id_ticket > 0) {
                         VALUES ($id_ticket, $ultimoEstado, 2, 'Ticket cancelado por el usuario')";
                 mysqli_query($conexion, $sql);
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
@@ -220,7 +220,7 @@ if ($id_ticket > 0) {
                     $registro = mysqli_query($conexion, $sql);
                 }
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
@@ -249,7 +249,7 @@ if ($id_ticket > 0) {
                     mysqli_query($conexion, $sql);
                 }
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
@@ -266,7 +266,7 @@ if ($id_ticket > 0) {
                         VALUES ($id_ticket, $ticketEstado, $ticketEstado, 'El tecnico cambio la prioridad de este ticket.')";
                 mysqli_query($conexion, $sql);
 
-                header("Location: tickets.php?id=$id_ticket");
+                header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
         }
@@ -345,7 +345,7 @@ if ($vista === 'solicitudes') {
                     }
                 }
 
-                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                header("Location: /Kinetix/es/solicitud/$id_solicitud");
                 exit;
             }
 
@@ -356,7 +356,7 @@ if ($vista === 'solicitudes') {
                     $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
                     mysqli_query($conexion, $sql);
                 }
-                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                header("Location: /Kinetix/es/solicitud/$id_solicitud");
                 exit;
             }
 
@@ -367,7 +367,7 @@ if ($vista === 'solicitudes') {
                     $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
                     mysqli_query($conexion, $sql);
                 }
-                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                header("Location: /Kinetix/es/solicitud/$id_solicitud");
                 exit;
             }
 
@@ -378,7 +378,7 @@ if ($vista === 'solicitudes') {
                     $sql = "INSERT INTO historial_activo (id_activo, accion) VALUES (" . (int) $solicitudData['id_activo'] . ", '$accion')";
                     mysqli_query($conexion, $sql);
                 }
-                header("Location: tickets.php?vista=solicitudes&id_solicitud=$id_solicitud");
+                header("Location: /Kinetix/es/solicitud/$id_solicitud");
                 exit;
             }
         }
@@ -408,6 +408,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<base href="/Kinetix/es/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tickets</title>
@@ -424,11 +425,12 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
             </div>
 
             <ul>
-                <li><a href="inicio.php">Inicio</a></li>
-                <li><a href="preguntas-frecuentes.php">Ayuda</a></li>
-                <li><a href="tickets.php" class="active" aria-current="page">Tickets</a></li>
-                <li><a href="inventario.php">Inventario</a></li>
-                <li><a href="usuario.php?id=<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a href="inicio">Inicio</a></li>
+                <li><a href="preguntas-frecuentes">Ayuda</a></li>
+                <li><a href="tickets" class="active" aria-current="page">Tickets</a></li>
+                <li><a href="inventario">Inventario</a></li>
+                <li><a href="usuario/<?= $idUsuario ?>">Mi Cuenta</a></li>
+                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
                 <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
             </ul>
         </div>
@@ -448,26 +450,22 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
             <!-- Lista de tickets o solicitudes de servicio. -->
             <div class="sidebar">
                 <div class="ticket-tabs" role="tablist" aria-label="Tipo de solicitud">
-                    <a href="tickets.php" class="<?= $vista === 'tickets' ? 'active' : '' ?>" <?= $vista === 'tickets' ? 'aria-current="page"' : '' ?>>Tickets</a>
-                    <a href="tickets.php?vista=solicitudes" class="<?= $vista === 'solicitudes' ? 'active' : '' ?>" <?= $vista === 'solicitudes' ? 'aria-current="page"' : '' ?>>Solicitudes</a>
+                    <a href="tickets" class="<?= $vista === 'tickets' ? 'active' : '' ?>" <?= $vista === 'tickets' ? 'aria-current="page"' : '' ?>>Tickets</a>
+                    <a href="tickets/solicitudes" class="<?= $vista === 'solicitudes' ? 'active' : '' ?>" <?= $vista === 'solicitudes' ? 'aria-current="page"' : '' ?>>Solicitudes</a>
                 </div>
                 <div class="ticket-list">
                     <?php if ($vista === 'tickets') { ?>
                     <div class="ticket-filter">
-                        <form method="GET">
-                            <input type="hidden" name="filtro" value="categoria">
-                            <select name="id_categoria" id="id_categoria" onchange="this.form.submit()">
-                                <option value="0">Categoria</option>
+                        <select id="id_categoria" onchange="window.location.href = this.value === '0' ? 'tickets' : 'tickets/categoria/' + this.value">
+                            <option value="0" <?= $id_categoria === 0 ? 'selected' : '' ?>>Todos</option>
                                 <?php while($reg = mysqli_fetch_array($categoriasFiltroResultado)) { ?>
-                                <option value="<?= $reg['id_categoria'] ?>"> <?=  $reg['categoria'] ?></option>
+                                <option value="<?= (int) $reg['id_categoria'] ?>" <?= $id_categoria === (int) $reg['id_categoria'] ? 'selected' : '' ?>> <?=  $reg['categoria'] ?></option>
                                 <?php } ?>
-                                <option value="0"> Todos </option>
-                            </select>
-                        </form>
+                        </select>
                     </div>
                     <!-- Mostrar cada ticket encontrado. -->
                     <?php while($reg = mysqli_fetch_assoc($ticketlistresult)) { ?>
-                        <a class="ticket" href="tickets.php?id=<?= $reg['id_ticket']?>">
+                        <a class="ticket" href="ticket/<?= (int) $reg['id_ticket'] ?>">
                             <div class="ticket-top">
                                 <span class="ticket-id">#<?= str_pad($reg['id_ticket'], 5, '0', STR_PAD_LEFT) ?></span>
                                 <div class="ticket-status <?= strtolower(str_replace(' ', '-', $reg['estado'])) ?>">
@@ -489,10 +487,9 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 <h6 style="font-size:16px; font-weight: lighter;"><?= $reg['titulo'] ?></h6>
                             </div>
                         </a>
-                    <?php } ?>
-                    <?php } else { ?>
+                    <?php } } else { ?>
                         <?php while ($reg = mysqli_fetch_assoc($solicitudesResultado)) { ?>
-                            <a class="ticket" href="tickets.php?vista=solicitudes&id_solicitud=<?= (int) $reg['id_solicitud'] ?>">
+                            <a class="ticket" href="solicitud/<?= (int) $reg['id_solicitud'] ?>">
                                 <div class="ticket-top">
                                     <span class="ticket-id">Solicitud #<?= str_pad($reg['id_solicitud'], 5, '0', STR_PAD_LEFT) ?></span>
                                     <span class="ticket-status"><span class="status-dot"></span><?= $reg['estado'] ?></span>
@@ -513,7 +510,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                 <div class="header">
                     <h1 style="text-align: center; padding: 15px;">
                         <?= $vista === 'solicitudes'
-                            ? $solicitudData ? 'Solicitud #' . $solicitudData['id_solicitud'] . ' · ' . $solicitudData['activo'] : 'Seleccioná una solicitud'
+                            ? ($solicitudData ? 'Solicitud #' . $solicitudData['id_solicitud'] . ' · ' . $solicitudData['activo'] : 'Seleccioná una solicitud')
                             : $ticketTitulo ?? 'Seleccioná un ticket' ?>
                     </h1>
                 </div>
@@ -549,7 +546,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                     </div>
                     <?php if ($rol === 2 && $solicitudData) { ?>
                         <div class="tech-controls request-state-controls">
-                            <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                            <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                 <input type="hidden" name="accion" value="cambiarEstadoSolicitud">
                                 <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
                                 <select name="estado_solicitud" aria-label="Cambiar estado de la solicitud" onchange="this.form.submit()">
@@ -559,17 +556,17 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 </select>
                             </form>
                             <div class="request-action-row">
-                                <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                     <input type="hidden" name="accion" value="aceptarSolicitud">
                                     <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
                                     <button type="submit">Aceptar y revisar</button>
                                 </form>
-                                <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                     <input type="hidden" name="accion" value="resolverSolicitud">
                                     <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
                                     <button type="submit">Marcar solucionada</button>
                                 </form>
-                                <form method="POST" action="tickets.php?vista=solicitudes&id_solicitud=<?= $id_solicitud ?>">
+                                <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                     <input type="hidden" name="accion" value="cerrarSolicitud">
                                     <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
                                     <button type="submit">Cerrar solicitud</button>
@@ -640,12 +637,6 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 </select>
                             </form>
                         </div>
-                        <div>
-                            <form method="POST">
-                                <input type="hidden" name="accion" value="borrarTicket">
-                                <button type="submit" class="btn-editar" style="background-color:red; color:white"> Borrar Ticket </button>
-                            </form>
-                        </div>
                     </div>
                 <?php }?>
                 <!-- Formulario para enviar mensajes mientras el ticket esta abierto. -->
@@ -687,30 +678,8 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
         </div>
     </div>
     <!-- Aplicar el tema guardado y permitir cambiarlo desde el menu. -->
+    <script src="../js/theme.js"></script>
     <script>
-        const themeToggle = document.getElementById('themeToggle');
-
-        function applyTheme(theme) {
-            const body = document.body;
-            const isDark = theme === 'dark';
-            body.classList.toggle('dark-mode', isDark);
-            body.classList.toggle('light-mode', !isDark);
-            if (themeToggle) {
-                themeToggle.textContent = isDark ? '☀️' : '🌙';
-                themeToggle.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-            }
-        }
-
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        applyTheme(savedTheme);
-
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
-                applyTheme(nextTheme);
-                localStorage.setItem('theme', nextTheme);
-            });
-        }
     </script>
 </body>
 </html>
