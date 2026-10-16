@@ -1,0 +1,78 @@
+RewriteEngine On
+RewriteBase /Kinetix/
+
+# Rutas canonicas para paginas que reciben identificadores por GET.
+RewriteRule ^php/activo/([0-9]+)/?$ php/activo.php?id=$1 [L,QSA]
+RewriteRule ^es/usuario/([0-9]+)/?$ es/usuario.php?id=$1 [L,QSA]
+RewriteRule ^es/inventario/usuario/([0-9]+)/?$ es/inventario.php?usuario=$1 [L,QSA]
+RewriteRule ^es/ticket/([0-9]+)/?$ es/tickets.php?id=$1 [L,QSA]
+RewriteRule ^es/solicitud/([0-9]+)/?$ es/tickets.php?vista=solicitudes&id_solicitud=$1 [L,QSA]
+RewriteRule ^es/tickets/solicitudes/?$ es/tickets.php?vista=solicitudes [L,QSA]
+RewriteRule ^es/tickets/categoria/([0-9]+)/?$ es/tickets.php?filtro=categoria&id_categoria=$1 [L,QSA]
+RewriteRule ^es/admin/pregunta/([0-9]+)/?$ es/admin/panel-admin.php?editar_pregunta=$1 [L,QSA]
+RewriteRule ^es/admin/tabla/([a-z_]+)/?$ es/admin/panel-admin.php?tabla=$1 [L,QSA]
+RewriteRule ^es/admin/registro/ingreso/([a-z_]+)/?$ es/admin/registro/IngresarRegistro.php?tabla=$1 [L,QSA]
+
+# Redirigir rutas antiguas con guion a las rutas canonicas con segmentos.
+RewriteRule ^php/activo-([0-9]+)/?$ php/activo/$1 [R=301,L,NE]
+RewriteRule ^es/usuario-([0-9]+)/?$ es/usuario/$1 [R=301,L,NE]
+RewriteRule ^es/inventario-usuario-([0-9]+)/?$ es/inventario/usuario/$1 [R=301,L,NE]
+RewriteRule ^es/ticket-([0-9]+)/?$ es/ticket/$1 [R=301,L,NE]
+RewriteRule ^es/solicitud-([0-9]+)/?$ es/solicitud/$1 [R=301,L,NE]
+RewriteRule ^es/tickets-solicitudes/?$ es/tickets/solicitudes [R=301,L,NE]
+RewriteRule ^es/tickets-categoria-([0-9]+)/?$ es/tickets/categoria/$1 [R=301,L,NE]
+RewriteRule ^es/admin/pregunta-([0-9]+)/?$ es/admin/pregunta/$1 [R=301,L,NE]
+RewriteRule ^es/admin/tabla-([a-z_]+)/?$ es/admin/tabla/$1 [R=301,L,NE]
+RewriteRule ^es/admin/registro/ingreso-([a-z_]+)/?$ es/admin/registro/ingreso/$1 [R=301,L,NE]
+
+# Redirigir URLs antiguas con IDs a sus rutas canonicas.
+RewriteCond %{THE_REQUEST} \s/+[^\s]*php/activo(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)id=([0-9]+)(&|$)
+RewriteRule ^php/activo(?:\.php)?$ php/activo/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/usuario(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)id=([0-9]+)(&|$)
+RewriteRule ^es/usuario(?:\.php)?$ es/usuario/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/inventario(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)usuario=([0-9]+)(&|$)
+RewriteRule ^es/inventario(?:\.php)?$ es/inventario/usuario/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/tickets(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)vista=solicitudes(&|$)
+RewriteCond %{QUERY_STRING} (^|&)id_solicitud=([0-9]+)(&|$)
+RewriteRule ^es/tickets(?:\.php)?$ es/solicitud/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/tickets(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)id=([0-9]+)(&|$)
+RewriteRule ^es/tickets(?:\.php)?$ es/ticket/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/tickets(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)vista=solicitudes(&|$)
+RewriteRule ^es/tickets(?:\.php)?$ es/tickets/solicitudes? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/tickets(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)filtro=categoria(&|$)
+RewriteCond %{QUERY_STRING} (^|&)id_categoria=([0-9]+)(&|$)
+RewriteRule ^es/tickets(?:\.php)?$ es/tickets/categoria/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/admin/panel-admin(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)editar_pregunta=([0-9]+)(&|$)
+RewriteRule ^es/admin/panel-admin(?:\.php)?$ es/admin/pregunta/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/admin/panel-admin(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)tabla=([a-z_]+)(&|$) [NC]
+RewriteRule ^es/admin/panel-admin(?:\.php)?$ es/admin/tabla/%2? [R=301,L,NE]
+
+RewriteCond %{THE_REQUEST} \s/+[^\s]*es/admin/registro/IngresarRegistro(?:\.php)?\? [NC]
+RewriteCond %{QUERY_STRING} (^|&)tabla=([a-z_]+)(&|$) [NC]
+RewriteRule ^es/admin/registro/IngresarRegistro(?:\.php)?$ es/admin/registro/ingreso/%2? [R=301,L,NE,NC]
+
+# Quitar .php de las solicitudes publicas.
+RewriteCond %{THE_REQUEST} \s/+[^\s]*\.php(?:[\s?]) [NC]
+RewriteRule ^(.+)\.php$ $1 [R=301,L,NE]
+
+# Resolver las rutas sin extension al archivo PHP correspondiente.
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.+?)/?$ $1.php [L]

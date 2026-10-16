@@ -9,7 +9,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
     $_SESSION['mensaje'] = "No tienes acceso a esta pagina";
     $_SESSION['tipoError'] = "error";
-    header("Location: login.php");
+    header("Location: ../es/login");
     exit;
 } else {
     try {
@@ -31,7 +31,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
     } catch (mysqli_sql_exception $e) {
         $_SESSION['mensaje'] = "Error al obtener tablas. Error: " . $e->getMessage();;
         $_SESSION['tipoError'] = "error";
-        header("Location: login.php");
+        header("Location: ../es/login");
         exit;
     }
 
@@ -62,7 +62,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
             $_SESSION['mensaje'] = "El activo no pudo ser registrado";
             $_SESSION['tipoError'] = "error";
         }
-        Header("Location: ../es/inventario.php");
+        Header("Location: ../es/inventario");
         exit;
     } 
 }
@@ -87,8 +87,8 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
                 <img src="../imagenes/Logo1.png" alt="Logo Kinetix">
             </div>
             <ul>
-                <li><a href="../es/inicio.php">Inicio</a></li>
-                <li><a href="../es/inventario.php">Volver</a></li>
+                <li><a href="../es/inicio">Inicio</a></li>
+                <li><a href="../es/inventario">Volver</a></li>
                 <li style="font-size: 15px;">||</li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙 Dark</button>
@@ -96,15 +96,6 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] === 1 ) {
             </ul>
         </div>
     </nav>
-
-    <!-- Mensaje error -->
-    <?php if (isset($_SESSION['mensaje'])) { ?>
-    <div class="toast-wrapper">
-        <div id="formMessage" class="form-message <?= $_SESSION['tipoError'] ?>">
-            <?= $_SESSION['mensaje']?>
-        </div>
-    </div>
-    <?php unset($_SESSION['mensaje'], $_SESSION['tipoError']); } ?>
 
     <div class="page">
         <div class="container">
