@@ -1,6 +1,36 @@
 RewriteEngine On
 RewriteBase /Kinetix/
 
+# Cachear recursos estaticos en el navegador durante una semana.
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType text/javascript "access plus 1 week"
+    ExpiresByType image/avif "access plus 1 week"
+    ExpiresByType image/gif "access plus 1 week"
+    ExpiresByType image/jpeg "access plus 1 week"
+    ExpiresByType image/png "access plus 1 week"
+    ExpiresByType image/svg+xml "access plus 1 week"
+    ExpiresByType image/webp "access plus 1 week"
+    ExpiresByType image/x-icon "access plus 1 week"
+    ExpiresByType font/woff "access plus 1 week"
+    ExpiresByType font/woff2 "access plus 1 week"
+    ExpiresByType application/font-woff "access plus 1 week"
+</IfModule>
+
+# No cachear paginas dinamicas ni HTML servido directamente.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(?i:css|js|avif|gif|jpe?g|png|svg|webp|ico|woff2?)$">
+        Header set Cache-Control "public, max-age=604800"
+    </FilesMatch>
+    <FilesMatch "\.(?i:php|html)$">
+        Header always set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </FilesMatch>
+</IfModule>
+
 # Rutas canonicas para paginas que reciben identificadores por GET.
 RewriteRule ^php/activo/([0-9]+)/?$ php/activo.php?id=$1 [L,QSA]
 RewriteRule ^es/usuario/([0-9]+)/?$ es/usuario.php?id=$1 [L,QSA]
