@@ -85,7 +85,9 @@ $ubicacion = $usuario['calle'] . ' - ' . $usuario['ciudad'] . ' <br> Telefono: '
 				<p>Consultá la información asociada a esta cuenta de Kinetix.</p>
 			</div>
 			<?php if ($idUsuario === ((int) $_SESSION['idUsuario'] ?? 0)) { ?>
-				<a class="perfil-action" href="usuario-config">Configurar perfil</a>
+				<form action="usuario-config">
+					<button class="perfil-action" type="submit">Configurar perfil</button>
+				</form>
 			<?php } ?>
 		</section>
 
