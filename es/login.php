@@ -14,26 +14,24 @@ if (isset($_SESSION['rol'])) {
     exit;
 }
 
-$mensaje = $_SESSION['mensaje'] ?? "";
-$tipoError = $_SESSION['tipoError'] ?? "";
 $email = $_SESSION['email'] ?? null;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $email             = $_POST['email'] ?? '';
       $password       = $_POST['password'] ?? '';
 
     try {
-        
         $sql = "SELECT id_usuario, nombre, apellido, password, activo, id_rol FROM usuario WHERE email = '$email' LIMIT 1";
         $query = mysqli_query($conexion, $sql);
         $usuario = mysqli_fetch_assoc($query);
 
         if (!$usuario || !password_verify($password, $usuario['password'])) {
-            $tipoError = "error";
-            $mensaje = "Lo que ingreso parece estar mal, intentelo de nuevo.";
-        } elseif ($usuario['activo'] == 0) {
-            $tipoError = "error";
-            $mensaje = "Este usuario fue desactivado por un administrador, intente registrarse de nuevo";
+            $_SESSION['tipoError'] = "error";
+            $_SESSION['mensaje'] = "Lo que ingreso parece estar mal, intentelo de nuevo.";
+        } elseif (((int) $usuario['activo']) === 0) {
+            $_SESSION['tipoError'] = "error";
+            $_SESSION['mensaje'] = "Este usuario fue desactivado. Intente registrarse de nuevo";
+            header("Location: inicio");
+            exit;
         } else {
             $_SESSION['idUsuario'] = $usuario['id_usuario'];
             $_SESSION['email'] = $email;
@@ -47,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     } catch (Throwable $e) {
-            $tipoError = "error";
-            $mensaje = "Error al iniciar sesion. Intentalo de nuevo.";
+            $_SESSION['tipoError'] = "error";
+            $_SESSION['mensaje'] = "Error al iniciar sesion. Intentalo de nuevo.";
     }
 }
 ?>
