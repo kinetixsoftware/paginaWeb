@@ -10,32 +10,24 @@ if ((int) ($_SESSION['rol'] ?? 0) !== 3) {
 	exit;
 }
 
-$consultar = static function (mysqli $conexion, string $sql): mysqli_result {
-    $resultado = mysqli_query($conexion, $sql);
-    if (!$resultado) {
-        throw new RuntimeException('No se pudo cargar el informe: ' . mysqli_error($conexion));
-    }
-    return $resultado;
-};
-
-$usuariosResumen = mysqli_fetch_assoc($consultar($conexion,
+$usuariosResumen = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT COUNT(*) AS total, SUM(activo = 1) AS activos,
             SUM(fecha_creacion >= DATE_SUB(NOW(), INTERVAL 24 HOUR)) AS recientes,
             SUM(id_rol = 2) AS tecnicos, SUM(id_rol = 1) AS usuarios
      FROM usuario"
 ));
-$activosResumen = mysqli_fetch_assoc($consultar($conexion,
+$activosResumen = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT COUNT(*) AS total, SUM(id_estado = 1) AS disponibles,
             SUM(id_estado = 3) AS reparacion, SUM(id_estado = 2) AS prestados
      FROM activo"
 ));
-$ticketsResumen = mysqli_fetch_assoc($consultar($conexion,
+$ticketsResumen = mysqli_fetch_assoc(mysqli_query($conexion,
     "SELECT SUM(id_estado IN (4, 5)) AS solucionados,
             COUNT(DISTINCT CASE WHEN id_estado IN (4, 5) THEN id_activo END) AS activos_arreglados,
             SUM(id_tecnico IS NULL) AS sin_tecnico
      FROM ticket"
 ));
-$detallesTecnicosResultado = $consultar($conexion,
+$detallesTecnicosResultado = mysqli_query($conexion,
     "SELECT u.id_usuario, CONCAT(u.nombre, ' ', u.apellido) AS NombreApellido,
             (SELECT COUNT(DISTINCT t.id_activo) FROM ticket t WHERE t.id_tecnico = u.id_usuario AND t.id_activo IS NOT NULL) AS Activos_Asignados,
             (SELECT COUNT(*) FROM ticket t WHERE t.id_tecnico = u.id_usuario) AS Tickets_Asignados,
@@ -45,7 +37,7 @@ $detallesTecnicosResultado = $consultar($conexion,
             (SELECT COUNT(*) FROM ticket t WHERE t.id_tecnico = u.id_usuario AND t.id_estado IN (1, 3)) AS Tickets_Sin_Solucionar
      FROM usuario u WHERE u.id_rol = 2 ORDER BY u.apellido, u.nombre"
 );
-$detallesUsuariosResultado = $consultar($conexion,
+$detallesUsuariosResultado = mysqli_query($conexion,
     "SELECT u.id_usuario, CONCAT(u.nombre, ' ', u.apellido) AS NombreApellido,
             (SELECT COUNT(*) FROM activo a WHERE a.id_usuario = u.id_usuario) AS Activos_Asignados,
             (SELECT COUNT(*) FROM activo a WHERE a.id_usuario = u.id_usuario AND a.id_estado = 3) AS Activos_En_Reparacion,
@@ -58,7 +50,8 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($accion === "crear_tecnico") {
         $idUsuario = $_POST['id_usuario'] ?? '';
         if(!empty($idUsuario)) {
-            $sql = $consultar($conexion,"UPDATE usuario SET id_rol ");
+            $sql2 = mysqli_query($conexion, 'UPDATE usuario SET id_rol = 2 WHERE id_usuario = $idUsuario');
+            $sql2 = mysqli_query($conexion, 'UPDATE activo SET id_usuario = null, id_estado = 1');
         }
     }
 }
