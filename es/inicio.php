@@ -14,6 +14,7 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kinetix - Panel de Cliente</title>
     <!-- estilo -->
+    <link rel="icon" type="image/svg+xml" href="../imagenes/favicon.svg">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
     <link rel="stylesheet" href="../css/pagina-inicio.css">
 </head>
@@ -24,33 +25,42 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
             <a class="menu-logo" href="inicio" aria-label="Kinetix, inicio">
                 <img src="../imagenes/Logo1.png" alt="Kinetix Software">
             </a>
-            <ul>
-                <?php if ($rol === 1 || $rol === 2) { ?>
-                <li><a href="inicio" class="active" aria-current="page">Inicio</a></li>
-                <li><a href="preguntas-frecuentes">Ayuda</a></li>
-                <li><a href="tickets">Tickets</a></li>
-                <li><a href="inventario">Inventario</a></li>
-                <li><a href="usuario/<?= $idUsuario ?>">Mi cuenta</a></li>
-                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
-                <?php } elseif ($rol === 3) { ?>
-                <li><a href="inicio" class="active" aria-current="page">Inicio</a></li>
-                <li><a href="admin/panel-admin">Administración</a></li>
-                <li><a href="admin/informes-admin">Informes</a></li>
-                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
-                <?php } else { ?>
-                <li><a href="login">Iniciar sesión</a></li>
-                <li><a href="registrarse">Crear cuenta</a></li>
-                <?php } ?>
-                <li class="language-switch">
-                    <input type="checkbox" id="langToggle" aria-label="Cambiar idioma">
-                    <label for="langToggle" class="switch" title="Cambiar idioma">
-                        <span class="lang left">ES</span>
-                        <span class="lang right">EN</span>
-                        <span class="slider"></span>
-                    </label>
-                </li>
-                <li><button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
-            </ul>
+
+            <div class="nav-links">
+                <ul>
+                    <?php if ($rol === 1 || $rol === 2) { ?>
+                    <li><a href="inicio" class="active" aria-current="page">Inicio</a></li>
+                    <li><a href="preguntas-frecuentes">Ayuda</a></li>
+                    <li><a href="tickets">Tickets</a></li>
+                    <li><a href="inventario">Inventario</a></li>
+                    <li><a href="usuario/<?= $idUsuario ?>">Mi cuenta</a></li>
+                    <?php } elseif ($rol === 3) { ?>
+                    <li><a href="inicio" class="active" aria-current="page">Inicio</a></li>
+                    <li><a href="admin/panel-admin">Administración</a></li>
+                    <li><a href="admin/informes-admin">Informes</a></li>
+                    <?php } else { ?>
+                    <li><a href="login">Iniciar sesión</a></li>
+                    <li><a href="registrarse">Crear cuenta</a></li>
+                    <?php } ?>
+                </ul>
+            </div>
+
+            <div class="nav-right">
+                <ul>
+                    <?php if ($rol === 1 || $rol === 2 || $rol === 3) { ?>
+                    <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
+                    <?php } ?>
+                    <li class="language-switch">
+                        <input type="checkbox" id="langToggle" aria-label="Cambiar idioma">
+                        <label for="langToggle" class="switch" title="Cambiar idioma">
+                            <span class="lang left">ES</span>
+                            <span class="lang right">EN</span>
+                            <span class="slider"></span>
+                        </label>
+                    </li>
+                    <li><button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
+                </ul>
+            </div>
         </div>
     </nav>
 
