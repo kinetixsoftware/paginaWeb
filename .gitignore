@@ -4,3 +4,4 @@ php/conexionBDD.php
 # Backups de MySQL
 *.sql
 *.sql.gz
+.kilo

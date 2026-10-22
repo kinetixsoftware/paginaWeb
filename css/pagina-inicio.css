@@ -1497,3 +1497,37 @@ body #langToggle:checked + .switch .right {
 .home-primary-action.home-ticket-action:active {
   transform: scale(0.92);
 }
+
+/* Nav de inicio: links junto al logo (izquierda), logout/idioma/tema a la derecha */
+.menu-content {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+}
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+.nav-links ul {
+    display: flex;
+    gap: 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    align-items: center;
+}
+.nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.nav-right ul {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
