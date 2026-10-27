@@ -2,8 +2,10 @@
 session_start();
 
 require_once "conexionBDD.php";
+require_once "image-upload.php";
 
 $conexion = conectarBD();
+$escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['mensaje'] = "Activo no encontrado";
@@ -38,7 +40,7 @@ if ($verificarTicket['CantidadActivos'] == 0) {
 }
 
 if($id_activo > 0) {
-    $sql = "SELECT a.id_activo, a.nombre, a.modelo, a.descripcion, a.numero_serie, a.fecha_adquisicion, 
+    $sql = "SELECT a.id_activo, a.nombre, a.modelo, a.descripcion, a.numero_serie, a.fecha_adquisicion, a.imagen_path,
                a.fecha_baja, a.id_marca, a.id_usuario, m.marca, a.id_estado, e.estado, a.id_categoria, c.categoria,
                (SELECT CONCAT('Fecha: ', ha.fecha ,'<br> Accion: ', ha.accion) from historial_activo as ha WHERE ha.id_activo = a.id_activo ORDER BY fecha DESC LIMIT 1) as UltimaActualizacion,
                (SELECT CONCAT('Nombre: ', u.nombre, '<br> Apellido: ', u.apellido) from usuario as u WHERE a.id_usuario = u.id_usuario) as NombreApellido,
@@ -51,6 +53,7 @@ if($id_activo > 0) {
         WHERE a.id_activo = '$id_activo'";
     $sql = mysqli_query($conexion, $sql);
     $resultados = mysqli_fetch_assoc($sql);
+    $imagenActivo = urlImagenSubida($resultados['imagen_path'] ?? null);
     if($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($_POST['accion'] == "solicitarActivo"){
             $sql = "SELECT id_ubicacion FROM usuario WHERE id_usuario = $idUsuario";
@@ -103,6 +106,16 @@ if($id_activo > 0) {
 $idResponsable = (int) ($resultados['id_usuario'] ?? 0);
 $usuario = empty($resultados['id_usuario']) ? "Sin Asignar" : $resultados['NombreApellido']; 
 $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento" : $resultados['fecha_baja'];
+$historialActivo = null;
+if ($idResponsable === $idUsuario && $rol === 1) {
+    $historialActivo = mysqli_query(
+        $conexion,
+        "SELECT fecha, accion
+         FROM historial_activo
+         WHERE id_activo = $id_activo
+         ORDER BY fecha DESC, id_historial DESC"
+    );
+}
 ?>
 
 <!doctype html>
@@ -112,6 +125,7 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $resultados['nombre'] ?> | Kinetix</title>
+    <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/inventario.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
 </head>
@@ -154,7 +168,13 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
 
             <section class="asset-detail" aria-labelledby="asset-title">
                 <div class="asset-hero">
-                    <img src="https://placehold.co/800x560/0f172a/e5e7eb?text=<?= $resultados['nombre'] ?>" alt="Imagen del activo">
+                    <div class="asset-hero-visual">
+                        <?php if ($imagenActivo !== null) { ?>
+                            <img src="<?= $escape($imagenActivo) ?>" alt="<?= $escape($resultados['nombre']) ?>">
+                        <?php } else { ?>
+                            <span aria-hidden="true">IT</span>
+                        <?php } ?>
+                    </div>
                     <div class="asset-hero-info">
                         <span class="status <?= $resultados['estado'] ?>"><?= $resultados['estado'] ?></span>
                         <p class="category">ID del activo: <?= $resultados['id_activo'] ?></p>
@@ -234,6 +254,21 @@ $fechaBaja = $resultados['fecha_baja'] == "0000-00-00" ? "Aun en funcionamiento"
 
                     <button type="submit">Enviar solicitud</button>
                 </form>
+            </section>
+            <section class="asset-section asset-history" id="historial" aria-labelledby="history-title">
+                <h2 id="history-title">Historial del activo</h2>
+                <?php if ($historialActivo && mysqli_num_rows($historialActivo) > 0) { ?>
+                    <ol class="asset-history-list">
+                        <?php while ($evento = mysqli_fetch_assoc($historialActivo)) { ?>
+                            <li>
+                                <time datetime="<?= $escape($evento['fecha']) ?>"><?= $escape(date('d/m/Y H:i', strtotime($evento['fecha']))) ?></time>
+                                <p><?= $escape($evento['accion']) ?></p>
+                            </li>
+                        <?php } ?>
+                    </ol>
+                <?php } else { ?>
+                    <p class="asset-history-empty">Todavía no hay movimientos registrados para este activo.</p>
+                <?php } ?>
             </section>
             <?php } ?>
         </div>

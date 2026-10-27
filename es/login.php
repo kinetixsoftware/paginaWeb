@@ -58,11 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión | Kinetix</title>
-    <link rel="icon" type="image/png" href="imagenes\Icon.png">
+    <title data-i18n="login.title">Iniciar sesión | Kinetix</title>
+    <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/Login.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
     <script src="../js/theme.js" defer></script>
+    <script src="../js/i18n.js?v=4" defer></script>
 </head>
 
 <body>
@@ -73,10 +74,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <img class="img--logo" src="../imagenes/logo1.png" width="50" height="50" alt="Logo Vrision">
             </div>
             <ul>
-                <li><a href="inicio">Volver</a></li>
-                <li><a href="registrarse">Registrarse</a></li>
+                <li><a href="inicio" data-i18n="common.back">Volver</a></li>
+                <li><a href="registrarse" data-i18n="common.register">Registrarse</a></li>
+<li>
+                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button>
+                </li>
                 <li>
-                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema"> 🌙 </button>
+                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                    </button>
                 </li>
             </ul>
     </nav>
@@ -92,22 +98,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Contenedor principal -->
     <section class="login-container">
         <div class="login-box">
-            <h2>Acceso a clientes</h2>
-            <p class="login-subtitle">
-                Iniciá sesión para poder acceder a nuestro servicio.<br>
-                <small>(Porfavor no uses un gmail real o contraseña personal)</small>
-            </p>
+                <h2 data-i18n="login.h2">Acceso a clientes</h2>
+                <p class="login-subtitle" data-i18n-html="true" data-i18n="login.subtitle">
+                    Iniciá sesión para poder acceder a nuestro servicio.<br>
+                    <small>(Por favor no uses un gmail real o contraseña personal)</small>
+                </p>
             <form method="post" class="login-form">
                 <div class="input-group">
-                    <label for="email">Correo electrónico</label>
-                    <input type="email" id="email" name="email" placeholder="ejemplo@gmail.com" value="<?= $email ?>" required>
+                    <label for="email" data-i18n="login.label_email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="ejemplo@gmail.com" value="<?= $email ?>" data-i18n-attrs='{"placeholder":"login.placeholder_email"}' required>
                 </div>
 
                 <div class="input-group">
-                    <label for="password">Contraseña</label>
+                    <label for="password" data-i18n="login.label_password">Contraseña</label>
                     <div class="password-input-wrapper">
                         <input type="password" id="password" name="password" placeholder="••••••••" required minlength="6">
-                        <button type="button" class="btn-toggle-pwd" onclick="showPassword()" aria-label="Mostrar contraseña">
+                        <button type="button" class="btn-toggle-pwd" onclick="showPassword()" aria-label="Mostrar contraseña" data-i18n-attrs='{"aria-label":"common.show_password"}'>
                             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
@@ -116,10 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>
 
-                <button type="submit" class="btn-login">Iniciar sesión</button>
+                <button type="submit" class="btn-login" data-i18n="login.btn">Iniciar sesión</button>
             </form>
 
-            <p class="login-footer">
+            <p class="login-footer" data-i18n-html="true" data-i18n="login.footer">
                 ¿No tenés una cuenta? <a href="registrarse">Registrate aquí</a>
             </p>
         </div>
@@ -127,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Pie de página -->
     <footer class="footer">
-        <p>© 2026 Kinetix. Todos los derechos reservados.</p>
+        <p data-i18n="footer.copyright">© 2026 Kinetix. Todos los derechos reservados.</p>
     </footer>
     <script>
     const urlParams = new URLSearchParams(window.location.search);

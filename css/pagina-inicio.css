@@ -107,47 +107,6 @@ body::before {
 .menu a.active{ color:var(--primary); }
 .menu a.active::after{ width:100%; height:3px; }
 
-.language-switch{ display:flex; justify-content:center; align-items:center; }
-#langToggle{ display:none; }
-.switch{
-    position:relative;
-    width:90px;
-    height:42px;
-    border-radius:999px;
-    overflow:hidden;
-    cursor:pointer;
-    background:linear-gradient(135deg,#8fdfff,#53c8ff);
-}
-.slider{
-    position:absolute;
-    top:4px;
-    left:4px;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    background:#fff;
-    transition:transform .35s cubic-bezier(.68,-0.55,.27,1.45);
-}
-.lang{
-    position:absolute;
-    top:50%;
-    width:34px;
-    height:34px;
-    transform:translateY(-50%);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:2;
-    font-size:18px;
-    transition:.3s;
-}
-.left{ left:4px; opacity:1; }
-.right{ right:4px; opacity:.45; }
-#langToggle:checked + .switch{ background:linear-gradient(135deg,#5bd0b6,#2ba98c); }
-#langToggle:checked + .switch .slider{ transform:translateX(48px); }
-#langToggle:checked + .switch .left{ opacity:.45; }
-#langToggle:checked + .switch .right{ opacity:1; }
-
 /* Inicio: portal y accesos */
 .home-shell {
   width: min(1260px, calc(100% - 48px));
@@ -1040,59 +999,6 @@ body {
 .menu ul a.active {
     background: var(--accent-soft);
     color: var(--accent);
-}
-
-/* Switch de idioma: mas compacto y con el texto legible sobre el deslizador */
-.language-switch {
-    position: relative;
-    margin: 0 6px;
-}
-
-/* El checkbox deja de ser display:none para que se pueda usar con teclado */
-#langToggle {
-    display: block;
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
-}
-
-#langToggle:focus-visible + .switch {
-    outline: 3px solid var(--focus);
-    outline-offset: 3px;
-}
-
-.switch {
-    width: 78px;
-    height: 38px;
-}
-
-.slider {
-    top: 4px;
-    left: 4px;
-    width: 30px;
-    height: 30px;
-}
-
-#langToggle:checked + .switch .slider {
-    transform: translateX(40px);
-}
-
-.lang {
-    width: 30px;
-    height: 30px;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-}
-
-body .switch .lang {
-    color: var(--muted);
-}
-
-body #langToggle:not(:checked) + .switch .left,
-body #langToggle:checked + .switch .right {
-    color: var(--accent-ink);
 }
 
 .theme-toggle {

@@ -164,6 +164,7 @@ h1 {
 	color: var(--accent);
 	font-size: 1.7rem;
 	font-weight: 800;
+	object-fit: cover;
 }
 
 .perfil-label,
@@ -180,6 +181,28 @@ h1 {
 .perfil-summary > p:last-child {
 	color: var(--accent);
 	font-weight: 700;
+}
+
+.perfil-stats {
+	display: flex;
+	gap: 28px;
+	margin-left: auto;
+}
+
+.perfil-stats > div {
+	display: flex;
+	flex-direction: column;
+	gap: 7px;
+}
+
+.perfil-stats strong {
+	color: var(--ink);
+	font-size: 1.15rem;
+}
+
+.perfil-stats span {
+	color: var(--muted);
+	font-size: .8rem;
 }
 
 .details-section {
@@ -272,6 +295,11 @@ h1 {
 		align-items: flex-start;
 		flex-direction: column;
 		padding: 24px;
+	}
+
+	.perfil-stats {
+		width: 100%;
+		margin-left: 0;
 	}
 
 	.details-grid {

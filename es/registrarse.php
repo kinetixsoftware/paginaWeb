@@ -88,11 +88,13 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrarse | Kinetix</title>
-    <link rel="icon" type="image/png" href="imagenes\Icon.png">
+    <title data-i18n="registrarse.title">Registrarse | Kinetix</title>
     <!-- Podés usar tu mismo archivo de estilos (ajustando la ruta si es necesario) -->
+     <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/Login.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
+    <script src="../js/theme.js" defer></script>
+    <script src="../js/i18n.js?v=4" defer></script>
 </head>
 
 <body>
@@ -104,11 +106,16 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
             </div>
 
             <ul>
-                <li><a href="inicio">Volver al inicio</a></li>
-                <li><a href="login">Iniciar Sesion</a></li>
+                <li><a href="inicio" data-i18n="common.back">Volver al inicio</a></li>
+                <li><a href="login" data-i18n="nav.iniciar_sesion">Iniciar Sesion</a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
                         Dark</button>
+                </li>
+                <li>
+                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                    </button>
                 </li>
             </ul>
         </div>
@@ -125,34 +132,34 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
     <!-- Contenedor principal de registro -->
     <section class="login-container">
         <div class="login-box">
-            <h2>Crear cuenta</h2>
-            <p class="login-subtitle"> Completá tus datos para registrarte en nuestro servicio. </p>
+            <h2 data-i18n="register.heading">Crear cuenta</h2>
+            <p class="login-subtitle" data-i18n="register.subtitle"> Completá tus datos para registrarte en nuestro servicio. </p>
 
             <form method="post" class="login-form">
                 <div class="input-row">
                     <div class="input-group">
-                        <label for="nombre">Nombre</label>
-                        <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required>
+                        <label for="nombre" data-i18n="register.first_name">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" data-i18n-attrs='{"placeholder":"register.first_name_placeholder"}' required>
                     </div>
 
                     <div class="input-group">
-                        <label for="apellido">Apellido</label>
-                        <input type="text" id="apellido" name="apellido" placeholder="Tu apellido" required>
+                        <label for="apellido" data-i18n="register.last_name">Apellido</label>
+                        <input type="text" id="apellido" name="apellido" placeholder="Tu apellido" data-i18n-attrs='{"placeholder":"register.last_name_placeholder"}' required>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label for="email">Correo electrónico</label>
-                    <input type="email" id="email" name="email" placeholder="ejemplo@gmail.com" required>
+                    <label for="email" data-i18n="login.label_email">Correo electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="ejemplo@gmail.com" data-i18n-attrs='{"placeholder":"login.placeholder_email"}' required>
                 </div>
 
                 <div class="input-group">
-                    <label for="password">Contraseña</label>
+                    <label for="password" data-i18n="login.label_password">Contraseña</label>
                     <div class="password-input-wrapper">
                         <input type="password" id="password" name="password" placeholder="••••••••" required
                             minlength="6">
                         <button type="button" class="btn-toggle-pwd" onclick="showPassword()"
-                            aria-label="Mostrar contraseña">
+                            aria-label="Mostrar contraseña" data-i18n-attrs='{"aria-label":"common.show_password"}'>
                             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
@@ -164,9 +171,9 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
                 </div>
 
                 <div class="input-group">
-                    <label for="id_ubicacion">Este usuario trabaja en</label>
+                    <label for="id_ubicacion" data-i18n="register.work_location">Este usuario trabaja en</label>
                     <select id="id_ubicacion" name="id_ubicacion" required>
-                        <option value="">Seleccioná una ubicación</option>
+                        <option value="" data-i18n="register.choose_location">Seleccioná una ubicación</option>
                         <?php while ($ubicacion = mysqli_fetch_assoc($ubicaciones)) { ?>
                             <option value="<?= (int) $ubicacion['id_ubicacion'] ?>"
                                 <?= $id_ubicacion === (int) $ubicacion['id_ubicacion'] ? 'selected' : '' ?>>
@@ -176,41 +183,39 @@ $ubicaciones = mysqli_query($conexion, $sqlUbicaciones);
                     </select>
                 </div>
 
-                <h3>¿En que rol te gustaria trabajar?</h3>
+                <h3 data-i18n="register.role_question">¿En que rol te gustaria trabajar?</h3>
                 <div class="input-switch">
                     <div class="tooltip">
-                        <span class="tooltiptext"> En este rol principalmente vas a interactuar con el tecnico, podes
+                        <span class="tooltiptext" data-i18n="register.role_tooltip"> En este rol principalmente vas a interactuar con el tecnico, podes
                             crear tickets, responder en ellos, solicitar productos. </span>
                         <div class="input-box1">
                             <input id="cliente" type="radio" onchange="alternateCheckboxes()" name="rol" value="1">
-                            <label for="cliente" id="clienteTexto"> Cliente </label>
+                            <label for="cliente" id="clienteTexto" data-i18n="register.client"> Cliente </label>
                         </div>
                     </div>
                     <div class="input-box1">
                         <input id="tecnico" type="radio" onchange="alternateCheckboxes()" name="rol" value="2">
-                        <label for="tecnico" id="tecnicoTexto"> Tecnico </label>
+                        <label for="tecnico" id="tecnicoTexto" data-i18n="register.technician"> Tecnico </label>
                     </div>
                 </div>
-                <p>Al crear una cuenta, aceptas nuestros <a href="#" class="terms-link">Términos y Política de
-                        Privacidad.</a>.</p>
+                <p><span data-i18n="register.terms_prefix">Al crear una cuenta, aceptas nuestros</span> <a href="#" class="terms-link" data-i18n="register.terms">Términos y Política de Privacidad.</a>.</p>
                 <div class="input-buttons">
                     <!-- En caso de     -->
-                    <button type="submit" class="btn-login">Registrarse</button>
+                    <button type="submit" class="btn-login" data-i18n="register.submit">Registrarse</button>
                 </div>
             </form>
 
             <p class="login-footer">
-                ¿Ya tenés una cuenta? <a href="login">Iniciá sesión</a>
+                <span data-i18n="register.have_account">¿Ya tenés una cuenta?</span> <a href="login" data-i18n="register.sign_in">Iniciá sesión</a>
             </p>
         </div>
     </section>
 
     <!-- Pie de página -->
     <footer class="footer">
-        <p>© 2026 Kinetix Softwares. Todos los derechos reservados.</p>
+        <p data-i18n="register.footer">© 2026 Kinetix Softwares. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="../js/theme.js"></script>
     <script>
     function showPassword() {
         var x = document.getElementById("password")

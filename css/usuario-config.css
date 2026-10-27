@@ -134,6 +134,7 @@ body {
     font-size: 1.5rem;
     font-weight: 800;
     flex-shrink: 0;
+    object-fit: cover;
 }
 
 .profile-info h3 {
@@ -176,8 +177,8 @@ body {
 }
 
 .settings-nav .nav-item:hover {
-    background: transparent;
-    color: #ffffff;
+    background: var(--surface-soft);
+    color: var(--ink);
 }
 
 .settings-nav .nav-item.active {
@@ -238,34 +239,6 @@ body {
 
 .modal-toggle:checked ~ .modal-overlay .modal {
     transform: scale(1);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.modal-header h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--ink);
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--muted);
-    cursor: pointer;
-    line-height: 1;
-    padding: 0;
-    transition: color 0.2s ease;
-}
-
-.modal-close:hover {
-    color: var(--ink);
 }
 
 .modal-body {
@@ -408,8 +381,7 @@ body {
     gap: 8px;
 }
 
-.setting-control input,
-.setting-control select {
+.setting-control input {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid var(--line);
@@ -421,13 +393,11 @@ body {
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.setting-control input:hover,
-.setting-control select:hover {
+.setting-control input:hover {
     border-color: var(--muted);
 }
 
-.setting-control input:focus,
-.setting-control select:focus {
+.setting-control input:focus {
     border-color: var(--focus);
     background: var(--surface);
 }

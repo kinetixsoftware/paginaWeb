@@ -60,9 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
     <link rel="stylesheet" href="../css/crear-ticket.css">
-    <title>Crear Ticket</title>
+    <script src="../js/theme.js" defer></script>
+    <script src="../js/i18n.js?v=4" defer></script>
+    <title data-i18n="ticket_create.title">Crear Ticket</title>
 </head>
 
 <body>
@@ -74,15 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <ul>
-                <li><a href="inicio">Inicio</a></li>
-                <li><a href="preguntas-frecuentes">Ayuda</a></li>
-                <li><a href="tickets">Tickets</a></li>
-                <li><a href="inventario">Inventario</a></li>
-                <li><a href="usuario/<?= $idUsuario ?>">Mi Cuenta</a></li>
-                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
+                <li><a href="inicio" data-i18n="nav.inicio">Inicio</a></li>
+                <li><a href="preguntas-frecuentes" data-i18n="nav.ayuda" active>Ayuda</a></li>
+                <li><a href="tickets" data-i18n="nav.tickets">Tickets</a></li>
+                <li><a href="inventario" data-i18n="nav.inventario">Inventario</a></li>
+                <li><a href="usuario/<?= $idUsuario ?>" data-i18n="nav.mi_cuenta">Mi Cuenta</a></li>
+                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
                 <li>
                     <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
                         Dark</button>
+                </li>
+                <li>
+                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                    </button>
                 </li>
             </ul>
         </div>
@@ -99,58 +107,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="page">
         <div class="container">
-            <h1>Crear Ticket</h1>
-            <p class="subtitle"> Completa el formulario para enviar una solicitud al equipo de soporte. </p>
+            <h1 data-i18n="ticket_create.heading">Crear Ticket</h1>
+            <p class="subtitle" data-i18n="ticket_create.subtitle"> Completa el formulario para enviar una solicitud al equipo de soporte. </p>
             <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
-                    <label for="ticketTitulo">Asunto *</label>
-                    <input type="text" id="ticketTitulo" name="ticketTitulo" placeholder="Ej.: No puedo iniciar sesión">
+                    <label for="ticketTitulo" data-i18n="ticket_create.subject">Asunto *</label>
+                    <input type="text" id="ticketTitulo" name="ticketTitulo" placeholder="Ej.: No puedo iniciar sesión" data-i18n-attrs='{"placeholder":"ticket_create.subject_placeholder"}'>
                 </div>
                 <div class="form-group">
-                    <label for="ticketCategoria">Tipo de ticket</label>
+                    <label for="ticketCategoria" data-i18n="ticket_create.type">Tipo de ticket</label>
                     <select name="ticketCategoria" id="ticketCategoria">
                         <?php while ($reg = mysqli_fetch_array($resultadocategorias)) { ?>
-                        <option name="<?=$reg['categoria'] ?>" value="<?= $reg['id_categoria'] ?>">
+                        <option name="<?=$reg['categoria'] ?>" value="<?= $reg['id_categoria'] ?>" data-i18n-db>
                             <?= $reg['categoria'] ?></option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="ticketPrioridad">Prioridad *</label>
+                    <label for="ticketPrioridad" data-i18n="ticket_create.priority">Prioridad *</label>
                     <select id="ticketPrioridad" name="ticketPrioridad">
                         <?php while ($reg = mysqli_fetch_array($resultadoprioridad)) { ?>
-                        <option name="<?=$reg['prioridad'] ?>" value="<?= $reg['id_prioridad'] ?>">
-                            <h5><?= $reg['prioridad'] ?></h5>
+                        <option name="<?=$reg['prioridad'] ?>" value="<?= $reg['id_prioridad'] ?>" data-i18n-db>
+                            <h5 data-i18n-db><?= $reg['prioridad'] ?></h5>
                         </option>
                         <?php } ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="descripcion">Descripción *</label>
-                    <textarea id="descripcion" name="descripcion" rows="5" cols="40" placeholder="Describa detalladamente el problema..."></textarea>
+                    <label for="descripcion" data-i18n="ticket_create.description">Descripción *</label>
+                    <textarea id="descripcion" name="descripcion" rows="5" cols="40" placeholder="Describa detalladamente el problema..." data-i18n-attrs='{"placeholder":"ticket_create.description_placeholder"}'></textarea>
                 </div>
                 <div class="buttons">
                     <button type="button" class="cancel"
-                        onclick="window.location.href='faq-pagina-cliente.html'"> Cancelar </button>
-                    <button type="submit" class="btn-login">Crear Ticket</button>
+                        onclick="window.location.href='preguntas-frecuentes'"><span data-i18n="ticket_create.cancel">Cancelar</span></button>
+                    <button type="submit" class="btn-login" data-i18n="ticket_create.submit">Crear Ticket</button>
                 </div>
             </form>
         </div>
     </div>
-
-    <script src="../js/theme.js"></script>
-    <script>
-    const formMessage = document.getElementById('formMessage');
-    const params = new URLSearchParams(window.location.search);
-    const status = params.get('status');
-    const msg = params.get('msg');
-
-    if (status && msg) {
-        formMessage.hidden = false;
-        formMessage.textContent = decodeURIComponent(msg);
-        formMessage.classList.add(status === 'success' ? 'success' : 'error');
-    }
-    </script>
 </body>
-
 </html>

@@ -2,6 +2,7 @@
 session_start();
 
 require_once "../php/conexionBDD.php";
+require_once "../php/image-upload.php";
 
 // Leer el rol y el ID del usuario que inicio sesion.
 $rol = isset($_SESSION['rol']) ? (int) $_SESSION['rol'] : null;
@@ -40,6 +41,7 @@ $filtroTickets = $rol === 2
     : "t.id_solicitante = $idUsuario";
 
 $conexion = conectarBD();
+$escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 // Consultar los tickets que corresponden al rol y al filtro actual.
 $ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, pt.prioridad, ct.categoria
                 FROM ticket           AS t 
@@ -273,7 +275,7 @@ if ($id_ticket > 0) {
 
         // Cargar los mensajes del ticket en orden de llegada.
         $mensajes = "SELECT mt.id_mensaje, mt.id_usuario, mt.contenido, mt.fecha_creacion,
-                            u.nombre, u.apellido
+                            u.nombre, u.apellido, u.foto_path
                     FROM mensaje_ticket AS mt
                     JOIN usuario AS u ON mt.id_usuario = u.id_usuario
                     WHERE mt.id_ticket = $id_ticket
@@ -411,9 +413,12 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
 <base href="/Kinetix/es/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tickets</title>
+<title data-i18n="tickets.title">Tickets</title>
 <link rel="stylesheet" href="../css/sistema-de-tickets-tecnico.css">
+<link rel="icon" type="image/png" href="../imagenes/favicon.png">
 <link rel="stylesheet" href="../css/kinetix-theme.css">
+<script src="../js/theme.js" defer></script>
+<script src="../js/i18n.js?v=4" defer></script>
 </head>
 
 <body>
@@ -425,13 +430,18 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
             </div>
 
             <ul>
-                <li><a href="inicio">Inicio</a></li>
-                <li><a href="preguntas-frecuentes">Ayuda</a></li>
-                <li><a href="tickets" class="active" aria-current="page">Tickets</a></li>
-                <li><a href="inventario">Inventario</a></li>
-                <li><a href="usuario/<?= $idUsuario ?>">Mi Cuenta</a></li>
-                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text">Cerrar sesión</span></a></li>
+                <li><a href="inicio" data-i18n="nav.inicio">Inicio</a></li>
+                <li><a href="preguntas-frecuentes" data-i18n="nav.ayuda">Ayuda</a></li>
+                <li><a href="tickets" class="active" aria-current="page" data-i18n="nav.tickets">Tickets</a></li>
+                <li><a href="inventario" data-i18n="nav.inventario">Inventario</a></li>
+                <li><a href="usuario/<?= $idUsuario ?>" data-i18n="nav.mi_cuenta">Mi Cuenta</a></li>
+                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
                 <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
+                <li>
+                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                    </button>
+                </li>
             </ul>
         </div>
     </nav>
@@ -449,17 +459,17 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
         <div class="container">
             <!-- Lista de tickets o solicitudes de servicio. -->
             <div class="sidebar">
-                <div class="ticket-tabs" role="tablist" aria-label="Tipo de solicitud">
-                    <a href="tickets" class="<?= $vista === 'tickets' ? 'active' : '' ?>" <?= $vista === 'tickets' ? 'aria-current="page"' : '' ?>>Tickets</a>
-                    <a href="tickets/solicitudes" class="<?= $vista === 'solicitudes' ? 'active' : '' ?>" <?= $vista === 'solicitudes' ? 'aria-current="page"' : '' ?>>Solicitudes</a>
+                <div class="ticket-tabs" role="tablist" aria-label="Tipo de solicitud" data-i18n-attrs='{"aria-label":"tickets.request_type"}'>
+                    <a href="tickets" class="<?= $vista === 'tickets' ? 'active' : '' ?>" <?= $vista === 'tickets' ? 'aria-current="page"' : '' ?> data-i18n="nav.tickets">Tickets</a>
+                    <a href="tickets/solicitudes" class="<?= $vista === 'solicitudes' ? 'active' : '' ?>" <?= $vista === 'solicitudes' ? 'aria-current="page"' : '' ?> data-i18n="tickets.requests">Solicitudes</a>
                 </div>
                 <div class="ticket-list">
                     <?php if ($vista === 'tickets') { ?>
                     <div class="ticket-filter">
                         <select id="id_categoria" onchange="window.location.href = this.value === '0' ? 'tickets' : 'tickets/categoria/' + this.value">
-                            <option value="0" <?= $id_categoria === 0 ? 'selected' : '' ?>>Todos</option>
+                            <option value="0" <?= $id_categoria === 0 ? 'selected' : '' ?> data-i18n="tickets.all">Todos</option>
                                 <?php while($reg = mysqli_fetch_array($categoriasFiltroResultado)) { ?>
-                                <option value="<?= (int) $reg['id_categoria'] ?>" <?= $id_categoria === (int) $reg['id_categoria'] ? 'selected' : '' ?>> <?=  $reg['categoria'] ?></option>
+                                <option value="<?= (int) $reg['id_categoria'] ?>" <?= $id_categoria === (int) $reg['id_categoria'] ? 'selected' : '' ?> data-i18n-db><?=  $reg['categoria'] ?></option>
                                 <?php } ?>
                         </select>
                     </div>
@@ -470,16 +480,16 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 <span class="ticket-id">#<?= str_pad($reg['id_ticket'], 5, '0', STR_PAD_LEFT) ?></span>
                                 <div class="ticket-status <?= strtolower(str_replace(' ', '-', $reg['estado'])) ?>">
                                     <span class="status-dot"></span>
-                                    <?= $reg['estado'] ?>
+                                    <span data-i18n-db><?= $reg['estado'] ?></span>
                                 </div>
                             </div>
                             <div class="ticket-category-row">
-                                <h6 style="font-size:13px;">Categoria: <?= $reg['categoria']?> </h6>
+                                <h6 style="font-size:13px;"><span data-i18n="tickets.ticket_category">Categoria:</span> <span data-i18n-db><?= $reg['categoria']?></span></h6>
                                 <?php if ($rol !== 2 && !($reg['estado'] === "Cancelado" || $reg['estado'] === "Resuelto" || $reg['estado'] === "Cerrado")) {?>
                                 <form method="POST">
                                     <input type="hidden" name="accion" value="cancelarTicket">
                                     <input type="hidden" name="id_ticket" value="<?= $reg['id_ticket'] ?>">
-                                    <button class="btn-eliminar">Cancelar</button>
+                                    <button class="btn-eliminar" data-i18n="tickets.cancel">Cancelar</button>
                                 </form>
                                 <?php }?>
                             </div>
@@ -491,13 +501,13 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                         <?php while ($reg = mysqli_fetch_assoc($solicitudesResultado)) { ?>
                             <a class="ticket" href="solicitud/<?= (int) $reg['id_solicitud'] ?>">
                                 <div class="ticket-top">
-                                    <span class="ticket-id">Solicitud #<?= str_pad($reg['id_solicitud'], 5, '0', STR_PAD_LEFT) ?></span>
-                                    <span class="ticket-status"><span class="status-dot"></span><?= $reg['estado'] ?></span>
+                                    <span class="ticket-id"><span data-i18n="tickets.request">Solicitud</span> #<?= str_pad($reg['id_solicitud'], 5, '0', STR_PAD_LEFT) ?></span>
+                                    <span class="ticket-status"><span class="status-dot"></span><span data-i18n-db><?= $reg['estado'] ?></span></span>
                                 </div>
                                 <div class="ticket-title">
                                     <h6><?= $reg['activo'] ?></h6>
                                 </div>
-                                <p class="request-list-meta"><?= ucfirst($reg['tipo_servicio'] ?? '') ?> · <?= $reg['prioridad'] ?? 'Sin prioridad' ?></p>
+                                <p class="request-list-meta"><span data-i18n-db><?= ucfirst($reg['tipo_servicio'] ?? '') ?></span> · <span data-i18n-db><?= $reg['prioridad'] ?? 'Sin prioridad' ?></span></p>
                             </a>
                         <?php } ?>
                     <?php } ?>
@@ -510,8 +520,8 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                 <div class="header">
                     <h1 style="text-align: center; padding: 15px;">
                         <?= $vista === 'solicitudes'
-                            ? ($solicitudData ? 'Solicitud #' . $solicitudData['id_solicitud'] . ' · ' . $solicitudData['activo'] : 'Seleccioná una solicitud')
-                            : $ticketTitulo ?? 'Seleccioná un ticket' ?>
+                            ? ($solicitudData ? '<span data-i18n="tickets.request">Solicitud</span> #' . $solicitudData['id_solicitud'] . ' · ' . $solicitudData['activo'] : '<span data-i18n="tickets.select_request">Seleccioná una solicitud</span>')
+                            : ($ticketTitulo ?? '<span data-i18n="tickets.select_ticket">Seleccioná un ticket</span>') ?>
                     </h1>
                 </div>
                 <?php if ($vista === 'solicitudes') { ?>
@@ -519,19 +529,19 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                         <?php if ($solicitudData) { ?>
                             <article class="request-details">
                                 <dl>
-                                    <div><dt>Solicitante</dt><dd><?= htmlspecialchars($solicitudData['solicitante_nombre'] ?? '') ?> <?= htmlspecialchars($solicitudData['solicitante_apellido'] ?? '') ?> (<?= htmlspecialchars($solicitudData['solicitante_email'] ?? '') ?>)</dd></div>
-                                    <div><dt>Activo</dt><dd><?= $solicitudData['activo'] ?> (ID: <?= (int) $solicitudData['id_activo'] ?>)</dd></div>
-                                    <div><dt>Tipo de servicio</dt><dd><?= ucfirst($solicitudData['tipo_servicio'] ?? '') ?></dd></div>
-                                    <div><dt>Prioridad</dt><dd><?= $solicitudData['prioridad'] ?? 'Sin prioridad' ?></dd></div>
-                                    <div><dt>Estado</dt><dd><?= $solicitudData['estado'] ?></dd></div>
-                                    <div><dt>Sede</dt><dd><?= htmlspecialchars($solicitudData['ubicacion_calle'] ?? 'No definida') ?> <?= !empty($solicitudData['ubicacion_ciudad']) ? '· ' . htmlspecialchars($solicitudData['ubicacion_ciudad']) : '' ?></dd></div>
-                                    <div><dt>Creada</dt><dd><?= $solicitudData['fecha_creacion'] ?></dd></div>
+                                    <div><dt data-i18n="tickets.requester">Solicitante</dt><dd><?= htmlspecialchars($solicitudData['solicitante_nombre'] ?? '') ?> <?= htmlspecialchars($solicitudData['solicitante_apellido'] ?? '') ?> (<?= htmlspecialchars($solicitudData['solicitante_email'] ?? '') ?>)</dd></div>
+                                    <div><dt data-i18n="tickets.asset">Activo</dt><dd><?= $solicitudData['activo'] ?> (ID: <?= (int) $solicitudData['id_activo'] ?>)</dd></div>
+                                    <div><dt data-i18n="tickets.service_type">Tipo de servicio</dt><dd><span data-i18n-db><?= ucfirst($solicitudData['tipo_servicio'] ?? '') ?></span></dd></div>
+                                    <div><dt data-i18n="tickets.priority">Prioridad</dt><dd><span data-i18n-db><?= $solicitudData['prioridad'] ?? '' ?></span></dd></div>
+                                    <div><dt data-i18n="tickets.status">Estado</dt><dd><span data-i18n-db><?= $solicitudData['estado'] ?></span></dd></div>
+                                    <div><dt data-i18n="tickets.location">Sede</dt><dd><?php if (empty($solicitudData['ubicacion_calle'])) { ?><span data-i18n="tickets.undefined_location">No definida</span><?php } else { ?><?= htmlspecialchars($solicitudData['ubicacion_calle']) ?><?php } ?> <?= !empty($solicitudData['ubicacion_ciudad']) ? '· ' . htmlspecialchars($solicitudData['ubicacion_ciudad']) : '' ?></dd></div>
+                                    <div><dt data-i18n="tickets.created">Creada</dt><dd><?= $solicitudData['fecha_creacion'] ?></dd></div>
                                 </dl>
                                 <p><?= nl2br($solicitudData['descripcion']) ?></p>
                             </article>
                             <?php if ($historialActivo) { ?>
                                 <div class="ticket-history request-history">
-                                    <h3>Historial de la solicitud</h3>
+                                    <h3 data-i18n="tickets.request_history">Historial de la solicitud</h3>
                                     <?php while ($historial = mysqli_fetch_assoc($historialActivo)) { ?>
                                         <div class="history-item">
                                             <small><?= $historial['fecha'] ?></small>
@@ -541,7 +551,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 </div>
                             <?php } ?>
                         <?php } else { ?>
-                            <p class="ticket-history-empty">Seleccioná una solicitud de la lista.</p>
+                            <p class="ticket-history-empty" data-i18n="tickets.select_request_from_list">Seleccioná una solicitud de la lista.</p>
                         <?php } ?>
                     </div>
                     <?php if ($rol === 2 && $solicitudData) { ?>
@@ -549,9 +559,9 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                 <input type="hidden" name="accion" value="cambiarEstadoSolicitud">
                                 <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
-                                <select name="estado_solicitud" aria-label="Cambiar estado de la solicitud" onchange="this.form.submit()">
+                                <select name="estado_solicitud" aria-label="Cambiar estado de la solicitud" data-i18n-attrs='{"aria-label":"tickets.change_status"}' onchange="this.form.submit()">
                                     <?php while ($estado = mysqli_fetch_assoc($estadosSolicitudResultado)) { ?>
-                                        <option value="<?= (int) $estado['id_estado'] ?>" <?= (int) $estado['id_estado'] === (int) $solicitudData['id_estado'] ? 'selected' : '' ?>><?= $estado['estado'] ?></option>
+                                        <option value="<?= (int) $estado['id_estado'] ?>" <?= (int) $estado['id_estado'] === (int) $solicitudData['id_estado'] ? 'selected' : '' ?> data-i18n-db><?= $estado['estado'] ?></option>
                                     <?php } ?>
                                 </select>
                             </form>
@@ -559,17 +569,17 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                     <input type="hidden" name="accion" value="aceptarSolicitud">
                                     <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
-                                    <button type="submit">Aceptar y revisar</button>
+                                    <button type="submit" data-i18n="tickets.accept_review">Aceptar y revisar</button>
                                 </form>
                                 <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                     <input type="hidden" name="accion" value="resolverSolicitud">
                                     <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
-                                    <button type="submit">Marcar solucionada</button>
+                                    <button type="submit" data-i18n="tickets.mark_resolved">Marcar solucionada</button>
                                 </form>
                                 <form method="POST" action="solicitud/<?= $id_solicitud ?>">
                                     <input type="hidden" name="accion" value="cerrarSolicitud">
                                     <input type="hidden" name="id_solicitud" value="<?= $id_solicitud ?>">
-                                    <button type="submit">Cerrar solicitud</button>
+                                    <button type="submit" data-i18n="tickets.close_request">Cerrar solicitud</button>
                                 </form>
                             </div>
                         </div>
@@ -578,15 +588,23 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                 <!-- Mostrar los mensajes y permitir borrar los propios. -->
                 <div class="chat">
                     <?php while($mensajesResultado && $reg = mysqli_fetch_assoc($mensajesResultado)) { ?>
+                        <?php $fotoMensaje = urlImagenSubida($reg['foto_path']); ?>
                         <div class="message <?= $idUsuario === (int) $reg['id_usuario'] ? 'sent' : 'received' ?>">
-                            <strong><?= $reg['nombre'] . ' ' . $reg['apellido'] ?></strong>
-                            <div><?= $reg['contenido'] ?></div>
+                            <div class="message-author">
+                                <?php if ($fotoMensaje !== null) { ?>
+                                    <img src="<?= $escape($fotoMensaje) ?>" alt="" loading="lazy">
+                                <?php } else { ?>
+                                    <span class="message-avatar-placeholder" aria-hidden="true"><?= $escape(strtoupper(substr($reg['nombre'], 0, 1))) ?></span>
+                                <?php } ?>
+                                <strong><?= $escape($reg['nombre'] . ' ' . $reg['apellido']) ?></strong>
+                            </div>
+                            <div class="message-body"><?= $escape($reg['contenido']) ?></div>
                             <?php if ($idUsuario === (int) $reg['id_usuario'] && !in_array($ticketEstado, [2, 4, 5])) { ?>
                                 <form method="POST">
                                     <input type="hidden" name="accion" value="eliminarMensaje">
                                     <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
                                     <input type="hidden" name="id_mensaje" value="<?= $reg['id_mensaje'] ?>">
-                                    <button type="submit">Eliminar</button>
+                                    <button type="submit" data-i18n="tickets.delete">Eliminar</button>
                                 </form>
                             <?php } ?>
                         </div>
@@ -595,12 +613,12 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                 <!-- CONTROL DEL TICKET PARA EL TECNICO -->
                 <?php if ($rol === 2) {?>
                     <div class="resolution-panel" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'style="visibility: hidden;"' : ''; ?>>
-                        <h2>Resultado del ticket</h2>
+                        <h2 data-i18n="tickets.resolution">Resultado del ticket</h2>
                         <form method="POST">
                             <input type="hidden" name="accion" value="cerrarTicket">
                             <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
-                            <textarea name="solucion" rows="2"  <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'placeholder="El ticket esta cerrado." disabled' : 'placeholder="Escribí cuál fue la solución aplicada..."' ?>></textarea>
-                            <button type="submit" class="btn-editar" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'disabled' : '' ?>>Cerrar ticket y guardar resultado</button>
+                            <textarea name="solucion" rows="2" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'placeholder="El ticket esta cerrado." disabled data-i18n-attrs=\'{"placeholder":"tickets.closed_placeholder"}\'' : 'placeholder="Escribí cuál fue la solución aplicada..." data-i18n-attrs=\'{"placeholder":"tickets.solution_placeholder"}\'' ?>></textarea>
+                            <button type="submit" class="btn-editar" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'disabled' : '' ?> data-i18n="tickets.close_save_resolution">Cerrar ticket y guardar resultado</button>
                         </form>
                     </div>
                     <div class="tech-controls" <?= $id_ticket > 0 ? '' : 'style="visibility: hidden;"'; ?>>
@@ -608,9 +626,9 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             <form method="POST">
                                 <input type="hidden" name="accion" value="cambiarCategoria">
                                 <select name="categoria" id="categoria" onchange="this.form.submit()">
-                                    <option value="">Cambiar categoria</option>
+                                    <option value="" data-i18n="tickets.change_category">Cambiar categoria</option>
                                     <?php while($reg = mysqli_fetch_array($categoriasResultado)) { ?>
-                                    <option value="<?= $reg['id_categoria'] ?>"> <?=  $reg['categoria'] ?></option>
+                                    <option value="<?= $reg['id_categoria'] ?>" data-i18n-db><?=  $reg['categoria'] ?></option>
                                     <?php } ?>
                                 </select>
                             </form>
@@ -619,9 +637,9 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             <form method="POST">
                                 <input type="hidden" name="accion" value="cambiarPrioridad">
                                 <select name="prioridad" id="prioridad" onchange="this.form.submit()">
-                                    <option value="">Cambiar prioridad</option>
+                                    <option value="" data-i18n="tickets.change_priority">Cambiar prioridad</option>
                                     <?php while($reg = mysqli_fetch_array($prioridadesResultado)) { ?>
-                                    <option value="<?= $reg['id_prioridad'] ?>"> <?=  $reg['prioridad'] ?></option>
+                                    <option value="<?= $reg['id_prioridad'] ?>" data-i18n-db><?=  $reg['prioridad'] ?></option>
                                     <?php } ?>
                                 </select>
                             </form>
@@ -630,9 +648,9 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             <form method="POST">
                                 <input type="hidden" name="accion" value="cambiarEstado">
                                 <select name="estado" id="estado" onchange="this.form.submit()">
-                                    <option value="">Cambiar estado</option>
+                                    <option value="" data-i18n="tickets.change_status">Cambiar estado</option>
                                     <?php while($reg = mysqli_fetch_array($estadosResultado)) { ?>
-                                    <option value="<?= $reg['id_estado'] ?>"> <?=  $reg['estado'] ?></option>
+                                    <option value="<?= $reg['id_estado'] ?>" data-i18n-db><?=  $reg['estado'] ?></option>
                                     <?php } ?>
                                 </select>
                             </form>
@@ -644,8 +662,8 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                     <form method="POST">
                         <input type="hidden" name="accion" value="mandarMensaje">
                         <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
-                        <textarea name="contenido" rows="2" cols="10" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'placeholder="El ticket esta cerrado." disabled' : 'placeholder="Escriba un mensaje..."' ?> onkeydown="if (event.key === 'Enter') { this.form.submit(); }"></textarea>
-                        <button type="submit" class="send-button" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'disabled' : '' ?>>Enviar</button>
+                        <textarea name="contenido" rows="2" cols="10" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'placeholder="El ticket esta cerrado." disabled data-i18n-attrs=\'{"placeholder":"tickets.closed_placeholder"}\'' : 'placeholder="Escriba un mensaje..." data-i18n-attrs=\'{"placeholder":"tickets.message_placeholder"}\'' ?> onkeydown="if (event.key === 'Enter') { this.form.submit(); }"></textarea>
+                        <button type="submit" class="send-button" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'disabled' : '' ?> data-i18n="tickets.send">Enviar</button>
                     </form>
                 </div>
                 <?php } ?>
@@ -654,16 +672,16 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
             <!-- Historial del ticket o del activo, visible solo para tecnicos. -->
             <?php if ($rol === 2) { ?>
                 <?php $historialActual = $vista === 'solicitudes' ? $historialActivo : $historialTicket; ?>
-                <aside class="ticket-history" aria-label="Historial del <?= $vista === 'solicitudes' ? 'activo' : 'ticket' ?>">
+                <aside class="ticket-history" aria-label="Historial del <?= $vista === 'solicitudes' ? 'activo' : 'ticket' ?>" data-i18n-attrs='{"aria-label":"<?= $vista === 'solicitudes' ? 'tickets.asset_history' : 'tickets.ticket_history' ?>"}'>
                     <div class="ticket-history-header">
-                        <h2><?= $vista === 'solicitudes' ? 'Historial del activo' : 'Historial del ticket' ?></h2>
+                        <h2 data-i18n="<?= $vista === 'solicitudes' ? 'tickets.asset_history' : 'tickets.ticket_history' ?>"><?= $vista === 'solicitudes' ? 'Historial del activo' : 'Historial del ticket' ?></h2>
                         <span><?= $vista === 'solicitudes'
-                            ? ($solicitudData ? $solicitudData['activo'] : 'Sin seleccionar')
-                            : ($id_ticket > 0 ? '#' . str_pad($id_ticket, 5, '0', STR_PAD_LEFT) : 'Sin seleccionar') ?></span>
+                            ? ($solicitudData ? $solicitudData['activo'] : '<span data-i18n="tickets.no_selection">Sin seleccionar</span>')
+                            : ($id_ticket > 0 ? '#' . str_pad($id_ticket, 5, '0', STR_PAD_LEFT) : '<span data-i18n="tickets.no_selection">Sin seleccionar</span>') ?></span>
                     </div>
                     <div class="ticket-history-list">
                         <?php if (empty($historialActual)) { ?>
-                            <p class="ticket-history-empty">Aca se mostrara el historial del <?= $vista === 'solicitudes' ? 'activo seleccionado' : 'ticket seleccionado' ?>.</p>
+                            <p class="ticket-history-empty" data-i18n="<?= $vista === 'solicitudes' ? 'tickets.asset_history_empty' : 'tickets.ticket_history_empty' ?>">Aca se mostrara el historial del <?= $vista === 'solicitudes' ? 'activo seleccionado' : 'ticket seleccionado' ?>.</p>
                         <?php } else { ?>
                             <?php while ($reg = mysqli_fetch_assoc($historialActual)) { ?>
                                 <article class="ticket-history-item">
@@ -678,8 +696,5 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
         </div>
     </div>
     <!-- Aplicar el tema guardado y permitir cambiarlo desde el menu. -->
-    <script src="../js/theme.js"></script>
-    <script>
-    </script>
 </body>
 </html>
