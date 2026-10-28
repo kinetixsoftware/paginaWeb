@@ -39,6 +39,7 @@ if ($verificarTicket['CantidadActivos'] == 0) {
     exit;
 }
 
+$imagenActivo = null;
 if($id_activo > 0) {
     $sql = "SELECT a.id_activo, a.nombre, a.modelo, a.descripcion, a.numero_serie, a.fecha_adquisicion, a.imagen_path,
                a.fecha_baja, a.id_marca, a.id_usuario, m.marca, a.id_estado, e.estado, a.id_categoria, c.categoria,
@@ -55,19 +56,68 @@ if($id_activo > 0) {
     $resultados = mysqli_fetch_assoc($sql);
     $imagenActivo = urlImagenSubida($resultados['imagen_path'] ?? null);
     if($_SERVER['REQUEST_METHOD'] === 'POST') {
-        if ($_POST['accion'] == "solicitarActivo"){
-            $sql = "SELECT id_ubicacion FROM usuario WHERE id_usuario = $idUsuario";
-            $sql = mysqli_query($conexion, $sql);
-            $res = mysqli_fetch_assoc($sql);
-            $ubicacion = $res['id_ubicacion'];
+        if (($_POST['accion'] ?? '') === "solicitarActivo" && $rol === 1 && empty($resultados['id_usuario']) && (int) $resultados['id_estado'] !== 3) {
+            $consultaUbicacion = mysqli_query($conexion, "SELECT id_ubicacion FROM usuario WHERE id_usuario = $idUsuario LIMIT 1");
+            if (!$consultaUbicacion) {
+                throw new RuntimeException('No se pudo verificar la ubicación del usuario: ' . mysqli_error($conexion));
+            }
+            $ubicacionUsuario = mysqli_fetch_assoc($consultaUbicacion);
+            $ubicacion = $ubicacionUsuario['id_ubicacion'] ?? null;
 
-            $sql = "UPDATE activo SET id_usuario = $idUsuario, id_ubicacion = $ubicacion, id_estado = 2 WHERE id_activo = $id_activo AND id_usuario IS NULL";
-            $sql = mysqli_query($conexion, $sql);
-            if($sql) {
-                $sql = "INSERT INTO historial_activo(id_activo, accion) VALUES ($id_activo, 'Usuario: $idUsuario ahora es responsable de este activo')";
-                $sql = mysqli_query($conexion, $sql);
+            if ($ubicacion === null) {
+                $_SESSION['ubicacion'] = null;
+                $_SESSION['mensaje'] = 'Necesitás configurar tu ubicación en <a href="/Kinetix/es/usuario-config">usuario-config</a> antes de solicitar un activo.';
+                $_SESSION['tipoError'] = 'error';
+                header("Location: /Kinetix/php/activo/$id_activo");
+                exit;
+            }
+
+            $ubicacion = (int) $ubicacion;
+            $transaccionIniciada = false;
+            try {
+                $transaccionIniciada = mysqli_begin_transaction($conexion);
+                if (!$transaccionIniciada) {
+                    throw new RuntimeException('No se pudo iniciar la asignación del activo.');
+                }
+
+                $solicitudActualizada = mysqli_query(
+                    $conexion,
+                    "UPDATE activo SET id_usuario = $idUsuario, id_ubicacion = $ubicacion, id_estado = 2
+                     WHERE id_activo = $id_activo AND id_usuario IS NULL"
+                );
+                if (!$solicitudActualizada || mysqli_affected_rows($conexion) !== 1) {
+                    throw new RuntimeException('El activo ya no está disponible para solicitar.');
+                }
+
+                $accion = mysqli_real_escape_string($conexion, "Usuario: $idUsuario ahora es responsable de este activo");
+                $historialGuardado = mysqli_query(
+                    $conexion,
+                    "INSERT INTO historial_activo (id_activo, accion) VALUES ($id_activo, '$accion')"
+                );
+                if (!$historialGuardado) {
+                    throw new RuntimeException('No se pudo guardar el historial del activo: ' . mysqli_error($conexion));
+                }
+                if (!mysqli_commit($conexion)) {
+                    throw new RuntimeException('No se pudo confirmar la asignación del activo.');
+                }
+                $transaccionIniciada = false;
 
                 header("Location: /Kinetix/es/inventario");
+                exit;
+            } catch (mysqli_sql_exception | RuntimeException $error) {
+                if ($transaccionIniciada) {
+                    try {
+                        mysqli_rollback($conexion);
+                    } catch (mysqli_sql_exception $errorRollback) {
+                        error_log('Asset request rollback failed: ' . $errorRollback->getMessage());
+                    }
+                }
+                error_log('Asset request failed: ' . $error->getMessage());
+                $_SESSION['mensaje'] = $error->getMessage() === 'El activo ya no está disponible para solicitar.'
+                    ? $error->getMessage()
+                    : 'No se pudo solicitar el activo. Inténtalo nuevamente.';
+                $_SESSION['tipoError'] = 'error';
+                header("Location: /Kinetix/php/activo/$id_activo");
                 exit;
             }
         }
