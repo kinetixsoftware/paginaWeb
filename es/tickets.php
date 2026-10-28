@@ -4,13 +4,13 @@ session_start();
 require_once "../php/conexionBDD.php";
 require_once "../php/image-upload.php";
 
-// Leer el rol y el ID del usuario que inicio sesion.
+// Leer el rol y el ID del usuario
 $rol = isset($_SESSION['rol']) ? (int) $_SESSION['rol'] : null;
 $idUsuario = (int) ($_SESSION['idUsuario'] ?? 0);
 $visitante = "";
 
-// Permitir el acceso solo a usuarios y tecnicos.
-if ($rol === null || $rol === 3) {
+// Permitir el acceso a usuarios, tecnicos y administradores
+if ($rol === null || !in_array($rol, [1, 2, 3], true)) {
     $_SESSION['mensaje'] = "No estas autorizado a ver esta pagina";
     $_SESSION['tipoError'] = "error";
     header("Location: /Kinetix/es/inicio");
@@ -19,55 +19,90 @@ if ($rol === null || $rol === 3) {
     $visitante = "Usuario";
 }  else if ($rol === 2) {
     $visitante = "Tecnico";
+} else if ($rol === 3) {
+    $visitante = "Administrador";
+}
+
+$conexion = conectarBD();
+$escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+$estadosFiltroResultado = mysqli_query(
+    $conexion,
+    "SELECT id_estado, estado FROM estado_ticket ORDER BY id_estado"
+);
+if (!$estadosFiltroResultado) {
+    throw new RuntimeException('No se pudieron cargar los estados de los tickets: ' . mysqli_error($conexion));
 }
 
 // Aplicar el filtro de categoria si se recibio desde el formulario.
-$filtroTipo = ($_GET['filtro'] ?? '');
-$id_categoria = (int) ($_GET['id_categoria'] ?? 0);
+$id_categoria = filter_var($_GET['id_categoria'] ?? 0, FILTER_VALIDATE_INT);
+$id_categoria = $id_categoria === false ? 0 : (int) $id_categoria;
 $filtroCategoria = '';
-if (!empty($filtroTipo)) {
-    if ($filtroTipo == "categoria") {
-        if ($id_categoria > 0) {
-            $filtroCategoria = " AND ct.id_categoria = $id_categoria";
-        }
-    }
-    // Aca van mas filtros en un futuro.
+if ($id_categoria > 0) {
+    $filtroCategoria = " AND ct.id_categoria = $id_categoria";
 }
 
 // Los tecnicos ven sus tickets y los que aun no tienen tecnico asignado.
 // Los usuarios solo ven los tickets que ellos crearon.
-$filtroTickets = $rol === 2
-    ? "(t.id_tecnico = $idUsuario OR t.id_tecnico IS NULL)"
-    : "t.id_solicitante = $idUsuario";
+$filtroTickets = match ($rol) {
+    2 => "(t.id_tecnico = $idUsuario OR t.id_tecnico IS NULL)",
+    3 => '1 = 1',
+    default => "t.id_solicitante = $idUsuario",
+};
+$estadoFiltro = filter_var($_GET['estado'] ?? 0, FILTER_VALIDATE_INT);
+$estadoFiltro = $estadoFiltro === false ? 0 : (int) $estadoFiltro;
+$estadoValido = false;
+if ($rol === 3 && $estadoFiltro > 0) {
+    $estadoValidacion = mysqli_query(
+        $conexion,
+        "SELECT id_estado FROM estado_ticket WHERE id_estado = $estadoFiltro LIMIT 1"
+    );
+    if (!$estadoValidacion) {
+        throw new RuntimeException('No se pudo validar el estado seleccionado: ' . mysqli_error($conexion));
+    }
+    $estadoValido = mysqli_fetch_assoc($estadoValidacion) !== null;
+}
+$filtroEstado = $estadoValido ? " AND t.id_estado = $estadoFiltro" : '';
+$ordenTickets = ($_GET['orden'] ?? '') === 'antiguos' ? 'antiguos' : 'recientes';
+$ordenSQL = $ordenTickets === 'antiguos'
+    ? 't.fecha_creacion ASC, t.id_ticket ASC'
+    : 't.fecha_creacion DESC, t.id_ticket DESC';
 
-$conexion = conectarBD();
-$escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 // Consultar los tickets que corresponden al rol y al filtro actual.
-$ticketslist = "SELECT t.id_ticket, t.titulo, e.estado, u.nombre, u.apellido, pt.prioridad, ct.categoria
+$ticketslist = "SELECT t.id_ticket, t.titulo, t.fecha_creacion, e.estado, u.nombre, u.apellido,
+                       tecnico.nombre AS tecnico_nombre, tecnico.apellido AS tecnico_apellido,
+                       pt.prioridad, ct.categoria
                 FROM ticket           AS t 
                 JOIN estado_ticket    AS e   ON t.id_estado = e.id_estado
                 JOIN usuario          AS u   ON t.id_solicitante = u.id_usuario
+                LEFT JOIN usuario     AS tecnico ON t.id_tecnico = tecnico.id_usuario
                 JOIN prioridad_ticket AS pt  ON t.id_prioridad = pt.id_prioridad
                 JOIN categoria_ticket AS ct  ON t.id_categoria = ct.id_categoria
-                WHERE $filtroTickets$filtroCategoria
-                ORDER BY t.fecha_creacion, pt.prioridad DESC;";
+                WHERE $filtroTickets$filtroCategoria$filtroEstado
+                ORDER BY $ordenSQL;";
 
 $ticketlistresult = mysqli_query($conexion, $ticketslist);
 $mensajesResultado = null;
 $ticketTitulo = null;
 $ticketEstado = null;
+$ticketData = null;
 $id_ticket = (int) ($_GET['id'] ?? $_POST['id_ticket'] ?? 0);
 $historialTicket = null;
 
 // Cargar el ticket seleccionado y revisar que el usuario pueda verlo.
 if ($id_ticket > 0) {
-    $ticket = "SELECT id_tecnico, id_solicitante, titulo, id_estado
-               FROM ticket
+    $ticket = "SELECT t.id_tecnico, t.id_solicitante, t.titulo, t.id_estado, t.id_categoria,
+                      t.id_prioridad, tecnico.nombre AS tecnico_nombre, tecnico.apellido AS tecnico_apellido
+               FROM ticket AS t
+               LEFT JOIN usuario AS tecnico ON t.id_tecnico = tecnico.id_usuario
                WHERE id_ticket = $id_ticket
                LIMIT 1";
     $ticketResultado = mysqli_query($conexion, $ticket);
     $ticketData = mysqli_fetch_assoc($ticketResultado);
-    $ticketPermitido = $ticketData && (($rol === 2 && (empty($ticketData['id_tecnico']) || (int) $ticketData['id_tecnico'] === $idUsuario)) || ($rol === 1 && (int) $ticketData['id_solicitante'] === $idUsuario));
+    $ticketPermitido = $ticketData && (
+        $rol === 3
+        || ($rol === 2 && (empty($ticketData['id_tecnico']) || (int) $ticketData['id_tecnico'] === $idUsuario))
+        || ($rol === 1 && (int) $ticketData['id_solicitante'] === $idUsuario)
+    );
 
     if ($ticketPermitido) {
         $ticketTitulo = $ticketData['titulo'];
@@ -93,7 +128,7 @@ if ($id_ticket > 0) {
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Guardar un mensaje nuevo y dejar registro en el historial.
-            if (($_POST['accion'] ?? '') === 'mandarMensaje' && !(in_array($ticketEstado, [2, 4, 5]))) {
+            if (($_POST['accion'] ?? '') === 'mandarMensaje' && $rol !== 3 && !in_array($ticketEstado, [2, 4, 5], true)) {
                 $contenidoMensaje = trim($_POST['contenido'] ?? '');
 
                 if ($contenidoMensaje !== '') {
@@ -113,7 +148,7 @@ if ($id_ticket > 0) {
             }
 
             // Eliminar un mensaje escrito por el usuario actual.
-            if (($_POST['accion'] ?? '') === 'eliminarMensaje') {
+            if (($_POST['accion'] ?? '') === 'eliminarMensaje' && $rol !== 3) {
                 $idMensaje = (int) ($_POST['id_mensaje'] ?? 0);
 
                 if ($idMensaje > 0) {
@@ -141,24 +176,30 @@ if ($id_ticket > 0) {
             }
 
             // Cambiar la categoria del ticket.
-            if (($_POST['accion'] ?? '') === 'cambiarCategoria') {
-                $id_categoria = $_POST['categoria'];
+            if (($_POST['accion'] ?? '') === 'cambiarCategoria' && in_array($rol, [2, 3], true)) {
+                $nuevaCategoria = filter_var($_POST['categoria'] ?? null, FILTER_VALIDATE_INT);
+                $categoriaResultado = $nuevaCategoria
+                    ? mysqli_query($conexion, "SELECT categoria FROM categoria_ticket WHERE id_categoria = $nuevaCategoria LIMIT 1")
+                    : false;
+                $categoriaData = $categoriaResultado ? mysqli_fetch_assoc($categoriaResultado) : null;
 
-                $sql = "UPDATE ticket
-                        SET id_categoria = $id_categoria
-                        WHERE id_ticket = $id_ticket";
-                mysqli_query($conexion, $sql);
-
-                $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
-                        VALUES ($id_ticket, $ticketEstado, $ticketEstado, 'El tecnico cambio la categoria de este ticket.')";
-                mysqli_query($conexion, $sql);
+                if ($categoriaData && (int) $nuevaCategoria !== (int) $ticketData['id_categoria']) {
+                    $actualizada = mysqli_query($conexion, "UPDATE ticket SET id_categoria = $nuevaCategoria WHERE id_ticket = $id_ticket");
+                    if ($actualizada) {
+                        $actor = $rol === 3 ? 'administrador' : 'tecnico';
+                        $accion = mysqli_real_escape_string($conexion, "El $actor cambio la categoria del ticket a: " . $categoriaData['categoria']);
+                        if (!mysqli_query($conexion, "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion) VALUES ($id_ticket, $ticketEstado, $ticketEstado, '$accion')")) {
+                            throw new RuntimeException('No se pudo guardar el cambio de categoría en el historial: ' . mysqli_error($conexion));
+                        }
+                    }
+                }
 
                 header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
             }
 
             // Marcar el ticket como cancelado y guardar el cambio.
-            if (($_POST['accion'] ?? '') === 'cancelarTicket') {
+            if (($_POST['accion'] ?? '') === 'cancelarTicket' && $rol === 1 && (int) $ticketData['id_solicitante'] === $idUsuario) {
                 $id_ticket = $_POST['id_ticket'] ?? 0;
                 $sql = "UPDATE ticket
                         SET id_estado = 2
@@ -171,7 +212,7 @@ if ($id_ticket > 0) {
                             ORDER BY id_historial DESC
                             LIMIT 1";
                 $sqlS = mysqli_query($conexion, $uEstado);
-                $sqlS = mysqli_fetch_array($sqlS);
+                $sqlS = mysqli_fetch_assoc($sqlS);
                 $ultimoEstado = $sqlS['estado_nuevo'];
                     
                 $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
@@ -227,28 +268,25 @@ if ($id_ticket > 0) {
             }
 
             // Cambiar el estado del ticket y agregarlo al historial.
-            if (($_POST['accion'] ?? '') === 'cambiarEstado') {
-                $id_estado= $_POST['estado'];
-                $ticketEstado = $id_estado;
+            if (($_POST['accion'] ?? '') === 'cambiarEstado' && in_array($rol, [2, 3], true)) {
+                $nuevoEstado = filter_var($_POST['estado'] ?? null, FILTER_VALIDATE_INT);
+                $estadosPermitidos = $rol === 3 ? [1, 3] : [3, 4, 5];
+                $estadoResultado = $nuevoEstado !== false
+                    ? mysqli_query($conexion, "SELECT id_estado FROM estado_ticket WHERE id_estado = " . (int) $nuevoEstado . " LIMIT 1")
+                    : false;
+                $estadoValido = $estadoResultado
+                    && mysqli_fetch_assoc($estadoResultado)
+                    && in_array((int) $nuevoEstado, $estadosPermitidos, true);
 
-                if($id_estado !== 1 && $id_estado !== 2) {
-                    $sql = "UPDATE ticket
-                            SET id_estado = $id_estado
-                            WHERE id_ticket = $id_ticket";
-                    mysqli_query($conexion, $sql);
-
-                    $uEstado = "SELECT estado_nuevo 
-                                FROM historial_ticket 
-                                WHERE id_ticket = $id_ticket
-                                ORDER BY id_historial DESC
-                                LIMIT 1";
-                    $sqlS = mysqli_query($conexion, $uEstado);
-                    $sqlS = mysqli_fetch_array($sqlS);
-                    $ultimoEstado = $sqlS['estado_nuevo'];
-                    
-                    $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
-                            VALUES ($id_ticket, $ultimoEstado, $id_estado, 'Tecnico cambio el estado del ticket')";
-                    mysqli_query($conexion, $sql);
+                if ($estadoValido && (int) $nuevoEstado !== $ticketEstado) {
+                    $actualizado = mysqli_query($conexion, "UPDATE ticket SET id_estado = " . (int) $nuevoEstado . " WHERE id_ticket = $id_ticket");
+                    if ($actualizado) {
+                        $actor = $rol === 3 ? 'administrador' : 'tecnico';
+                        $accion = "El $actor cambio el estado del ticket.";
+                        if (!mysqli_query($conexion, "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion) VALUES ($id_ticket, $ticketEstado, " . (int) $nuevoEstado . ", '$accion')")) {
+                            throw new RuntimeException('No se pudo guardar el cambio de estado en el historial: ' . mysqli_error($conexion));
+                        }
+                    }
                 }
 
                 header("Location: /Kinetix/es/ticket/$id_ticket");
@@ -256,17 +294,76 @@ if ($id_ticket > 0) {
             }
 
             // Cambiar la prioridad y guardar el cambio en el historial.
-            if (($_POST['accion'] ?? '') === 'cambiarPrioridad') {
-                $id_prioridad = $_POST['prioridad']; 
+            if (($_POST['accion'] ?? '') === 'cambiarPrioridad' && in_array($rol, [2, 3], true)) {
+                $nuevaPrioridad = filter_var($_POST['prioridad'] ?? null, FILTER_VALIDATE_INT);
+                $prioridadResultado = $nuevaPrioridad
+                    ? mysqli_query($conexion, "SELECT prioridad FROM prioridad_ticket WHERE id_prioridad = $nuevaPrioridad LIMIT 1")
+                    : false;
+                $prioridadData = $prioridadResultado ? mysqli_fetch_assoc($prioridadResultado) : null;
 
-                $sql = "UPDATE ticket
-                        SET id_prioridad = $id_prioridad
-                        WHERE id_ticket = $id_ticket";
-                mysqli_query($conexion, $sql);
+                if ($prioridadData && (int) $nuevaPrioridad !== (int) $ticketData['id_prioridad']) {
+                    $actualizada = mysqli_query($conexion, "UPDATE ticket SET id_prioridad = $nuevaPrioridad WHERE id_ticket = $id_ticket");
+                    if ($actualizada) {
+                        $actor = $rol === 3 ? 'administrador' : 'tecnico';
+                        $accion = mysqli_real_escape_string($conexion, "El $actor cambio la prioridad del ticket a: " . $prioridadData['prioridad']);
+                        if (!mysqli_query($conexion, "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion) VALUES ($id_ticket, $ticketEstado, $ticketEstado, '$accion')")) {
+                            throw new RuntimeException('No se pudo guardar el cambio de prioridad en el historial: ' . mysqli_error($conexion));
+                        }
+                    }
+                }
 
-                $sql = "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
-                        VALUES ($id_ticket, $ticketEstado, $ticketEstado, 'El tecnico cambio la prioridad de este ticket.')";
-                mysqli_query($conexion, $sql);
+                header("Location: /Kinetix/es/ticket/$id_ticket");
+                exit;
+            }
+
+            if (($_POST['accion'] ?? '') === 'quitarTecnico' && $rol === 3 && !empty($ticketData['id_tecnico'])) {
+                $idTecnicoAnterior = (int) $ticketData['id_tecnico'];
+                $nuevoEstado = in_array($ticketEstado, [1, 3], true) ? 1 : $ticketEstado;
+                $transaccionIniciada = false;
+                try {
+                    $transaccionIniciada = mysqli_begin_transaction($conexion);
+                    if (!$transaccionIniciada) {
+                        throw new RuntimeException('No se pudo iniciar la eliminación de la asignación.');
+                    }
+
+                    $actualizada = mysqli_query(
+                        $conexion,
+                        "UPDATE ticket SET id_tecnico = NULL, id_estado = $nuevoEstado
+                         WHERE id_ticket = $id_ticket AND id_tecnico = $idTecnicoAnterior"
+                    );
+                    if (!$actualizada || mysqli_affected_rows($conexion) !== 1) {
+                        throw new RuntimeException('No se pudo eliminar la asignación del técnico.');
+                    }
+
+                    $accion = mysqli_real_escape_string(
+                        $conexion,
+                        'El administrador elimino al tecnico de este ticket, brevemente otro tecnico procedera a ayudarte.'
+                    );
+                    if (!mysqli_query(
+                        $conexion,
+                        "INSERT INTO historial_ticket (id_ticket, estado_anterior, estado_nuevo, accion)
+                         VALUES ($id_ticket, $ticketEstado, $nuevoEstado, '$accion')"
+                    )) {
+                        throw new RuntimeException('No se pudo registrar la eliminación de la asignación en el historial: ' . mysqli_error($conexion));
+                    }
+                    if (!mysqli_commit($conexion)) {
+                        throw new RuntimeException('No se pudo confirmar la eliminación de la asignación.');
+                    }
+                    $transaccionIniciada = false;
+                } catch (mysqli_sql_exception | RuntimeException $error) {
+                    if ($transaccionIniciada) {
+                        try {
+                            mysqli_rollback($conexion);
+                        } catch (mysqli_sql_exception $errorRollback) {
+                            error_log('Ticket technician unassignment rollback failed: ' . $errorRollback->getMessage());
+                        }
+                    }
+                    error_log('Ticket technician unassignment failed: ' . $error->getMessage());
+                    $_SESSION['mensaje'] = 'No se pudo quitar el técnico asignado. Inténtalo nuevamente.';
+                    $_SESSION['tipoError'] = 'error';
+                    header("Location: /Kinetix/es/ticket/$id_ticket");
+                    exit;
+                }
 
                 header("Location: /Kinetix/es/ticket/$id_ticket");
                 exit;
@@ -465,14 +562,29 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                 </div>
                 <div class="ticket-list">
                     <?php if ($vista === 'tickets') { ?>
-                    <div class="ticket-filter">
-                        <select id="id_categoria" onchange="window.location.href = this.value === '0' ? 'tickets' : 'tickets/categoria/' + this.value">
+                    <form class="ticket-filter" method="GET" action="tickets">
+                        <label for="id_categoria" data-i18n="tickets.filter_category">Categoría</label>
+                        <select id="id_categoria" name="id_categoria" onchange="this.form.submit()">
                             <option value="0" <?= $id_categoria === 0 ? 'selected' : '' ?> data-i18n="tickets.all">Todos</option>
-                                <?php while($reg = mysqli_fetch_array($categoriasFiltroResultado)) { ?>
+                                <?php while ($reg = mysqli_fetch_assoc($categoriasFiltroResultado)) { ?>
                                 <option value="<?= (int) $reg['id_categoria'] ?>" <?= $id_categoria === (int) $reg['id_categoria'] ? 'selected' : '' ?> data-i18n-db><?=  $reg['categoria'] ?></option>
                                 <?php } ?>
                         </select>
-                    </div>
+                        <?php if ($rol === 3) { ?>
+                            <label for="estadoFiltro" data-i18n="tickets.filter_status">Estado</label>
+                            <select id="estadoFiltro" name="estado" onchange="this.form.submit()">
+                                <option value="0" <?= $estadoFiltro === 0 ? 'selected' : '' ?> data-i18n="tickets.all_statuses">Todos los estados</option>
+                                <?php while ($estado = mysqli_fetch_assoc($estadosFiltroResultado)) { ?>
+                                    <option value="<?= (int) $estado['id_estado'] ?>" <?= $estadoFiltro === (int) $estado['id_estado'] ? 'selected' : '' ?> data-i18n-db><?= $escape($estado['estado']) ?></option>
+                                <?php } ?>
+                            </select>
+                            <label for="ordenFiltro" data-i18n="tickets.filter_age">Antigüedad</label>
+                            <select id="ordenFiltro" name="orden" onchange="this.form.submit()">
+                                <option value="recientes" <?= $ordenTickets === 'recientes' ? 'selected' : '' ?> data-i18n="tickets.newest_first">Más recientes primero</option>
+                                <option value="antiguos" <?= $ordenTickets === 'antiguos' ? 'selected' : '' ?> data-i18n="tickets.oldest_first">Más antiguos primero</option>
+                            </select>
+                        <?php } ?>
+                    </form>
                     <!-- Mostrar cada ticket encontrado. -->
                     <?php while($reg = mysqli_fetch_assoc($ticketlistresult)) { ?>
                         <a class="ticket" href="ticket/<?= (int) $reg['id_ticket'] ?>">
@@ -485,7 +597,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             </div>
                             <div class="ticket-category-row">
                                 <h6 style="font-size:13px;"><span data-i18n="tickets.ticket_category">Categoria:</span> <span data-i18n-db><?= $reg['categoria']?></span></h6>
-                                <?php if ($rol !== 2 && !($reg['estado'] === "Cancelado" || $reg['estado'] === "Resuelto" || $reg['estado'] === "Cerrado")) {?>
+                                <?php if ($rol === 1 && !($reg['estado'] === "Cancelado" || $reg['estado'] === "Resuelto" || $reg['estado'] === "Cerrado")) {?>
                                 <form method="POST">
                                     <input type="hidden" name="accion" value="cancelarTicket">
                                     <input type="hidden" name="id_ticket" value="<?= $reg['id_ticket'] ?>">
@@ -524,6 +636,23 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             : ($ticketTitulo ?? '<span data-i18n="tickets.select_ticket">Seleccioná un ticket</span>') ?>
                     </h1>
                 </div>
+                <?php if ($rol === 3 && $vista === 'tickets' && $id_ticket > 0 && $ticketData) { ?>
+                    <section class="admin-ticket-summary" aria-label="Datos del ticket">
+                        <p><strong>Solicitante:</strong> #<?= (int) $ticketData['id_solicitante'] ?></p>
+                        <p><strong>Técnico asignado:</strong>
+                            <?= !empty($ticketData['id_tecnico'])
+                                ? $escape(trim($ticketData['tecnico_nombre'] . ' ' . $ticketData['tecnico_apellido'])) . ' (#' . (int) $ticketData['id_tecnico'] . ')'
+                                : 'Sin asignar' ?>
+                        </p>
+                    </section>
+                    <?php if (!empty($ticketData['id_tecnico'])) { ?>
+                        <form class="admin-unassign-form" method="POST" action="ticket/<?= $id_ticket ?>">
+                            <input type="hidden" name="accion" value="quitarTecnico">
+                            <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
+                            <button type="submit" class="btn-eliminar">Quitar técnico asignado</button>
+                        </form>
+                    <?php } ?>
+                <?php } ?>
                 <?php if ($vista === 'solicitudes') { ?>
                     <div class="chat">
                         <?php if ($solicitudData) { ?>
@@ -599,7 +728,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 <strong><?= $escape($reg['nombre'] . ' ' . $reg['apellido']) ?></strong>
                             </div>
                             <div class="message-body"><?= $escape($reg['contenido']) ?></div>
-                            <?php if ($idUsuario === (int) $reg['id_usuario'] && !in_array($ticketEstado, [2, 4, 5])) { ?>
+                            <?php if ($rol !== 3 && $idUsuario === (int) $reg['id_usuario'] && !in_array($ticketEstado, [2, 4, 5], true)) { ?>
                                 <form method="POST">
                                     <input type="hidden" name="accion" value="eliminarMensaje">
                                     <input type="hidden" name="id_ticket" value="<?= $id_ticket ?>">
@@ -610,7 +739,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                         </div>
                     <?php }?>
                 </div>
-                <!-- CONTROL DEL TICKET PARA EL TECNICO -->
+                <!-- Controles de resolución exclusivos del técnico. -->
                 <?php if ($rol === 2) {?>
                     <div class="resolution-panel" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'style="visibility: hidden;"' : ''; ?>>
                         <h2 data-i18n="tickets.resolution">Resultado del ticket</h2>
@@ -621,13 +750,15 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                             <button type="submit" class="btn-editar" <?= ($id_ticket <= 0 || in_array($ticketEstado, [2, 4, 5])) ? 'disabled' : '' ?> data-i18n="tickets.close_save_resolution">Cerrar ticket y guardar resultado</button>
                         </form>
                     </div>
-                    <div class="tech-controls" <?= $id_ticket > 0 ? '' : 'style="visibility: hidden;"'; ?>>
+                <?php } ?>
+                <?php if (in_array($rol, [2, 3], true) && $id_ticket > 0) { ?>
+                    <div class="tech-controls">
                         <div>
                             <form method="POST">
                                 <input type="hidden" name="accion" value="cambiarCategoria">
                                 <select name="categoria" id="categoria" onchange="this.form.submit()">
                                     <option value="" data-i18n="tickets.change_category">Cambiar categoria</option>
-                                    <?php while($reg = mysqli_fetch_array($categoriasResultado)) { ?>
+                                    <?php while ($reg = mysqli_fetch_assoc($categoriasResultado)) { ?>
                                     <option value="<?= $reg['id_categoria'] ?>" data-i18n-db><?=  $reg['categoria'] ?></option>
                                     <?php } ?>
                                 </select>
@@ -638,7 +769,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 <input type="hidden" name="accion" value="cambiarPrioridad">
                                 <select name="prioridad" id="prioridad" onchange="this.form.submit()">
                                     <option value="" data-i18n="tickets.change_priority">Cambiar prioridad</option>
-                                    <?php while($reg = mysqli_fetch_array($prioridadesResultado)) { ?>
+                                    <?php while ($reg = mysqli_fetch_assoc($prioridadesResultado)) { ?>
                                     <option value="<?= $reg['id_prioridad'] ?>" data-i18n-db><?=  $reg['prioridad'] ?></option>
                                     <?php } ?>
                                 </select>
@@ -649,8 +780,10 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                                 <input type="hidden" name="accion" value="cambiarEstado">
                                 <select name="estado" id="estado" onchange="this.form.submit()">
                                     <option value="" data-i18n="tickets.change_status">Cambiar estado</option>
-                                    <?php while($reg = mysqli_fetch_array($estadosResultado)) { ?>
-                                    <option value="<?= $reg['id_estado'] ?>" data-i18n-db><?=  $reg['estado'] ?></option>
+                                    <?php while ($reg = mysqli_fetch_assoc($estadosResultado)) { ?>
+                                        <?php if ($rol === 2 || in_array((int) $reg['id_estado'], [1, 3], true)) { ?>
+                                            <option value="<?= (int) $reg['id_estado'] ?>" <?= (int) $reg['id_estado'] === $ticketEstado ? 'selected' : '' ?> data-i18n-db><?= $escape($reg['estado']) ?></option>
+                                        <?php } ?>
                                     <?php } ?>
                                 </select>
                             </form>
@@ -658,6 +791,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                     </div>
                 <?php }?>
                 <!-- Formulario para enviar mensajes mientras el ticket esta abierto. -->
+                <?php if ($rol !== 3) { ?>
                 <div class="chat-input">
                     <form method="POST">
                         <input type="hidden" name="accion" value="mandarMensaje">
@@ -667,10 +801,11 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                     </form>
                 </div>
                 <?php } ?>
+                <?php } ?>
             </div>
 
             <!-- Historial del ticket o del activo, visible solo para tecnicos. -->
-            <?php if ($rol === 2) { ?>
+            <?php if (in_array($rol, [2, 3], true) && ($rol === 2 || $vista === 'tickets')) { ?>
                 <?php $historialActual = $vista === 'solicitudes' ? $historialActivo : $historialTicket; ?>
                 <aside class="ticket-history" aria-label="Historial del <?= $vista === 'solicitudes' ? 'activo' : 'ticket' ?>" data-i18n-attrs='{"aria-label":"<?= $vista === 'solicitudes' ? 'tickets.asset_history' : 'tickets.ticket_history' ?>"}'>
                     <div class="ticket-history-header">

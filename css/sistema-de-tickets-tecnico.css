@@ -209,6 +209,18 @@ body {
     margin-bottom: 14px;
 }
 
+.ticket-filter label {
+    display: block;
+    margin: 0 0 5px;
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.ticket-filter select {
+    margin-bottom: 10px;
+}
+
 .ticket-filter select,
 .tech-controls select {
     width: 100%;
@@ -286,8 +298,10 @@ body {
 
 .ticket-title {
     display:flex;
+    flex-wrap: wrap;
 }
 .ticket-title h6 {
+    flex-basis: 100%;
     color: var(--text);
     font-size: .98rem;
     font-weight: 400;
@@ -296,6 +310,32 @@ body {
 
 .request-list-meta {
     margin-top: 8px;
+}
+
+.ticket-admin-meta {
+    flex-basis: 100%;
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: .74rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.admin-ticket-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-soft);
+    color: var(--text);
+    font-size: .82rem;
+}
+
+.admin-unassign-form {
+    padding: 8px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel-soft);
     color: var(--muted);
     font-size: .78rem;
 }
