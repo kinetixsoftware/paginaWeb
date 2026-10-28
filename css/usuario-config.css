@@ -381,7 +381,8 @@ body {
     gap: 8px;
 }
 
-.setting-control input {
+.setting-control input,
+.setting-control select {
     width: 100%;
     padding: 12px 14px;
     border: 1.5px solid var(--line);
@@ -393,11 +394,13 @@ body {
     transition: border-color 0.2s ease, background 0.2s ease;
 }
 
-.setting-control input:hover {
+.setting-control input:hover,
+.setting-control select:hover {
     border-color: var(--muted);
 }
 
-.setting-control input:focus {
+.setting-control input:focus,
+.setting-control select:focus {
     border-color: var(--focus);
     background: var(--surface);
 }

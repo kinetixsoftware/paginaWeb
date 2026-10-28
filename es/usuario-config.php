@@ -14,13 +14,11 @@ if ($idUsuario <= 0) {
 
 $conexion = conectarBD();
 $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-$consulta = mysqli_query(
-    $conexion,
-    "SELECT u.nombre, u.apellido, u.password, u.email, u.foto_path, r.nombre_rol
-     FROM usuario AS u
-     LEFT JOIN rol AS r ON r.id_rol = u.id_rol
-     WHERE u.id_usuario = $idUsuario LIMIT 1"
-);
+$consulta = mysqli_query($conexion,
+            "SELECT u.nombre, u.apellido, u.password, u.email, u.foto_path, u.id_ubicacion, r.nombre_rol
+            FROM usuario AS u
+            LEFT JOIN rol AS r ON r.id_rol = u.id_rol
+            WHERE u.id_usuario = $idUsuario LIMIT 1");
 $datos = $consulta ? mysqli_fetch_assoc($consulta) : false;
 
 if (!$datos) {
@@ -35,12 +33,27 @@ $mensaje = '';
 $claveMensaje = '';
 $tipoMensaje = '';
 
+$resultadoUbicaciones = mysqli_query(
+    $conexion,
+    "SELECT u.id_ubicacion, u.calle, c.ciudad
+     FROM ubicacion AS u
+     LEFT JOIN ciudad AS c ON c.id_ciudad = u.id_ciudad
+     ORDER BY c.ciudad, u.calle"
+);
+if (!$resultadoUbicaciones) {
+    throw new RuntimeException('No se pudieron cargar las ubicaciones: ' . mysqli_error($conexion));
+}
+$ubicaciones = [];
+while ($ubicacion = mysqli_fetch_assoc($resultadoUbicaciones)) {
+    $ubicaciones[] = $ubicacion;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $accion = $_POST['accion'] ?? '';
     $tabEnviado = $_POST['tab'] ?? '';
 
     if ($accion === 'verTab') {
-        $tab = in_array($tabEnviado, ['Cuenta', 'Contraseña'], true) ? $tabEnviado : 'Cuenta';
+        $tab = in_array($tabEnviado, ['Cuenta', 'Contraseña', 'Ubicación'], true) ? $tabEnviado : 'Cuenta';
     } elseif ($accion === 'cambiarDatos') {
         $tab = 'Cuenta';
         $nombre = trim(is_string($_POST['nombre'] ?? null) ? $_POST['nombre'] : '');
@@ -49,16 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombreCaracteres = preg_match_all('/./us', $nombre);
         $apellidoCaracteres = preg_match_all('/./us', $apellido);
 
-        if (
-            $nombre === ''
-            || $apellido === ''
-            || $nombreCaracteres === false
-            || $nombreCaracteres > 50
-            || $apellidoCaracteres === false
-            || $apellidoCaracteres > 100
-            || strlen($email) > 255
-            || !filter_var($email, FILTER_VALIDATE_EMAIL)
-        ) {
+        if ($nombre === '' || $apellido === '' || $nombreCaracteres === false || $nombreCaracteres > 50 || $apellidoCaracteres === false || $apellidoCaracteres > 100 || strlen($email) > 255 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $mensaje = 'Ingresa nombre, apellido y un correo electrónico válido.';
             $claveMensaje = 'config.error_data';
             $tipoMensaje = 'error';
@@ -76,12 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorFoto = '';
             try {
                 $nuevaFoto = guardarImagenSubida($_FILES['foto'] ?? [], 'usuarios');
-                $fotoSQL = $nuevaFoto === null
-                    ? ''
-                    : ", foto_path = '" . mysqli_real_escape_string($conexion, $nuevaFoto) . "'";
+                $fotoSQL = $nuevaFoto === null ? '' : ", foto_path = '" . mysqli_real_escape_string($conexion, $nuevaFoto) . "'";
                 $consultaIniciada = true;
-                $actualizado = mysqli_query(
-                    $conexion,
+                $actualizado = mysqli_query($conexion,
                     "UPDATE usuario SET nombre = '$nombreSQL', apellido = '$apellidoSQL', email = '$emailSQL'$fotoSQL
                      WHERE id_usuario = $idUsuario"
                 );
@@ -130,6 +131,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $datos['email'] = $email;
             }
         }
+    } elseif ($accion === 'cambiarUbicacion') {
+        $tab = 'Ubicación';
+        $ubicacionEnviada = $_POST['id_ubicacion'] ?? '';
+        $idUbicacion = $ubicacionEnviada === '' ? null : filter_var($ubicacionEnviada, FILTER_VALIDATE_INT);
+
+        $idsUbicaciones = array_map('intval', array_column($ubicaciones, 'id_ubicacion'));
+        if ($ubicacionEnviada !== '' && ($idUbicacion === false || !in_array((int) $idUbicacion, $idsUbicaciones, true))) {
+            $mensaje = 'Seleccioná una ubicación válida.';
+            $claveMensaje = 'config.error_location';
+            $tipoMensaje = 'error';
+        } else {
+            $ubicacionSQL = $idUbicacion === null ? 'NULL' : (string) (int) $idUbicacion;
+            try {
+                $actualizado = mysqli_query(
+                    $conexion,
+                    "UPDATE usuario SET id_ubicacion = $ubicacionSQL WHERE id_usuario = $idUsuario"
+                );
+            } catch (mysqli_sql_exception $error) {
+                error_log('Account location update failed: ' . $error->getMessage());
+                $actualizado = false;
+            }
+
+            if ($actualizado) {
+                $datos['id_ubicacion'] = $idUbicacion === null ? null : (int) $idUbicacion;
+                $_SESSION['ubicacion'] = $datos['id_ubicacion'];
+                $mensaje = 'La ubicación se actualizó correctamente.';
+                $claveMensaje = 'config.success_location';
+                $tipoMensaje = 'success';
+            } else {
+                $mensaje = 'No se pudo actualizar la ubicación. Inténtalo nuevamente.';
+                $claveMensaje = 'config.error_location_save';
+                $tipoMensaje = 'error';
+            }
+        }
     } elseif ($accion === 'cambiarPassword') {
         $tab = 'Contraseña';
         $actual = is_string($_POST['password_actual'] ?? null) ? $_POST['password_actual'] : '';
@@ -175,12 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $transaccionIniciada = mysqli_begin_transaction($conexion);
             if ($transaccionIniciada) {
-                $activosActualizados = mysqli_query(
-                    $conexion,
+                $activosActualizados = mysqli_query($conexion,
                     "UPDATE activo SET id_usuario = NULL WHERE id_usuario = $idUsuario"
                 );
-                $cuentaActualizada = $activosActualizados && mysqli_query(
-                    $conexion,
+                $cuentaActualizada = $activosActualizados && mysqli_query($conexion,
                     "UPDATE usuario SET activo = 0 WHERE id_usuario = $idUsuario"
                 );
 
@@ -269,12 +302,12 @@ $nombreCompleto = trim($datos['nombre'] . ' ' . $datos['apellido']);
                 </div>
 
                 <nav class="settings-nav" aria-label="Configuración de cuenta">
-                    <?php foreach (['Cuenta' => 'config.tab_cuenta', 'Contraseña' => 'config.tab_contrasena'] as $nombreTab => $claveTab) { ?>
+                    <?php foreach (['Cuenta' => 'config.tab_cuenta', 'Ubicación' => 'config.tab_ubicacion', 'Contraseña' => 'config.tab_contrasena'] as $nombreTab => $claveTab) { ?>
                         <form method="POST">
                             <input type="hidden" name="accion" value="verTab">
                             <input type="hidden" name="tab" value="<?= $escape($nombreTab) ?>">
                             <button type="submit" class="nav-item <?= $tab === $nombreTab ? 'active' : '' ?>" <?= $tab === $nombreTab ? 'aria-current="page"' : '' ?>>
-                                <span class="nav-icon" aria-hidden="true"><?= $nombreTab === 'Cuenta' ? '&#128100;' : '&#128273;' ?></span>
+                                <span class="nav-icon" aria-hidden="true"><?= $nombreTab === 'Cuenta' ? '&#128100;' : ($nombreTab === 'Ubicación' ? '&#128205;' : '&#128273;') ?></span>
                                 <span class="nav-label" data-i18n="<?= $escape($claveTab) ?>"><?= $escape($nombreTab) ?></span>
                             </button>
                         </form>
@@ -311,7 +344,7 @@ $nombreCompleto = trim($datos['nombre'] . ' ' . $datos['apellido']);
 
             <section class="settings-content">
                 <header class="content-header">
-                    <h1 data-i18n="<?= $tab === 'Cuenta' ? 'config.tab_cuenta' : 'config.tab_contrasena' ?>"><?= $escape($tab) ?></h1>
+                    <h1 data-i18n="<?= $tab === 'Cuenta' ? 'config.tab_cuenta' : ($tab === 'Ubicación' ? 'config.tab_ubicacion' : 'config.tab_contrasena') ?>"><?= $escape($tab) ?></h1>
                     <p data-i18n="config.p">Gestioná tu información personal y de acceso.</p>
                 </header>
 
@@ -362,6 +395,29 @@ $nombreCompleto = trim($datos['nombre'] . ' ' . $datos['apellido']);
                                 </div>
                                 <div class="setting-control">
                                     <input type="text" value="<?= $escape($datos['nombre_rol'] ?? '') ?>" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-save" type="submit" data-i18n="config.btn_guardar">Guardar cambios</button>
+                    </form>
+                <?php } elseif ($tab === 'Ubicación') { ?>
+                    <form method="POST">
+                        <input type="hidden" name="accion" value="cambiarUbicacion">
+                        <div class="settings-group">
+                            <div class="setting-row">
+                                <div class="setting-info">
+                                    <h3 data-i18n="config.location">Ubicación de trabajo</h3>
+                                    <p data-i18n="config.location_hint">Necesitás una ubicación para solicitar activos.</p>
+                                </div>
+                                <div class="setting-control">
+                                    <select name="id_ubicacion">
+                                        <option value="" data-i18n="config.choose_location">Seleccioná una ubicación</option>
+                                        <?php foreach ($ubicaciones as $ubicacion) { ?>
+                                            <option value="<?= (int) $ubicacion['id_ubicacion'] ?>" <?= (int) ($datos['id_ubicacion'] ?? 0) === (int) $ubicacion['id_ubicacion'] ? 'selected' : '' ?>>
+                                                <?= $escape($ubicacion['calle'] . ' - ' . ($ubicacion['ciudad'] ?? 'Sin ciudad')) ?>
+                                            </option>
+                                        <?php } ?>
+                                    </select>
                                 </div>
                             </div>
                         </div>
