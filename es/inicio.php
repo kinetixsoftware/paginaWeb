@@ -38,6 +38,7 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
                     <li><a href="usuario/<?= $idUsuario ?>" data-i18n="nav.mi_cuenta">Mi cuenta</a></li>
                     <?php } elseif ($rol === 3) { ?>
                     <li><a href="inicio" class="active" aria-current="page" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="tickets" data-i18n="nav.tickets">Tickets</a></li>
                     <li><a href="admin/panel-admin" data-i18n="nav.administracion">Administración</a></li>
                     <li><a href="admin/informes-admin" data-i18n="nav.informes">Informes</a></li>
                     <?php } else { ?>

@@ -14,8 +14,7 @@ if (!$idUsuario || $idUsuario < 1) {
 
 $conexion = conectarBD();
 $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-$consulta = mysqli_query(
-    $conexion,
+$consulta = mysqli_query($conexion,
     "SELECT u.id_usuario, u.nombre, u.apellido, u.email, u.fecha_creacion, u.foto_path,
             r.nombre_rol, ub.calle, c.ciudad, ub.telefono,
             (SELECT COUNT(*) FROM activo AS a WHERE a.id_usuario = u.id_usuario) AS cantidad_activos
@@ -43,9 +42,7 @@ if ($usuario['nombre_rol'] === 'Administrador') {
 $esPropio = $idUsuario === (int) ($_SESSION['idUsuario'] ?? 0);
 $nombreCompleto = trim($usuario['nombre'] . ' ' . $usuario['apellido']);
 $fotoPerfil = urlImagenSubida($usuario['foto_path']);
-$ubicacion = $esPropio
-    ? trim(($usuario['calle'] ?? '') . ' - ' . ($usuario['ciudad'] ?? ''), ' -')
-    : ($usuario['ciudad'] ?? '');
+$ubicacion = $esPropio ? trim(($usuario['calle'] ?? '') . ' - ' . ($usuario['ciudad'] ?? ''), ' -') : ($usuario['ciudad'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="es">

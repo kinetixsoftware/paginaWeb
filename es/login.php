@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $password       = $_POST['password'] ?? '';
 
     try {
-        $sql = "SELECT id_usuario, nombre, apellido, password, activo, id_rol FROM usuario WHERE email = '$email' LIMIT 1";
+        $sql = "SELECT id_usuario, nombre, apellido, password, activo, id_rol, id_ubicacion FROM usuario WHERE email = '$email' LIMIT 1";
         $query = mysqli_query($conexion, $sql);
         $usuario = mysqli_fetch_assoc($query);
 
@@ -38,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['nombre'] = $usuario['nombre'];
             $_SESSION['apellido'] = $usuario['apellido'];
             $_SESSION['rol'] = $usuario['id_rol'];
+            $_SESSION['ubicacion'] = $usuario['id_ubicacion'] === null
+                ? null
+                : (int) $usuario['id_ubicacion'];
 
             $_SESSION['mensaje'] = "Inicio de sesión exitoso. ";
             $_SESSION['tipoError'] = "success";
