@@ -269,6 +269,17 @@ if ($columnasTablaSeleccionada) {
             </div>
         </section>
 
+        <section class="admin-section" id="backup-estructura" aria-labelledby="backup-estructura-title">
+            <div class="admin-section-heading">
+                <div>
+                    <p class="admin-eyebrow">RESPALDO DE BASE DE DATOS</p>
+                    <h2 id="backup-estructura-title">Backup de estructura</h2>
+                </div>
+                <p>Descargá un archivo SQL con la definición de las tablas, índices y relaciones. No incluye los datos.</p>
+            </div>
+            <a class="admin-button primary" href="descargar-backup">Descargar backup .sql</a>
+        </section>
+
         <section class="admin-section faq-admin" id="preguntas-frecuentes" aria-labelledby="faq-admin-title">
             <div class="admin-section-heading">
                 <div>
