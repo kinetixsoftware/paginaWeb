@@ -18,6 +18,7 @@ $sql = mysqli_query($conexion, $sql);
     <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/FAQ-pagina-cliente.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
+    <link rel="stylesheet" href="../css/menu-layout.css">
     <script src="../js/theme.js" defer></script>
     <script src="../js/i18n.js?v=4" defer></script>
     <title data-i18n="faq.title">Preguntas Frecuentes</title>
@@ -31,25 +32,29 @@ $sql = mysqli_query($conexion, $sql);
                 <img src="../imagenes/Logo1.png" alt="Logo Kinetix">
             </div>
 
-            <ul>
+            <div class="nav-links"><ul>
                 <li><a href="inicio" data-i18n="nav.inicio">Inicio</a></li>
-                <li><a href="tickets" data-i18n="nav.tickets">Tickets</a></li>
                 <li><a href="preguntas-frecuentes" class="active" data-i18n="nav.ayuda">Ayuda</a></li>
+                <li><a href="tickets" data-i18n="nav.tickets">Tickets</a></li>
                 <li><a href="inventario" data-i18n="nav.inventario">Inventario</a></li>
                 <li><a href="inicio" data-i18n="nav.mi_cuenta">Mi Cuenta</a></li>
-                <?php if (isset($_SESSION['rol'])) { ?>
-                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
-                <?php } ?>
-                <li>
-                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
-                        Dark</button>
-                </li>
-                <li>
-                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
-                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
-                    </button>
-                </li>
-            </ul>
+            </ul></div>
+            <div class="nav-actions">
+                <ul>
+                    <?php if (isset($_SESSION['rol'])) { ?>
+                    <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
+                    <?php } ?>
+                    <li>
+                        <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
+                            Dark</button>
+                    </li>
+                    <li>
+                        <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                            <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 

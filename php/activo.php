@@ -80,8 +80,7 @@ if($id_activo > 0) {
                     throw new RuntimeException('No se pudo iniciar la asignación del activo.');
                 }
 
-                $solicitudActualizada = mysqli_query(
-                    $conexion,
+                $solicitudActualizada = mysqli_query($conexion,
                     "UPDATE activo SET id_usuario = $idUsuario, id_ubicacion = $ubicacion, id_estado = 2
                      WHERE id_activo = $id_activo AND id_usuario IS NULL"
                 );
@@ -90,8 +89,7 @@ if($id_activo > 0) {
                 }
 
                 $accion = mysqli_real_escape_string($conexion, "Usuario: $idUsuario ahora es responsable de este activo");
-                $historialGuardado = mysqli_query(
-                    $conexion,
+                $historialGuardado = mysqli_query($conexion,
                     "INSERT INTO historial_activo (id_activo, accion) VALUES ($id_activo, '$accion')"
                 );
                 if (!$historialGuardado) {
@@ -113,9 +111,7 @@ if($id_activo > 0) {
                     }
                 }
                 error_log('Asset request failed: ' . $error->getMessage());
-                $_SESSION['mensaje'] = $error->getMessage() === 'El activo ya no está disponible para solicitar.'
-                    ? $error->getMessage()
-                    : 'No se pudo solicitar el activo. Inténtalo nuevamente.';
+                $_SESSION['mensaje'] = $error->getMessage() === 'El activo ya no está disponible para solicitar.' ? $error->getMessage() : 'No se pudo solicitar el activo. Inténtalo nuevamente.';
                 $_SESSION['tipoError'] = 'error';
                 header("Location: /Kinetix/php/activo/$id_activo");
                 exit;

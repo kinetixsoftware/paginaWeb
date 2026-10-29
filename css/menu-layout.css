@@ -1,0 +1,147 @@
+/* ============================================================
+   Layout del menú superior: logo izquierda | textos centro | acciones derecha
+   ============================================================ */
+.menu .menu-content {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: center !important;
+    gap: 24px !important;
+    padding-block: 10px !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+}
+
+.menu .menu-content > .menu-logo {
+    grid-column: 1 !important;
+    justify-self: start !important;
+    display: flex !important;
+    align-items: center !important;
+    flex: 0 0 auto !important;
+}
+
+.menu .menu-content > .menu-logo img {
+    display: block !important;
+    max-height: 48px !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.menu .menu-content > .nav-links {
+    grid-column: 2 !important;
+    justify-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: clamp(10px, 1.4vw, 22px) !important;
+    flex: 0 0 auto !important;
+}
+
+.menu .menu-content > .nav-links > ul {
+    display: flex !important;
+    align-items: center !important;
+    gap: clamp(10px, 1.4vw, 22px) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+}
+
+.menu .menu-content > .nav-links > ul > li {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.menu .menu-content > .nav-actions {
+    grid-column: 3 !important;
+    justify-self: end !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 0 0 auto !important;
+}
+
+.menu .menu-content > .nav-actions > ul,
+.menu .menu-content > .nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+.menu .menu-content > .nav-actions > ul > li,
+.menu .menu-content > .nav-actions > button,
+.menu .menu-content > .nav-actions > a {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.menu .menu-content .nav-actions .theme-toggle,
+.menu .menu-content .nav-actions .switch,
+.menu .menu-content .nav-actions .logout-button {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+@media (max-width: 1000px) {
+    .menu .menu-content {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto auto !important;
+        justify-content: center !important;
+        gap: 10px !important;
+        padding-block: 10px !important;
+    }
+
+    .menu .menu-content > .menu-logo {
+        grid-row: 1 !important;
+        grid-column: 1 !important;
+        justify-self: center !important;
+    }
+
+    .menu .menu-content > .nav-links {
+        grid-row: 2 !important;
+        grid-column: 1 !important;
+        justify-self: center !important;
+    }
+
+    .menu .menu-content > .nav-links > ul {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 8px 14px !important;
+    }
+
+    .menu .menu-content > .nav-actions {
+        grid-row: 3 !important;
+        grid-column: 1 !important;
+        justify-self: center !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+    }
+}
+
+@media (max-width: 560px) {
+    .menu .menu-content {
+        gap: 8px !important;
+        padding: 8px 14px 12px !important;
+    }
+
+    .menu .menu-content > .menu-logo img {
+        width: 130px !important;
+        height: auto !important;
+    }
+
+    .menu .menu-content > .nav-links > ul {
+        width: 100% !important;
+        justify-content: center !important;
+        gap: 8px 12px !important;
+    }
+
+    .menu .menu-content > .nav-actions > ul {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        gap: 10px !important;
+    }
+}

@@ -126,6 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['accion'] ?? '') === 'ingre
     <link rel="icon" type="image/png" href="../../../imagenes/favicon.png">
     <link rel="stylesheet" href="../../../css/panel-admin.css">
     <link rel="stylesheet" href="../../../css/kinetix-theme.css">
+    <link rel="stylesheet" href="../../../css/menu-layout.css">
 </head>
 <body class="admin-record-body">
     <header class="admin-record-header">

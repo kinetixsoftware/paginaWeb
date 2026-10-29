@@ -514,6 +514,7 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
 <link rel="stylesheet" href="../css/sistema-de-tickets-tecnico.css">
 <link rel="icon" type="image/png" href="../imagenes/favicon.png">
 <link rel="stylesheet" href="../css/kinetix-theme.css">
+<link rel="stylesheet" href="../css/menu-layout.css">
 <script src="../js/theme.js" defer></script>
 <script src="../js/i18n.js?v=4" defer></script>
 </head>
@@ -526,20 +527,26 @@ $estadosSolicitudResultado = mysqli_query($conexion, "SELECT id_estado, estado F
                 <img src="../imagenes/Logo1.png" alt="Logo Kinetix">
             </div>
 
-            <ul>
-                <li><a href="inicio" data-i18n="nav.inicio">Inicio</a></li>
-                <li><a href="preguntas-frecuentes" data-i18n="nav.ayuda">Ayuda</a></li>
-                <li><a href="tickets" class="active" aria-current="page" data-i18n="nav.tickets">Tickets</a></li>
-                <li><a href="inventario" data-i18n="nav.inventario">Inventario</a></li>
-                <li><a href="usuario/<?= $idUsuario ?>" data-i18n="nav.mi_cuenta">Mi Cuenta</a></li>
-                <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
-                <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
-                <li>
-                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
-                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
-                    </button>
-                </li>
-            </ul>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="inicio" data-i18n="nav.inicio">Inicio</a></li>
+                    <li><a href="preguntas-frecuentes" data-i18n="nav.ayuda">Ayuda</a></li>
+                    <li><a href="tickets" class="active" aria-current="page" data-i18n="nav.tickets">Tickets</a></li>
+                    <li><a href="inventario" data-i18n="nav.inventario">Inventario</a></li>
+                    <li><a href="usuario/<?= $idUsuario ?>" data-i18n="nav.mi_cuenta">Mi Cuenta</a></li>
+                </ul>
+            </div>
+            <div class="nav-actions">
+                <ul>
+                    <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
+                    <li> <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙</button></li>
+                    <li>
+                        <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                            <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
 

@@ -86,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
      <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/Login.css">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
+    <link rel="stylesheet" href="../css/menu-layout.css">
     <script src="../js/theme.js" defer></script>
     <script src="../js/i18n.js?v=4" defer></script>
 </head>
@@ -98,19 +99,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <img class="img--logo" src="../../imagenes/Logo1.png" width="50" height="50" alt="Logo Vrision">
             </div>
 
-            <ul>
+            <div class="nav-links"><ul>
                 <li><a href="inicio" data-i18n="common.back">Volver al inicio</a></li>
                 <li><a href="login" data-i18n="nav.iniciar_sesion">Iniciar Sesion</a></li>
-                <li>
-                    <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
-                        Dark</button>
-                </li>
-                <li>
-                    <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
-                        <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
-                    </button>
-                </li>
-            </ul>
+            </ul></div>
+            <div class="nav-actions">
+                <ul>
+                    <li>
+                        <button type="button" id="themeToggle" class="theme-toggle" aria-label="Cambiar tema">🌙
+                            Dark</button>
+                    </li>
+                    <li>
+                        <button type="button" id="langToggle" class="switch" data-i18n-toggle aria-label="Cambiar idioma">
+                            <span class="lang left">ES</span><span class="lang right">EN</span><span class="slider"></span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </nav>
     <!-- Mensaje error -->
