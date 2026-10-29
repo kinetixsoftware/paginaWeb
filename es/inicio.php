@@ -17,6 +17,7 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
     <link rel="icon" type="image/png" href="../imagenes/favicon.png">
     <link rel="stylesheet" href="../css/kinetix-theme.css">
     <link rel="stylesheet" href="../css/pagina-inicio.css">
+    <link rel="stylesheet" href="../css/menu-layout.css">
     <script src="../js/theme.js" defer></script>
     <script src="../js/i18n.js?v=4" defer></script>
 </head>
@@ -48,7 +49,7 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
                 </ul>
             </div>
 
-            <div class="nav-right">
+            <div class="nav-actions">
                 <ul>
                     <?php if ($rol === 1 || $rol === 2 || $rol === 3) { ?>
                     <li><a class="logout-button" href="../php/logout"><span class="logout-sign" aria-hidden="true"></span><span class="logout-text" data-i18n="nav.cerrar_sesion">Cerrar sesión</span></a></li>
@@ -103,6 +104,61 @@ $nombre = htmlspecialchars((string) ($_SESSION['nombre'] ?? ''), ENT_QUOTES, 'UT
                 <span class="mark-float mark-float-bottom"><b>02</b> <span data-i18n="inicio.float.advance">Hacé que avancen</span> <i></i></span>
             </div>
         </section>
+
+        <section class="home-showcase" aria-labelledby="home-showcase-title">
+            <div class="home-showcase-heading">
+                <p class="home-eyebrow">VISTA DE DEMOSTRACIÓN</p>
+                <h2 id="home-showcase-title">Kinetix en acción</h2>
+                <p>Capturas reales del sistema, con datos ficticios de usuarios, tickets, mensajes, activos y solicitudes.</p>
+            </div>
+            <div class="showcase-slideshow" id="showcaseSlideshow">
+                <?php
+                $slides = [
+                    ['img' => 'Screenshot_Inventario.png', 'title' => 'Inventario', 'desc' => 'Consultá los activos registrados, su categoría, marca y estado.'],
+                    ['img' => 'Screenshot_Tickets.png', 'title' => 'Tickets', 'desc' => 'Seguimiento de consultas con historial y chat.'],
+                    ['img' => 'Screenshot_Perfil.png', 'title' => 'Perfil', 'desc' => 'Datos y configuración de tu cuenta.'],
+                    ['img' => 'Screenshot_Ayuda.png', 'title' => 'Ayuda', 'desc' => 'Centro de preguntas frecuentes.'],
+                ];
+                foreach ($slides as $i => $s) { ?>
+                <figure class="showcase-slide <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>">
+                    <img src="../imagenes/<?= $s['img'] ?>" alt="<?= $s['title'] ?>" loading="lazy">
+                    <figcaption>
+                        <strong><?= $s['title'] ?></strong>
+                        <span><?= $s['desc'] ?></span>
+                    </figcaption>
+                </figure>
+                <?php } ?>
+                <button type="button" class="showcase-prev" aria-label="Anterior">‹</button>
+                <button type="button" class="showcase-next" aria-label="Siguiente">›</button>
+                <div class="showcase-dots">
+                    <?php foreach ($slides as $i => $s) { ?>
+                    <button type="button" class="showcase-dot <?= $i === 0 ? 'active' : '' ?>" data-index="<?= $i ?>" aria-label="Ir a <?= $s['title'] ?>"></button>
+                    <?php } ?>
+                </div>
+            </div>
+            <div class="showcase-modal" id="showcaseModal" hidden>
+                <button type="button" class="showcase-modal-close" aria-label="Cerrar">×</button>
+                <img src="" alt="" id="showcaseModalImg">
+            </div>
+            <p class="home-showcase-caption">Las cuentas, equipos, mensajes y solicitudes visibles son ficticios y se crearon para esta demostración.</p>
+        </section>
+        <script>
+        (function(){
+            const slides = document.querySelectorAll('#showcaseSlideshow .showcase-slide');
+            const dots = document.querySelectorAll('#showcaseSlideshow .showcase-dot');
+            let i = 0;
+            function show(n){ i=(n+slides.length)%slides.length; slides.forEach((s,k)=>s.classList.toggle('active',k===i)); dots.forEach((d,k)=>d.classList.toggle('active',k===i)); }
+            document.querySelector('#showcaseSlideshow .showcase-prev').addEventListener('click',()=>show(i-1));
+            document.querySelector('#showcaseSlideshow .showcase-next').addEventListener('click',()=>show(i+1));
+            dots.forEach(d=>d.addEventListener('click',()=>show(+d.dataset.index)));
+            setInterval(()=>show(i+1),5000);
+            const modal=document.getElementById('showcaseModal');
+            const modalImg=document.getElementById('showcaseModalImg');
+            slides.forEach(s=>s.querySelector('img').addEventListener('click',()=>{modalImg.src=s.querySelector('img').src;modalImg.alt=s.querySelector('img').alt;modal.hidden=false;}));
+            modal.querySelector('.showcase-modal-close').addEventListener('click',()=>modal.hidden=true);
+            modal.addEventListener('click',e=>{if(e.target===modal)modal.hidden=true;});
+        })();
+        </script>
 
         <section class="home-overview" aria-labelledby="home-overview-title">
             <div class="home-overview-intro">

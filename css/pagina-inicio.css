@@ -583,6 +583,55 @@ body::before {
   margin-top: 86px;
 }
 
+.home-showcase {
+  margin-top: 78px;
+}
+
+.home-showcase-heading {
+  max-width: 760px;
+}
+
+.home-showcase-heading h2 {
+  margin-top: 12px;
+  color: var(--ink);
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.home-showcase-heading > p:last-child {
+  margin-top: 12px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.home-showcase-preview {
+  display: block;
+  margin-top: 26px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.home-showcase-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.home-showcase-preview:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.home-showcase-caption {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
 .home-overview-intro {
   max-width: 790px;
 }
@@ -889,6 +938,10 @@ body::before {
 
   .home-overview {
     margin-top: 55px;
+  }
+
+  .home-showcase {
+    margin-top: 58px;
   }
 
   .home-overview-grid {
@@ -1437,3 +1490,19 @@ body {
     padding: 0;
     list-style: none;
 }
+.showcase-slideshow { position: relative; max-width: 900px; margin: 0 auto; overflow: hidden; border-radius: 14px; }
+.showcase-slide { display: none; margin: 0; }
+.showcase-slide.active { display: block; }
+.showcase-slide img { width: 100%; display: block; cursor: zoom-in; }
+.showcase-slide figcaption { padding: 10px 14px; background: rgba(0,0,0,.6); color: #fff; display: flex; gap: 10px; align-items: baseline; }
+.showcase-slide figcaption strong { font-weight: 600; }
+.showcase-prev, .showcase-next { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,.5); color: #fff; border: none; font-size: 28px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; }
+.showcase-prev { left: 10px; } .showcase-next { right: 10px; }
+.showcase-dots { position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
+.showcase-dot { width: 10px; height: 10px; border-radius: 50%; border: none; background: rgba(255,255,255,.5); cursor: pointer; }
+.showcase-dot.active { background: #fff; }
+.showcase-modal { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.showcase-modal[hidden] { display: none; }
+.showcase-modal img { max-width: 90vw; max-height: 90vh; }
+.showcase-modal-close { position: absolute; top: 20px; right: 30px; background: none; border: none; color: #fff; font-size: 36px; cursor: pointer; }
+
